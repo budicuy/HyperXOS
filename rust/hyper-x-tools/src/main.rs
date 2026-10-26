@@ -22,7 +22,7 @@ fn main() -> iced::Result {
         min_size: Some(Size::new(920.0, 620.0)),
         transparent: true,
         blur: true,
-        decorations: true,
+        decorations: false,
         ..Default::default()
     };
 
@@ -83,6 +83,12 @@ pub enum Message {
     SelectPage(Page),
     RefreshMetrics,
     ClearLog,
+
+    // Window Management
+    WindowDrag,
+    WindowMinimize,
+    WindowMaximize,
+    WindowClose,
 
     // Kernel
     InstallKernel(String),
@@ -203,6 +209,18 @@ impl App {
             Message::ClearLog => {
                 self.terminal_log = "Terminal dibersihkan.\n".to_string();
                 Task::none()
+            }
+            Message::WindowDrag => {
+                window::latest().and_then(window::drag)
+            }
+            Message::WindowMinimize => {
+                window::latest().and_then(|id| window::minimize(id, true))
+            }
+            Message::WindowMaximize => {
+                window::latest().and_then(window::toggle_maximize)
+            }
+            Message::WindowClose => {
+                window::latest().and_then(window::close)
             }
 
             // --- KERNEL MANAGER ---
@@ -451,8 +469,15 @@ impl App {
     }
 
     pub fn view(&self) -> Element<'_, Message> {
-        let side = sidebar(self.current_page, Message::SelectPage);
-        let head = header(self.current_page, Message::RefreshMetrics);
+        let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
+        let head = header(
+            self.current_page,
+            Message::RefreshMetrics,
+            Message::WindowDrag,
+            Message::WindowMinimize,
+            Message::WindowMaximize,
+            Message::WindowClose,
+        );
 
         let main_content: Element<'_, Message> = match self.current_page {
             Page::Dashboard => ui::pages::dashboard::view(

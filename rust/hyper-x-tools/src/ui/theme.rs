@@ -227,6 +227,48 @@ pub fn glass_action_button(_theme: &iced::Theme, status: button::Status) -> butt
     }
 }
 
+pub fn window_control_btn(color: Color, is_close: bool) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
+    move |_theme, status| {
+        let (bg, border, icon_color) = match status {
+            button::Status::Hovered => {
+                if is_close {
+                    (
+                        Some(Background::Color(Color::from_rgba(0.95, 0.35, 0.45, 0.40))),
+                        Color::from_rgba(0.95, 0.55, 0.66, 0.65),
+                        Color::WHITE,
+                    )
+                } else {
+                    (
+                        Some(Background::Color(Color { a: 0.35, ..color })),
+                        Color { a: 0.65, ..color },
+                        Color::WHITE,
+                    )
+                }
+            }
+            button::Status::Pressed => (
+                Some(Background::Color(Color { a: 0.50, ..color })),
+                Color { a: 0.80, ..color },
+                Color::WHITE,
+            ),
+            _ => (
+                Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.06))),
+                Color::from_rgba(1.0, 1.0, 1.0, 0.12),
+                TEXT_SUB,
+            ),
+        };
+
+        button::Style {
+            background: bg,
+            text_color: icon_color,
+            border: Border::default()
+                .rounded(Radius::from(6.0))
+                .width(1.0)
+                .color(border),
+            ..button::Style::default()
+        }
+    }
+}
+
 // --- Progress Bar Style (Gradient Glow Bar) ---
 pub fn glass_progress_bar_style(accent: Color) -> impl Fn(&iced::Theme) -> progress_bar::Style {
     move |_theme| {

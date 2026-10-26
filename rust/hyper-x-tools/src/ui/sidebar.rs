@@ -1,4 +1,4 @@
-use iced::widget::{button, column, container, image, row, text};
+use iced::widget::{button, column, container, image, mouse_area, row, text};
 use iced::{Alignment, Element, Length};
 
 use crate::ui::icons::{self, svg_icon};
@@ -17,6 +17,7 @@ pub enum Page {
 pub fn sidebar<'a, Message: Clone + 'a>(
     current_page: Page,
     on_select: impl Fn(Page) -> Message + 'a,
+    on_drag: Message,
 ) -> Element<'a, Message> {
     // 1. Brand Logo Header
     let logo_data: &'static [u8] = include_bytes!("../../assets/logo.png");
@@ -24,25 +25,28 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         .width(36)
         .height(36);
 
-    let brand = row![
-        logo_img,
-        column![
-            text("HYPERX TOOLS")
-                .size(13)
-                .style(|_| text::Style {
-                    color: Some(TEXT_MAIN),
-                }),
-            text("Pusat Kendali Sistem")
-                .size(10)
-                .style(|_| text::Style {
-                    color: Some(ACCENT_CYAN),
-                }),
+    let brand = mouse_area(
+        row![
+            logo_img,
+            column![
+                text("HYPERX TOOLS")
+                    .size(13)
+                    .style(|_| text::Style {
+                        color: Some(TEXT_MAIN),
+                    }),
+                text("Pusat Kendali Sistem")
+                    .size(10)
+                    .style(|_| text::Style {
+                        color: Some(ACCENT_CYAN),
+                    }),
+            ]
+            .spacing(1)
+            .align_x(Alignment::Start),
         ]
-        .spacing(1)
-        .align_x(Alignment::Start),
-    ]
-    .spacing(10)
-    .align_y(Alignment::Center);
+        .spacing(10)
+        .align_y(Alignment::Center),
+    )
+    .on_press(on_drag);
 
     let separator = container("")
         .width(Length::Fill)
