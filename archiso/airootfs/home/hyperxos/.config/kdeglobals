@@ -1,6 +1,7 @@
 [General]
 ColorScheme=HyperXOSDark
 Name=HyperXOS Dark
+BrowserApplication=firefox.desktop
 
 [KDE]
 LookAndFeelPackage=org.kde.breezedark.desktop

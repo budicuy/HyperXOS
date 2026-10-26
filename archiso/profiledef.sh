@@ -28,6 +28,7 @@ file_permissions=(
   ["/home/hyperxos"]="1000:1000:750"
   ["/home/hyperxos/.config"]="1000:1000:750"
   ["/home/hyperxos/.config/kdeglobals"]="1000:1000:644"
+  ["/home/hyperxos/.config/plasma-org.kde.plasma.desktop-appletsrc"]="1000:1000:644"
   ["/home/hyperxos/Desktop/calamares.desktop"]="1000:1000:755"
   ["/home/hyperxos/Desktop/buka-log.desktop"]="1000:1000:755"
   ["/home/hyperxos/Desktop/hyperxtools.desktop"]="1000:1000:755"

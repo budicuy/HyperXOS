@@ -1,7 +1,7 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
-pkgrel=2
+pkgrel=4
 pkgdesc="Default desktop and user skeleton settings for HyperXOS"
 arch=('any')
 url="https://github.com/hyperxos"

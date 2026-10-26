@@ -59,6 +59,7 @@ xorg-xwayland
 dolphin
 konsole
 kdialog
+firefox
 
 # Open-Source Graphics Drivers (64-bit Only)
 mesa
