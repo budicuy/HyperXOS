@@ -57,26 +57,26 @@ pub const TEXT_MUTED: Color = Color::from_rgb(0.65, 0.70, 0.82);
 // --- Window & Container Glass Styles (Frosted Gradient Translucency) ---
 pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {
     let gradient = Linear::new(Radians(0.785)) // 45 degrees
-        .add_stop(0.0, Color::from_rgba(0.05, 0.06, 0.10, 0.92))
-        .add_stop(0.5, Color::from_rgba(0.03, 0.04, 0.08, 0.90))
-        .add_stop(1.0, Color::from_rgba(0.05, 0.04, 0.09, 0.92));
+        .add_stop(0.0, Color::from_rgba(0.06, 0.08, 0.14, 0.76))
+        .add_stop(0.5, Color::from_rgba(0.04, 0.05, 0.10, 0.72))
+        .add_stop(1.0, Color::from_rgba(0.07, 0.05, 0.13, 0.76));
 
     container::Style {
         background: Some(Background::from(gradient)),
         border: Border::default()
             .rounded(Radius::from(16.0))
             .width(1.2)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.18)),
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.16)),
         ..container::Style::default()
     }
 }
 
 pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
-    // Gradasi dari Merah Crimson (#dc2626) ke Oren Fire (#ea580c)
+    // Gradasi elegan dari bawah (warm burnt orange/crimson) ke atas (dark obsidian)
     let gradient = Linear::new(Radians(1.571)) // 90 degrees (top to bottom)
-        .add_stop(0.0, Color::from_rgba(0.86, 0.14, 0.22, 0.96)) // Merah crimson
-        .add_stop(0.55, Color::from_rgba(0.92, 0.28, 0.12, 0.95)) // Merah-oren
-        .add_stop(1.0, Color::from_rgba(0.95, 0.44, 0.08, 0.95)); // Oren cerah
+        .add_stop(0.0, Color::from_rgba(0.07, 0.08, 0.12, 0.90)) // Atas: dark obsidian
+        .add_stop(0.45, Color::from_rgba(0.36, 0.10, 0.12, 0.85)) // Tengah: deep wine crimson
+        .add_stop(1.0, Color::from_rgba(0.68, 0.22, 0.08, 0.88)); // Bawah: warm burnt orange-crimson
 
     container::Style {
         background: Some(Background::from(gradient)),

@@ -27,39 +27,52 @@ pub fn view<'a, Message: Clone + 'a>(
             ..container::Style::default()
         });
 
-    let spec_col = |label: &'static str, val: String, accent: Option<Color>| -> Element<'a, Message> {
-        column![
-            text(label).size(9).font(FONT_DISPLAY_BOLD).style(|_| text::Style {
-                color: Some(Color::from_rgb(0.70, 0.75, 0.85)),
-            }),
-            text(val).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
-                color: Some(accent.unwrap_or(Color::WHITE)),
-            }),
+    let spec_row = |label: &'static str, val: String, accent: Color| -> Element<'a, Message> {
+        row![
+            text(label)
+                .size(10)
+                .font(FONT_DISPLAY_BOLD)
+                .width(115)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.68, 0.72, 0.82)),
+                }),
+            text(":")
+                .size(10)
+                .font(FONT_DISPLAY_BOLD)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.45, 0.50, 0.60)),
+                }),
+            text(val)
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(move |_| text::Style {
+                    color: Some(accent),
+                }),
         ]
-        .spacing(2)
+        .spacing(6)
+        .align_y(Alignment::Center)
         .into()
     };
 
-    let ram_total_gb = metrics.ram_total_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
-    let disk_total_gb = metrics.disk_total_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
-
-    let banner_specs_row1 = row![
-        spec_col("SISTEM OPERASI", format!("{} (Arch)", metrics.os_name), Some(ACCENT_CYAN)),
-        container("").width(Length::Fill),
-        spec_col("KERNEL AKTIF", metrics.kernel_version.clone(), Some(ACCENT_GREEN)),
-        container("").width(Length::Fill),
-        spec_col("PERANGKAT KERAS", format!("{} • {}", metrics.hardware_board, metrics.host_name), None),
+    let col1 = column![
+        spec_row("SISTEM OPERASI", format!("{} (Arch)", metrics.os_name), ACCENT_CYAN),
+        spec_row("PROSESOR (CPU)", format!("{} ({} Cores)", metrics.cpu_model, metrics.cpu_cores), ACCENT_AMBER),
+        spec_row("PERANGKAT HOST", format!("{} • {}", metrics.hardware_board, metrics.host_name), Color::WHITE),
     ]
-    .align_y(Alignment::Center);
+    .spacing(6)
+    .width(Length::FillPortion(1));
 
-    let banner_specs_row2 = row![
-        spec_col("PROSESOR (CPU)", format!("{} ({} Cores)", metrics.cpu_model, metrics.cpu_cores), Some(ACCENT_AMBER)),
-        container("").width(Length::Fill),
-        spec_col("AKSELERASI GRAFIS", metrics.gpu_model.clone(), Some(ACCENT_PURPLE)),
-        container("").width(Length::Fill),
-        spec_col("DESKTOP & SESI", format!("{} ({}) • Uptime {}", metrics.desktop_env, metrics.display_session, metrics.uptime_string), None),
+    let col2 = column![
+        spec_row("KERNEL AKTIF", metrics.kernel_version.clone(), ACCENT_GREEN),
+        spec_row("AKSELERASI GPU", metrics.gpu_model.clone(), ACCENT_PURPLE),
+        spec_row("DESKTOP & SESI", format!("{} ({}) • Uptime {}", metrics.desktop_env, metrics.display_session, metrics.uptime_string), Color::WHITE),
     ]
-    .align_y(Alignment::Center);
+    .spacing(6)
+    .width(Length::FillPortion(1));
+
+    let banner_specs = row![col1, col2]
+        .spacing(20)
+        .width(Length::Fill);
 
     let banner_right = column![
         row![
@@ -78,8 +91,7 @@ pub fn view<'a, Message: Clone + 'a>(
             background: Some(iced::Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.12))),
             ..container::Style::default()
         }),
-        banner_specs_row1,
-        banner_specs_row2,
+        banner_specs,
     ]
     .spacing(8)
     .width(Length::Fill);
@@ -118,6 +130,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
     // RAM
     let ram_used_gb = metrics.ram_used_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
+    let ram_total_gb = metrics.ram_total_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
     let ram_sub = format!("Terpakai: {:.1} GB / {:.1} GB", ram_used_gb, ram_total_gb);
     let swap_opt = if metrics.swap_total_bytes > 0 {
         let swap_used_gb = metrics.swap_used_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
@@ -138,6 +151,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
     // Disk
     let disk_used_gb = metrics.disk_used_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
+    let disk_total_gb = metrics.disk_total_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
     let disk_sub = format!("Terpakai: {:.1} GB / {:.1} GB", disk_used_gb, disk_total_gb);
     let fs_str = format!("FS: {}", metrics.disk_fs_type);
     let disk_val = format!("{:.1}%", metrics.disk_usage_percent);

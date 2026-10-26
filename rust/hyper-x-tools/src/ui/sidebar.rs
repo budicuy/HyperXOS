@@ -1,5 +1,6 @@
+use iced::border::Radius;
 use iced::widget::{button, column, container, mouse_area, row, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Border, Element, Length};
 
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
@@ -19,31 +20,43 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     on_select: impl Fn(Page) -> Message + 'a,
     on_drag: Message,
 ) -> Element<'a, Message> {
-    // 1. Brand Logo Header (Using persistent cached GPU texture handle to avoid flickering)
-    let logo_img = icons::logo_image(36.0);
+    // 1. Brand Logo Header with Solid Black Background
+    let logo_img = icons::logo_image(34.0);
+
+    let brand_inner = row![
+        logo_img,
+        column![
+            text("HYPERX TOOLS")
+                .size(13)
+                .font(FONT_DISPLAY_BOLD)
+                .style(|_| text::Style {
+                    color: Some(iced::Color::WHITE),
+                }),
+            text("Pusat Kendali Sistem")
+                .size(10)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.95, 0.75, 0.60)),
+                }),
+        ]
+        .spacing(1)
+        .align_x(Alignment::Start),
+    ]
+    .spacing(10)
+    .align_y(Alignment::Center);
 
     let brand = mouse_area(
-        row![
-            logo_img,
-            column![
-                text("HYPERX TOOLS")
-                    .size(13)
-                    .font(FONT_DISPLAY_BOLD)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::WHITE),
-                    }),
-                text("Pusat Kendali Sistem")
-                    .size(10)
-                    .font(FONT_BODY_SEMIBOLD)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(1.0, 0.92, 0.82)),
-                    }),
-            ]
-            .spacing(1)
-            .align_x(Alignment::Start),
-        ]
-        .spacing(10)
-        .align_y(Alignment::Center),
+        container(brand_inner)
+            .padding([10, 12])
+            .width(Length::Fill)
+            .style(|_| container::Style {
+                background: Some(iced::Background::Color(iced::Color::from_rgb(0.05, 0.06, 0.09))),
+                border: Border::default()
+                    .rounded(Radius::from(10.0))
+                    .width(1.0)
+                    .color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.12)),
+                ..container::Style::default()
+            })
     )
     .on_press(on_drag);
 
@@ -116,23 +129,36 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     // Sidebar Footer
     let footer = container(
         column![
-            text("HyperXOS Linux 2026.10")
-                .size(10)
-                .font(FONT_DISPLAY_BOLD)
-                .style(|_| text::Style {
-                    color: Some(iced::Color::WHITE),
-                }),
+            row![
+                container("")
+                    .width(6)
+                    .height(6)
+                    .style(|_| container::Style {
+                        background: Some(iced::Background::Color(ACCENT_GREEN)),
+                        border: Border::default().rounded(Radius::from(3.0)),
+                        ..container::Style::default()
+                    }),
+                text("HyperXOS Linux 2026.10")
+                    .size(11)
+                    .font(FONT_DISPLAY_BOLD)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::WHITE),
+                    }),
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
             text("Rust + Iced Glass v2.2")
-                .size(9)
-                .font(FONT_BODY_SEMIBOLD)
+                .size(10)
+                .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(1.0, 0.90, 0.80)),
+                    color: Some(iced::Color::from_rgb(0.78, 0.82, 0.92)),
                 }),
         ]
-        .spacing(2)
+        .spacing(4)
         .align_x(Alignment::Center),
     )
-    .padding(10)
+    .center_x(Length::Fill)
+    .padding([10, 12])
     .width(Length::Fill)
     .style(glass_card_style);
 
