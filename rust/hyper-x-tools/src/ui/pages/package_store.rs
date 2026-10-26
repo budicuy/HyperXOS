@@ -116,8 +116,11 @@ pub fn view<'a, Message: Clone + 'a>(
             .on_press(on_remove(pkg_name))
         };
 
+        let icon_view = icons::app_icon(&p.package_name, 38.0);
+
         let card = container(
             row![
+                icon_view,
                 column![
                     row![
                         text(&p.display_name).size(13).font(FONT_DISPLAY_BOLD).style(|_| text::Style {
@@ -135,7 +138,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 container("").width(Length::Fill),
                 action_btn,
             ]
-            .spacing(12)
+            .spacing(14)
             .align_y(Alignment::Center)
             .padding(12),
         )

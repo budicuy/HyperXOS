@@ -3,7 +3,7 @@
 use std::sync::LazyLock;
 use iced::widget::image;
 use iced::widget::svg::{Handle, Svg};
-use iced::{Color, Length};
+use iced::{Color, Element, Length};
 
 pub static LOGO_HANDLE: LazyLock<image::Handle> = LazyLock::new(|| {
     image::Handle::from_bytes(include_bytes!("../../assets/logo.png").as_slice())
@@ -13,6 +13,63 @@ pub fn logo_image(size: f32) -> image::Image<image::Handle> {
     image(LOGO_HANDLE.clone())
         .width(Length::Fixed(size))
         .height(Length::Fixed(size))
+}
+
+// Official Application Icons (64x64 RGBA)
+static ICON_BRAVE: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/brave-bin.png").as_slice()));
+static ICON_BTOP: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/btop.png").as_slice()));
+static ICON_CHROMIUM: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/chromium.png").as_slice()));
+static ICON_CODE: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/code.png").as_slice()));
+static ICON_DISCORD: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/discord.png").as_slice()));
+static ICON_DOCKER: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/docker.png").as_slice()));
+static ICON_FASTFETCH: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/fastfetch.png").as_slice()));
+static ICON_FIREFOX: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/firefox.png").as_slice()));
+static ICON_GIMP: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/gimp.png").as_slice()));
+static ICON_GIT: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/git.png").as_slice()));
+static ICON_HEROIC: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/heroic-games-launcher-bin.png").as_slice()));
+static ICON_HTOP: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/htop.png").as_slice()));
+static ICON_LUTRIS: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/lutris.png").as_slice()));
+static ICON_MPV: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/mpv.png").as_slice()));
+static ICON_NEOVIM: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/neovim.png").as_slice()));
+static ICON_OBS: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/obs-studio.png").as_slice()));
+static ICON_STEAM: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/steam.png").as_slice()));
+static ICON_TIMESHIFT: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/timeshift.png").as_slice()));
+static ICON_VLC: LazyLock<image::Handle> = LazyLock::new(|| image::Handle::from_bytes(include_bytes!("../../assets/apps/vlc.png").as_slice()));
+
+pub fn app_icon_handle(package_name: &str) -> Option<image::Handle> {
+    match package_name {
+        "brave-bin" => Some(ICON_BRAVE.clone()),
+        "btop" => Some(ICON_BTOP.clone()),
+        "chromium" => Some(ICON_CHROMIUM.clone()),
+        "code" => Some(ICON_CODE.clone()),
+        "discord" => Some(ICON_DISCORD.clone()),
+        "docker" => Some(ICON_DOCKER.clone()),
+        "fastfetch" => Some(ICON_FASTFETCH.clone()),
+        "firefox" => Some(ICON_FIREFOX.clone()),
+        "gimp" => Some(ICON_GIMP.clone()),
+        "git" => Some(ICON_GIT.clone()),
+        "heroic-games-launcher-bin" => Some(ICON_HEROIC.clone()),
+        "htop" => Some(ICON_HTOP.clone()),
+        "lutris" => Some(ICON_LUTRIS.clone()),
+        "mpv" => Some(ICON_MPV.clone()),
+        "neovim" => Some(ICON_NEOVIM.clone()),
+        "obs-studio" => Some(ICON_OBS.clone()),
+        "steam" => Some(ICON_STEAM.clone()),
+        "timeshift" => Some(ICON_TIMESHIFT.clone()),
+        "vlc" => Some(ICON_VLC.clone()),
+        _ => None,
+    }
+}
+
+pub fn app_icon<'a, Message: 'a>(package_name: &str, size: f32) -> Element<'a, Message> {
+    if let Some(handle) = app_icon_handle(package_name) {
+        image(handle)
+            .width(Length::Fixed(size))
+            .height(Length::Fixed(size))
+            .into()
+    } else {
+        svg_icon(STORE, size, Color::from_rgb(0.7, 0.7, 0.7)).into()
+    }
 }
 
 pub const DASHBOARD: &str = r#"<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>"#;
