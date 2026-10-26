@@ -2,11 +2,11 @@
 Version=1.0
 Type=Application
 Name=HyperXTools
-GenericName=Package & Application Manager
-Comment=Pasang atau hapus web browser, office, development tools, gaming, dan aplikasi pendukung di HyperXOS
+GenericName=Control Center & System Dashboard
+Comment=Pusat kendali serbaguna HyperXOS: Monitoring hardware, Gaming tweaks, CachyOS kernel manager, Snapshot backup, dan App store
 Exec=/usr/bin/hyper-x-tools
 Icon=hyper-x-tools
 Terminal=false
-Categories=System;Utility;PackageManager;
-Keywords=package;install;app;tools;browser;office;gaming;uninstall;manager;
+Categories=System;Settings;Utility;PackageManager;HardwareSettings;
+Keywords=system;dashboard;monitor;cpu;gpu;ram;kernel;gaming;tweaks;snapshot;backup;package;manager;
 StartupNotify=true

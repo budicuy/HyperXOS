@@ -350,6 +350,21 @@ QList<PackageItem> PackageManager::getPackagesByCategory(const QString &category
     return result;
 }
 
+QList<PackageItem> PackageManager::searchPackages(const QString &query, const QString &category) const
+{
+    QString q = query.trimmed().toLower();
+    QList<PackageItem> result;
+    for (const PackageItem &item : m_packageDefinitions) {
+        if (!category.isEmpty() && item.category != category) {
+            continue;
+        }
+        if (q.isEmpty() || item.name.toLower().contains(q) || item.description.toLower().contains(q) || item.id.toLower().contains(q)) {
+            result.append(item);
+        }
+    }
+    return result;
+}
+
 QStringList PackageManager::getCategories() const
 {
     return {"browser", "office", "dev", "gaming", "monitoring", "printing", "multimedia", "social"};

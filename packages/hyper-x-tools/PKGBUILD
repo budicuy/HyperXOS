@@ -1,8 +1,8 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyper-x-tools
-pkgver=1.0.0
-pkgrel=2
-pkgdesc="Modular Package Manager and Application Installer for HyperXOS (Qt 6 Native)"
+pkgver=2.0.0
+pkgrel=1
+pkgdesc="All-in-One Dashboard, Gaming Tweaker, CachyOS Kernel Manager & Snapshot Center for HyperXOS (Qt 6 Native)"
 arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')

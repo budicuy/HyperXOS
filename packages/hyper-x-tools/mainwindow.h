@@ -3,16 +3,26 @@
 
 #include <QMainWindow>
 #include <QListWidget>
-#include <QScrollArea>
+#include <QStackedWidget>
+#include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QPlainTextEdit>
-#include <QProgressBar>
-#include <QMap>
-#include "packagemanager.h"
+#include <QFrame>
+
+// Core Engines
+#include "core/systemmonitor.h"
+#include "core/kernelmanager.h"
+#include "core/systemtweaker.h"
+#include "core/snapshotmanager.h"
+#include "core/packagemanager.h"
+
+// Pages
+#include "pages/dashboardpage.h"
+#include "pages/gametweakspage.h"
+#include "pages/kernelmanagerpage.h"
+#include "pages/snapshotpage.h"
+#include "pages/maintenancepage.h"
+#include "pages/packagestorepage.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -21,51 +31,41 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void onCategorySelected(int index);
-    void onRefreshClicked();
-    void onInstallSelectedClicked();
-    void onUninstallSelectedClicked();
-    void onToggleLogClicked();
-    void onPackageCheckboxChanged(const QString &packageId, bool checked);
-    void onSingleInstallClicked(const QString &packageId);
-    void onSingleUninstallClicked(const QString &packageId);
+public slots:
+    void navigateToPage(int index);
 
-    void onLogReceived(const QString &text);
-    void onProcessStarted(const QString &title);
-    void onProcessFinished(bool success, const QString &message);
-    void onCacheRefreshed();
+private slots:
+    void onSidebarItemClicked(QListWidgetItem *item);
+    void onMetricsUpdated(const SystemMetrics &metrics);
 
 private:
     void setupUi();
     void applyStyleSheet();
-    void populateCategories();
-    void renderPackageList(const QString &category);
-    void updateStatsLabel();
+    void setupSidebar();
 
+    // Core
+    SystemMonitor *m_monitor;
+    KernelManager *m_kernelManager;
+    SystemTweaker *m_tweaker;
+    SnapshotManager *m_snapshotManager;
     PackageManager *m_packageManager;
-    QString m_currentCategory;
 
-    // UI Widgets
+    // UI Structure
+    QListWidget *m_sidebar;
+    QStackedWidget *m_stackedWidget;
+
+    // Header Widgets
     QLabel *m_logoLabel;
     QLabel *m_titleLabel;
-    QLabel *m_statsLabel;
-    QListWidget *m_categoryList;
-    QWidget *m_packageListContainer;
-    QVBoxLayout *m_packageListLayout;
-    QScrollArea *m_scrollArea;
+    QLabel *m_quickStatsLabel;
 
-    QPushButton *m_installButton;
-    QPushButton *m_uninstallButton;
-    QPushButton *m_refreshButton;
-    QPushButton *m_toggleLogButton;
-    QProgressBar *m_progressBar;
-    QPlainTextEdit *m_logConsole;
-
-    // State tracking
-    QMap<QString, QCheckBox*> m_checkboxMap;
-    QSet<QString> m_selectedToInstall;
-    QSet<QString> m_selectedToUninstall;
+    // Pages
+    DashboardPage *m_dashboardPage;
+    GamingTweaksPage *m_gamingPage;
+    KernelManagerPage *m_kernelPage;
+    SnapshotPage *m_snapshotPage;
+    MaintenancePage *m_maintenancePage;
+    PackageStorePage *m_storePage;
 };
 
 #endif // MAINWINDOW_H

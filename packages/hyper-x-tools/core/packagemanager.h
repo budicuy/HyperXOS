@@ -29,6 +29,7 @@ public:
 
     QList<PackageItem> getAllPackages() const;
     QList<PackageItem> getPackagesByCategory(const QString &category) const;
+    QList<PackageItem> searchPackages(const QString &query, const QString &category = QString()) const;
     QStringList getCategories() const;
     QString getCategoryDisplayName(const QString &category) const;
 
