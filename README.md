@@ -97,6 +97,16 @@ make run
 
 ---
 
+## 🙏 Ucapan Terima Kasih & Kredit (Acknowledgments)
+
+HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
+- **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
+- **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`) dan basis framework installer.
+- **[Calamares Installer](https://calamares.io):** Framework penginstal grafis mandiri yang andal dan fleksibel.
+- **[KDE Community](https://kde.org):** Lingkungan desktop KDE Plasma 6 Wayland yang elegan, modern, dan kaya fitur.
+
+---
+
 ## 📄 Lisensi & Kontribusi
 
 HyperXOS didistribusikan di bawah lisensi GPL-3.0. Seluruh komponen upstream Arch Linux dan KDE tunduk pada lisensi masing-masing.
