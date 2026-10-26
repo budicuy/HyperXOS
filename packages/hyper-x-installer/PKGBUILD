@@ -1,0 +1,23 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=hyper-x-installer
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Pure Rust Native System Installer for HyperXOS Linux (Iced 0.14 + WGPU Glassmorphism)"
+arch=('x86_64')
+url="https://github.com/budicuy/HyperXOS"
+license=('GPL-3.0-or-later')
+depends=('fontconfig' 'freetype2' 'libxkbcommon' 'polkit' 'gptfdisk' 'dosfstools' 'btrfs-progs' 'arch-install-scripts' 'limine' 'efibootmgr')
+makedepends=('cargo' 'rust')
+provides=('hyperxos-installer')
+
+build() {
+    cd "${startdir}/../../rust/hyper-x-installer"
+    cargo build --release --locked
+}
+
+package() {
+    install -Dm755 "${startdir}/../../rust/hyper-x-installer/target/release/hyper-x-installer" "${pkgdir}/usr/bin/hyper-x-installer"
+    install -Dm644 "${startdir}/hyper-x-installer.desktop" "${pkgdir}/usr/share/applications/hyper-x-installer.desktop"
+    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-installer.png"
+    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/pixmaps/hyper-x-installer.png"
+}

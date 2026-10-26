@@ -23,17 +23,4 @@ else
     log "Mode Offline terdeteksi: Memanfaatkan repositori lokal ISO."
 fi
 
-log "Memverifikasi ketersediaan paket katalog dan menghasilkan netinstall.yaml dinamis..."
-TEMPLATE="/etc/calamares/modules/netinstall.yaml.template"
-OUTPUT="/etc/calamares/modules/netinstall.yaml"
-
-if [ ! -f "${TEMPLATE}" ]; then
-    TEMPLATE="/usr/share/calamares/modules/netinstall.yaml.template"
-fi
-
-if [ -f "${TEMPLATE}" ]; then
-    python3 /usr/local/bin/hyperxos-generate-netinstall.py "${TEMPLATE}" "${OUTPUT}" || true
-    cp -f "${OUTPUT}" /usr/share/calamares/modules/netinstall.yaml 2>/dev/null || true
-fi
-
-log "Verifikasi selesai."
+log "Verifikasi jaringan dan repositori selesai."

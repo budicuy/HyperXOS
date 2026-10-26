@@ -37,9 +37,8 @@ EOF
     install -Dm644 assets/os-release "${pkgdir}/etc/hyperxos-release"
 
     # 4. Icon/Pixmaps (Orange HyperXOS Logo)
-    local logo_src="${startdir}/../../calamares/branding/hyperxos/logo.png"
+    local logo_src="${startdir}/../hyper-x-installer/logo.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/hyperxos.png"
-    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/calamares.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/hyperxos.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyperxos.png"
 }

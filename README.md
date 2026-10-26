@@ -1,23 +1,23 @@
 # HyperXOS Linux
 
 <p align="center">
-  <strong>Distribusi Arch Linux Modern, Performa Tinggi, dan Siap Pakai dengan KDE Plasma 6 & Calamares Installer</strong>
+  <strong>Distribusi Arch Linux Modern, Performa Tinggi, dan Siap Pakai dengan KDE Plasma 6 & Pure Rust Native Installer</strong>
 </p>
 
 ---
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **KDE Plasma 6 (Wayland native)**, framework instalasi grafis **Calamares**, AUR helper **`paru`** bawaan, serta arsitektur deteksi driver grafis fleksibel (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **KDE Plasma 6 (Wayland native)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, AUR helper **`paru`** bawaan, serta arsitektur deteksi driver grafis fleksibel (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
 - **Desktop Modern:** KDE Plasma 6 berbasis Wayland dengan tema kustom *HyperXOS Dark*, akselerasi grafis terpadu, dan rendering responsif.
-- **Installer Grafis Calamares:**
-  - Skema partisi default **Btrfs** dengan subvolume terisolasi (`@`, `@home`, `@log`, `@cache`, `@snapshots`) dan kompresi transparan `zstd:1`.
-  - Bootloader default **`systemd-boot`** (ESP di `/boot` berukuran 1024 MiB) dengan fallback otomatis ke **GRUB** untuk BIOS atau pilihan pengguna.
-  - Alur pemilihan paket opsional (*Gaming Suite*, *Office & Productivity*, *Development Tools*, *Minimal*).
-  - Alur pemilihan bootloader interaktif sebelum halaman ringkasan (*Summary*).
-  - Sanitasi sistem target tuntas (penghapusan akun dan konfigurasi live).
+- **Pure Rust Native Installer (`hyper-x-installer`):**
+  - Dibangun 100% menggunakan Rust murni dengan arsitektur UI Glassmorphic modern (Iced 0.14 + WGPU).
+  - Skema partisi otomatis: Partisi boot ESP FAT32 sebesar 4096 MiB (4 GB) di `/boot` dan partisi root **Btrfs** dengan subvolume terpisah (`@` untuk root dan `@home` untuk user data) dengan kompresi `zstd:1`.
+  - Bootloader default eksklusif **Limine** dengan tema visual HyperXOS dan registrasi otomatis ke UEFI NVRAM.
+  - Mode instalasi *Full Online* yang memasang paket dasar Arch/CachyOS dan desktop KDE Plasma 6 terbaru langsung dari mirror dalam satu transaksi atomic `pacstrap`.
+  - Terminal eksekusi real-time terintegrasi untuk pemantauan proses transparan.
 - **Deteksi Driver GPU Multi-Tier (`hw-detect-gpu`):**
   - **NVIDIA Turing ke atas (RTX 20xx+, GTX 16xx+):** Modul kernel terbuka `nvidia-open` + early KMS (`nvidia_drm.modeset=1 nvidia_drm.fbdev=1`).
   - **NVIDIA Pascal & Maxwell (GTX 10xx, GTX 9xx):** Driver legacy prebuilt branch 580 (`nvidia-580xx-dkms` + `nvidia-580xx-utils`).
@@ -80,7 +80,7 @@ make clean
 # Menjalankan ISO secara Live murni tanpa menginstal
 make dev
 
-# Menjalankan pengujian instalasi Calamares ke virtual disk 40 GB (disk otomatis di-reset bersih)
+# Menjalankan pengujian instalasi Native Installer ke virtual disk 40 GB (disk otomatis di-reset bersih)
 make install
 # (atau 'make vm-install')
 
@@ -101,8 +101,8 @@ make run
 
 HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
 - **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
-- **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`) dan basis framework installer.
-- **[Calamares Installer](https://calamares.io):** Framework penginstal grafis mandiri yang andal dan fleksibel.
+- **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`).
+- **[Limine Bootloader](https://limine-bootloader.org):** Bootloader modern yang tangguh, ringan, dan cepat.
 - **[KDE Community](https://kde.org):** Lingkungan desktop KDE Plasma 6 Wayland yang elegan, modern, dan kaya fitur.
 
 ---

@@ -8,7 +8,7 @@ PROJECT_DIR := $(shell pwd)
 OUT_DIR := $(PROJECT_DIR)/out
 SCRIPTS_DIR := $(PROJECT_DIR)/scripts
 ARCHISO_DIR := $(PROJECT_DIR)/archiso
-CALAMARES_DIR := $(PROJECT_DIR)/calamares
+INSTALLER_DIR := $(PROJECT_DIR)/rust/hyper-x-installer
 
 # Default target: display help
 help:
@@ -51,8 +51,8 @@ check:
 	@bash -n $(ARCHISO_DIR)/profiledef.sh && echo "[✓] Sintaks archiso/profiledef.sh valid."
 	@test -f $(ARCHISO_DIR)/packages.x86_64 || (echo "[-] packages.x86_64 tidak ditemukan!" && exit 1)
 	@echo "[✓] packages.x86_64 ditemukan ($$(grep -v -E '^#|^$$' $(ARCHISO_DIR)/packages.x86_64 | wc -l) paket terdaftar)."
-	@test -f $(CALAMARES_DIR)/settings.conf || (echo "[-] calamares/settings.conf tidak ditemukan!" && exit 1)
-	@echo "[✓] calamares/settings.conf ditemukan."
+	@test -f packages/hyper-x-installer/PKGBUILD || (echo "[-] packages/hyper-x-installer/PKGBUILD tidak ditemukan!" && exit 1)
+	@echo "[✓] hyper-x-installer ditemukan."
 	@bash -n $(SCRIPTS_DIR)/hw-detect-gpu.sh && echo "[✓] Sintaks scripts/hw-detect-gpu.sh valid."
 	@bash -n $(SCRIPTS_DIR)/run-qemu.sh && echo "[✓] Sintaks scripts/run-qemu.sh valid."
 	@bash -n $(SCRIPTS_DIR)/build-iso.sh && echo "[✓] Sintaks scripts/build-iso.sh valid."
@@ -108,3 +108,7 @@ checksum:
 hyperx:
 	@echo "==> [HyperXOS] Menjalankan HyperXTools secara langsung..."
 	@cd rust/hyper-x-tools && cargo run --release
+
+installer:
+	@echo "==> [HyperXOS] Menjalankan HyperXInstaller secara langsung..."
+	@cd rust/hyper-x-installer && cargo run --release

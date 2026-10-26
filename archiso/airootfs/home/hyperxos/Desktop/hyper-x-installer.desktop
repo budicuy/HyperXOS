@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install HyperXOS
+GenericName=System Installer
+Comment=Install HyperXOS Linux to disk (Pure Rust Native)
+Exec=pkexec /usr/bin/hyper-x-installer
+Icon=hyper-x-installer
+Terminal=false
+Categories=System;
+StartupNotify=true

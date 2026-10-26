@@ -2,7 +2,7 @@
 
 Selamat datang di rilis resmi pertama **HyperXOS** (`2026.10.26`).
 
-HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **KDE Plasma 6 (Wayland)**, antarmuka penginstal grafis **Calamares**, serta utilitas sistem terintegrasi **HyperXTools (Qt 6)**.
+HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **KDE Plasma 6 (Wayland)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
 
 ---
 
@@ -15,19 +15,21 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
 - **KDE Plasma 6 Wayland Desktop:**
   - Sesi desktop Wayland murni yang responsif dan hemat sumber daya.
   - Skema warna gelap kustom *HyperXOS Dark* dengan integrasi Breeze Dark.
-  - Shortcut taskbar telah terkonfigurasi: **Calamares**, **Firefox**, **Dolphin**, **Konsole**, dan **HyperXTools**.
+  - Shortcut taskbar telah terkonfigurasi: **HyperXOS Installer**, **Firefox**, **Dolphin**, **Konsole**, dan **HyperXTools**.
 
 - **Peramban Web Firefox Terintegrasi:**
   - Mozilla Firefox langsung tersedia di media Live USB dan secara otomatis terpasang pada instalasi target.
   - Didaftarkan sebagai peramban web *default* di lingkungan desktop.
 
-- **Installer Grafis Calamares Mandiri:**
-  - Disesuaikan khusus untuk HyperXOS dengan *branding* khas dan skema warna senada.
-  - Menggunakan modul `pacstrap` dinamis untuk instalasi sistem bersih langsung dari repositori resmi.
-  - Penanganan otomatis DNS fallback (`1.1.1.1`, `8.8.8.8`) dan inisialisasi pacman keyring di sistem target.
+- **Installer Grafis Pure Rust Mandiri (`hyper-x-installer`):**
+  - Dibangun 100% menggunakan Rust murni tanpa ketergantungan pada Python, C++, atau shell scripts.
+  - Antarmuka visual modern bertema Glassmorphism menggunakan Iced 0.14 dan WGPU rendering.
+  - Skema partisi standar terotomatisasi: Boot partition FAT32 4096 MiB (4 GB) di `/boot` dan Root partition Btrfs dengan subvolume terisolasi (`@` dan `@home`).
+  - Bootloader default eksklusif **Limine** terdaftar langsung pada UEFI NVRAM.
+  - Fresh online pacstrap langsung dari mirror upstream dalam satu transaksi tunggal.
 
-- **HyperXTools (C++ & Qt 6):**
-  - Aplikasi utilitas desktop eksklusif HyperXOS untuk pemantauan CPU/RAM/Disk, pemeringkatan cermin repositori (Reflector ranking), pembersihan cache pacman, dan status keamanan sistem.
+- **HyperXTools (Pure Rust + Iced + WGPU):**
+  - Aplikasi utilitas desktop eksklusif HyperXOS untuk pemantauan CPU/RAM/Disk, snapshot Btrfs/Timeshift, gaming tweaks, manajemen kernel CachyOS, dan app store package.
 
 - **Dukungan Grafis & Driver:**
   - Driver grafis *open-source* Mesa 64-bit lengkap dengan akselerasi Vulkan: AMD (RADV), Intel (ANV), dan NVIDIA (NVK).
@@ -93,7 +95,7 @@ sudo dd if=hyperxos-2026.10.26-x86_64.iso of=/dev/sdX bs=4M status=progress ofla
 | **Memori (RAM)** | 2 GB RAM (Mode teks/instalasi) | 4 GB+ RAM (Untuk pengalaman KDE Plasma 6 optimal) |
 | **Penyimpanan (Disk)** | 20 GB ruang kosong | 40 GB+ ruang penyimpanan SSD/NVMe |
 | **Tampilan / GPU** | Resolusi 1024x768 | Resolusi 1920x1080 dengan akselerasi OpenGL/Vulkan |
-| **Koneksi Jaringan** | Opsional (Tersedia mode offline) | Koneksi internet aktif saat instalasi Calamares online |
+| **Koneksi Jaringan** | Opsional (Tersedia mode offline) | Koneksi internet aktif saat instalasi online |
 
 ---
 

@@ -27,7 +27,7 @@ archiso/airootfs/opt/hyperxos-repo/
 packages/*/pkg/
 packages/*/src/
 packages/*/*.pkg.tar.*
-!packages/hyperxos-calamares/cachyos-calamares-*.pkg.tar.zst
+packages/hyper-x-installer/hyper-x-installer
 
 # 6. Rust & C++ Compilation Objects (HyperXTools)
 **/target/

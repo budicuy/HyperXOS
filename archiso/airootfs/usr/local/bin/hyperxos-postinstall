@@ -82,6 +82,7 @@ pacman -Sy || true
 # 8. Clean up installer shortcuts and setup user desktop icons
 log "Configuring desktop shortcuts and cleaning up live installer icons..."
 find /home -name 'calamares.desktop' -type f -delete 2>/dev/null || true
+find /home -name 'hyper-x-installer.desktop' -type f -delete 2>/dev/null || true
 
 # Place HyperXTools desktop icon on user desktops
 for user_home in /home/*; do

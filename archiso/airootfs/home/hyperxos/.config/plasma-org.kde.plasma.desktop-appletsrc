@@ -34,7 +34,7 @@ immutability=1
 plugin=org.kde.plasma.icontasks
 
 [Containments][1][Applets][4][Configuration][General]
-launchers=applications:calamares.desktop,applications:firefox.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop,applications:hyper-x-tools.desktop
+launchers=applications:hyper-x-installer.desktop,applications:firefox.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop,applications:hyper-x-tools.desktop
 
 [Containments][1][Applets][5]
 immutability=1
