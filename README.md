@@ -100,5 +100,5 @@ make run
 ## 📄 Lisensi & Kontribusi
 
 HyperXOS didistribusikan di bawah lisensi GPL-3.0. Seluruh komponen upstream Arch Linux dan KDE tunduk pada lisensi masing-masing.
-Laporkan isu dan kontribusi melalui repositori GitHub resmi HyperXOS.
+Laporkan isu dan kontribusi melalui repositori GitHub resmi HyperXOS: [https://github.com/budicuy/HyperXOS](https://github.com/budicuy/HyperXOS).
 

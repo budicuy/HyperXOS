@@ -440,7 +440,7 @@ Agar paket buatan sendiri (branding, tema, Calamares, utilitas kustom, `paru`) d
      ```ini
      [hyperxos]
      SigLevel = Required DatabaseOptional
-     Server = https://github.com/hyperxos/releases/download/repo/x86_64
+     Server = https://github.com/budicuy/HyperXOS/releases/download/repo/x86_64
      ```
    - Paket `hyperxos-keyring` menyediakan kunci GPG resmi sehingga verifikasi integritas paket rilis publik tetap terjaga aman.
 

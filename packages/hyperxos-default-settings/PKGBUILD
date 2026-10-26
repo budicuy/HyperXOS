@@ -4,7 +4,7 @@ pkgver=1.0.0
 pkgrel=4
 pkgdesc="Default desktop and user skeleton settings for HyperXOS"
 arch=('any')
-url="https://github.com/hyperxos"
+url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 depends=()
 

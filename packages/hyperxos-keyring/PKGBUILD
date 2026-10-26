@@ -4,7 +4,7 @@ pkgver=1.0.0
 pkgrel=1
 pkgdesc="Official GPG keyring for HyperXOS package verification"
 arch=('any')
-url="https://github.com/hyperxos"
+url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 
 package() {

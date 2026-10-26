@@ -18,10 +18,10 @@ strings:
     versionedName:       HyperXOS 2026.10
     shortVersionedName:  HyperXOS 2026.10
     bootloaderEntryName: HyperXOS
-    productUrl:          https://github.com/hyperxos
-    supportUrl:          https://github.com/hyperxos/issues
-    knownIssuesUrl:      https://github.com/hyperxos/issues
-    releaseNotesUrl:     https://github.com/hyperxos/releases
+    productUrl:          https://github.com/budicuy/HyperXOS
+    supportUrl:          https://github.com/budicuy/HyperXOS/issues
+    knownIssuesUrl:      https://github.com/budicuy/HyperXOS/issues
+    releaseNotesUrl:     https://github.com/budicuy/HyperXOS/releases
 
 images:
     productLogo:         "logo.png"

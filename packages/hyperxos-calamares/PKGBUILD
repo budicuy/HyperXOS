@@ -1,10 +1,10 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-calamares
 pkgver=3.4.2
-pkgrel=20
+pkgrel=21
 pkgdesc="Distribution-independent installer framework for HyperXOS"
 arch=('x86_64')
-url="https://github.com/hyperxos"
+url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 depends=(
     'boost-libs' 'ckbcomp' 'cryptsetup' 'dmidecode' 'gptfdisk'

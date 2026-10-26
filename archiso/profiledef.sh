@@ -4,7 +4,7 @@
 
 iso_name="hyperxos"
 iso_label="HYPERXOS_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="HyperXOS Linux <https://github.com/hyperxos>"
+iso_publisher="HyperXOS Linux <https://github.com/budicuy/HyperXOS>"
 iso_application="HyperXOS Live/Installation Media"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="hyperxos"

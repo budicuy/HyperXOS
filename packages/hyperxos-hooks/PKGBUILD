@@ -4,7 +4,7 @@ pkgver=1.0.0
 pkgrel=1
 pkgdesc="Pacman ALPM hooks for HyperXOS system automation"
 arch=('any')
-url="https://github.com/hyperxos"
+url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 depends=()
 
