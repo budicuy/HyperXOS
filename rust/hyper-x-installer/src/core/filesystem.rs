@@ -20,10 +20,10 @@ impl FilesystemManager {
     where
         F: FnMut(&str),
     {
-        // 1. Format ESP Partition as FAT32 (4GB)
-        progress_callback(&format!("Formatting {} as FAT32 (HYPERXOS_BOOT)...", layout.boot_partition));
+        // 1. Format ESP Partition as FAT32 (4GB) - FAT labels must be <= 11 characters
+        progress_callback(&format!("Formatting {} as FAT32 (HYPERX_BOOT)...", layout.boot_partition));
         let fat_res = Command::new("mkfs.fat")
-            .args(["-F32", "-n", "HYPERXOS_BOOT", &layout.boot_partition])
+            .args(["-F32", "-n", "HYPERX_BOOT", &layout.boot_partition])
             .status()
             .map_err(|e| format!("Failed to run mkfs.fat: {}", e))?;
         if !fat_res.success() {

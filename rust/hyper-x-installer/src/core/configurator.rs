@@ -141,9 +141,19 @@ CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --loc
 "#;
         let _ = fs::write("/mnt/etc/sddm.conf.d/10-wayland.conf", sddm_cfg);
 
+        let autologin_cfg = format!(
+            r#"[Autologin]
+User={}
+Session=plasma
+Relogin=false
+"#,
+            cfg.username
+        );
+        let _ = fs::write("/mnt/etc/sddm.conf.d/autologin.conf", autologin_cfg);
+
         // Enable services
         let _ = Command::new("arch-chroot")
-            .args(["/mnt", "systemctl", "enable", "sddm.service", "NetworkManager.service"])
+            .args(["/mnt", "systemctl", "enable", "sddm.service", "NetworkManager.service", "qemu-guest-agent.service"])
             .status();
         let _ = Command::new("arch-chroot")
             .args(["/mnt", "systemctl", "set-default", "graphical.target"])
@@ -164,8 +174,10 @@ CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --loc
                 .status();
         }
 
-        // 9. Rebuild mkinitcpio for target kernel
-        progress_callback("Generating initramfs with mkinitcpio -P...");
+        // 9. Rebuild mkinitcpio for target kernel (ensuring btrfs module is included)
+        progress_callback("Configuring mkinitcpio modules and generating initramfs with mkinitcpio -P...");
+        let _ = fs::create_dir_all("/mnt/etc/mkinitcpio.conf.d");
+        let _ = fs::write("/mnt/etc/mkinitcpio.conf.d/hyperxos.conf", "MODULES=(btrfs)\n");
         let mkinit_res = Command::new("arch-chroot")
             .args(["/mnt", "mkinitcpio", "-P"])
             .status()

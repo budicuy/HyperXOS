@@ -15,6 +15,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "bash-completion",
     "pciutils",
     "usbutils",
+    "qemu-guest-agent",
     // 2. Filesystems & Storage Support
     "btrfs-progs",
     "e2fsprogs",

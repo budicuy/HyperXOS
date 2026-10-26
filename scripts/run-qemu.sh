@@ -44,6 +44,8 @@ QEMU_CMD+=(
     -m 4096
     -netdev user,id=net0
     -device virtio-net-pci,netdev=net0,romfile=
+    -chardev socket,path=/tmp/qga.sock,server=on,wait=off,id=qga0
+    -device virtio-serial -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
 )
 
 # Robust Display Backend Detection (Prefer SDL with OpenGL 3D VirGL acceleration)
