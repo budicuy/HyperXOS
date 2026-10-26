@@ -98,12 +98,6 @@ for user_home in /home/*; do
                 break
             fi
         done
-        # Copy install log to user desktop if available
-        if [ -f /var/log/hyperxos-install.log ]; then
-            cp -f /var/log/hyperxos-install.log "${desktop_dir}/log-install.txt"
-            chmod 666 "${desktop_dir}/log-install.txt" 2>/dev/null || true
-            chown "${user_name}:${user_name}" "${desktop_dir}/log-install.txt" 2>/dev/null || true
-        fi
     fi
 done
 

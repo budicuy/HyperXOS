@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Buka Log Instalasi
-Comment=Tinjau riwayat lengkap proses instalasi HyperXOS
-Exec=kdialog --textbox /home/hyperxos/Desktop/log-install.txt 900 600
-Icon=text-x-log
-Terminal=false
-Categories=Utility;System;

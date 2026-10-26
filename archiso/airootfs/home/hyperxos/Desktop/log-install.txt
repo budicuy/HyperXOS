@@ -1,4 +1,0 @@
-==> [HyperXOS] Log Instalasi Sistem
-File ini akan otomatis diperbarui selama proses instalasi berlangsung.
-Setelah instalasi selesai, seluruh catatan eksekusi (partisi, unpackfs, driver, bootloader) tersimpan lengkap di sini.
-Anda dapat membukanya kembali kapan saja menggunakan browser Firefox atau text editor.
