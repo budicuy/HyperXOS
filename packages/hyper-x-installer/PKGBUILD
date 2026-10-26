@@ -12,7 +12,7 @@ provides=('hyperxos-installer')
 
 build() {
     cd "${startdir}/../../rust/hyper-x-installer"
-    cargo build --release --locked
+    cargo build --release
 }
 
 package() {

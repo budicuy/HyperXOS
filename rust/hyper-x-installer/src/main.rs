@@ -89,7 +89,46 @@ fn load_window_icon() -> Option<iced::window::Icon> {
     iced::window::icon::from_rgba(rgba.into_raw(), width, height).ok()
 }
 
-fn main() -> iced::Result {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 && (args[1] == "--auto-install" || args[1] == "-a") {
+        let disk = args.get(2).cloned().unwrap_or_else(|| "/dev/vda".to_string());
+        println!("============================================================");
+        println!("  HyperXOS Installer (Pure Rust) — Headless Automated Mode  ");
+        println!("  Target Disk: {}", disk);
+        println!("============================================================");
+
+        let (tx, rx) = unbounded();
+        let handle = thread::spawn(move || {
+            App::execute_installation(disk, UserConfig::default(), tx);
+        });
+
+        while let Ok(event) = rx.recv() {
+            match event {
+                InstallerEvent::Stage { name, pct } => {
+                    println!("\n[STAGE {:.0}%] {}", pct, name);
+                }
+                InstallerEvent::Log(line) => {
+                    println!("  -> {}", line);
+                }
+                InstallerEvent::Finished(res) => match res {
+                    Ok(()) => {
+                        println!("\n[✓] HyperXOS Installation COMPLETED SUCCESSFULLY!");
+                        let _ = handle.join();
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        eprintln!("\n[-] INSTALLATION FAILED: {}", e);
+                        let _ = handle.join();
+                        std::process::exit(1);
+                    }
+                },
+            }
+        }
+        let _ = handle.join();
+        return Ok(());
+    }
+
     let window_settings = window::Settings {
         size: Size::new(1060.0, 720.0),
         min_size: Some(Size::new(960.0, 640.0)),
@@ -116,7 +155,9 @@ fn main() -> iced::Result {
             background_color: iced::Color::TRANSPARENT,
             text_color: crate::ui::theme::TEXT_MAIN,
         })
-        .run()
+        .run()?;
+
+    Ok(())
 }
 
 pub struct App {
