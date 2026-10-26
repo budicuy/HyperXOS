@@ -1,7 +1,7 @@
 # HyperXOS Project Central Orchestration Makefile
 # Defines build, configuration, testing, and virtualization targets.
 
-.PHONY: help setup check build build-production test install vm-install run dev clean checksum
+.PHONY: help setup check build build-production test install vm-install run dev clean checksum release
 
 SHELL := /usr/bin/env bash
 PROJECT_DIR := $(shell pwd)
@@ -22,6 +22,7 @@ help:
 	@echo "  make check            Memvalidasi konfigurasi, skrip, dan paket"
 	@echo "  make build            Membangun ISO HyperXOS (Development mode: fast zstd-3)"
 	@echo "  make build-production Membangun ISO HyperXOS (Production: zstd-22, stripped, clean)"
+	@echo "  make release          Mempersiapkan dan mempublikasikan rilis GitHub"
 	@echo "  make test             Menjalankan pengujian otomatis & headless smoke test"
 	@echo "  make install          Menjalankan ISO ke virtual disk 40GB (reset otomatis)"
 	@echo "  make vm-install       Alias untuk 'make install'"
@@ -66,6 +67,9 @@ build-production: check
 	@$(MAKE) checksum
 
 production: build-production
+
+release:
+	@$(SCRIPTS_DIR)/publish-release.sh
 
 test:
 	@echo "==> [HyperXOS] Menjalankan pengujian otomatis QA..."
