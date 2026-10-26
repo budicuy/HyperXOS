@@ -1,46 +1,98 @@
 use iced::widget::{button, container, mouse_area, row, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::ui::icons::{self, svg_icon};
-use crate::ui::sidebar::Page;
 use crate::ui::theme::*;
 
 pub fn header<'a, Message: Clone + 'a>(
-    current_page: Page,
+    on_open_url: impl Fn(&'static str) -> Message + 'a,
     on_drag: Message,
     on_minimize: Message,
     on_maximize: Message,
     on_close: Message,
 ) -> Element<'a, Message> {
-    let page_title = match current_page {
-        Page::Dashboard => "Dashboard & Monitoring Sistem",
-        Page::KernelManager => "CachyOS Kernel Manager",
-        Page::GameTweaks => "Tweak Gaming & Latensi",
-        Page::Snapshots => "Snapshot & Pemulihan Btrfs",
-        Page::Maintenance => "Pemeliharaan & Perawatan Sistem",
-        Page::PackageStore => "HyperX Software Store",
-    };
+    // 1. External Link Buttons (GitHub, Releases, Issues, Docs)
+    let github_btn = button(
+        row![
+            svg_icon(icons::GITHUB, 13.0, Color::WHITE),
+            text("GitHub")
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(TEXT_MAIN),
+                }),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 10])
+    .style(glass_action_button)
+    .on_press(on_open_url("https://github.com/budicuy/HyperXOS"));
 
-    let title_breadcrumb = row![
-        text(page_title)
-            .size(15)
-            .font(FONT_DISPLAY_BOLD)
-            .style(|_| text::Style {
-                color: Some(TEXT_MAIN),
-            }),
-    ]
-    .spacing(8)
-    .align_y(Alignment::Center);
+    let releases_btn = button(
+        row![
+            svg_icon(icons::TAG, 12.0, ACCENT_CYAN),
+            text("Releases")
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.85, 0.92, 1.0)),
+                }),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 10])
+    .style(glass_action_button)
+    .on_press(on_open_url("https://github.com/budicuy/HyperXOS/releases"));
 
-    // Draggable area across the header
+    let issues_btn = button(
+        row![
+            svg_icon(icons::BUG, 12.0, ACCENT_AMBER),
+            text("Issues")
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.98, 0.90, 0.75)),
+                }),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 10])
+    .style(glass_action_button)
+    .on_press(on_open_url("https://github.com/budicuy/HyperXOS/issues"));
+
+    let docs_btn = button(
+        row![
+            svg_icon(icons::DOCS, 12.0, ACCENT_GREEN),
+            text("Docs")
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.80, 0.95, 0.85)),
+                }),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 10])
+    .style(glass_action_button)
+    .on_press(on_open_url("https://github.com/budicuy/HyperXOS#readme"));
+
+    let links_group = row![github_btn, releases_btn, issues_btn, docs_btn]
+        .spacing(8)
+        .align_y(Alignment::Center);
+
+    // 2. Draggable area across the header
     let drag_area = mouse_area(
         container("")
             .width(Length::Fill)
-            .height(28)
+            .height(28),
     )
     .on_press(on_drag);
 
-    // Custom Window Controls (Minimize, Maximize, Close)
+    // 3. Custom Window Controls (Minimize, Maximize, Close)
     let win_min = button(svg_icon(icons::MINUS, 12.0, ACCENT_AMBER))
         .padding([5, 8])
         .style(window_control_btn(ACCENT_AMBER, false))
@@ -61,13 +113,13 @@ pub fn header<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center);
 
     let bar = row![
-        title_breadcrumb,
+        links_group,
         drag_area,
         window_controls,
     ]
     .spacing(12)
     .align_y(Alignment::Center)
-    .padding([12, 18]);
+    .padding([10, 16]);
 
     container(bar)
         .width(Length::Fill)

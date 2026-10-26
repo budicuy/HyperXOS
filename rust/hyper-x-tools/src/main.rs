@@ -136,6 +136,9 @@ pub enum Message {
     StoreSearchChanged(String),
     InstallPackage(String),
     RemovePackage(String),
+
+    // External Links
+    OpenUrl(&'static str),
 }
 
 impl Default for App {
@@ -237,6 +240,12 @@ impl App {
             }
             Message::WindowClose => {
                 window::latest().and_then(window::close)
+            }
+            Message::OpenUrl(url) => {
+                let _ = std::process::Command::new("xdg-open")
+                    .arg(url)
+                    .spawn();
+                Task::none()
             }
 
             // --- KERNEL MANAGER ---
@@ -487,7 +496,7 @@ impl App {
     pub fn view(&self) -> Element<'_, Message> {
         let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
         let head = header(
-            self.current_page,
+            Message::OpenUrl,
             Message::WindowDrag,
             Message::WindowMinimize,
             Message::WindowMaximize,
