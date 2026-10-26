@@ -73,10 +73,11 @@ pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {
 
 pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
     // Gradasi dari bawah (Merah) ke atas (Oren), sedikit transparan (alpha ~0.80), murni tanpa warna hitam
-    let gradient = Linear::new(Radians(1.571)) // 90 degrees (top to bottom)
-        .add_stop(0.0, Color::from_rgba(0.96, 0.44, 0.08, 0.80))  // Atas: Oren cerah
-        .add_stop(0.5, Color::from_rgba(0.90, 0.26, 0.12, 0.80))  // Tengah: Transisi Oren-Merah
-        .add_stop(1.0, Color::from_rgba(0.85, 0.12, 0.20, 0.82)); // Bawah: Merah pekat
+    // Di Iced, Radians(0.0) mengarah vertikal dari start (bawah) ke end (atas)
+    let gradient = Linear::new(Radians(0.0)) // Vertikal: Bawah ke Atas
+        .add_stop(0.0, Color::from_rgba(0.85, 0.12, 0.20, 0.82))  // Bawah: Merah pekat
+        .add_stop(0.5, Color::from_rgba(0.90, 0.26, 0.12, 0.80))  // Tengah: Transisi Merah-Oren
+        .add_stop(1.0, Color::from_rgba(0.96, 0.44, 0.08, 0.80)); // Atas: Oren cerah
 
     container::Style {
         background: Some(Background::from(gradient)),
