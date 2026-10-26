@@ -1,5 +1,6 @@
 use iced::border::Radius;
-use iced::widget::{button, column, container, progress_bar, row, scrollable, text};
+use iced::widget::scrollable::{Direction, Scrollbar};
+use iced::widget::{button, column, container, progress_bar, row, text};
 use iced::{Alignment, Border, Color, Element, Length};
 
 use crate::ui::icons::svg_icon;
@@ -165,7 +166,7 @@ pub fn terminal_box<'a, Message: Clone + 'a>(
     .spacing(12)
     .align_y(Alignment::Center);
 
-    let console = scrollable(
+    let console = glass_scrollable(
         container(
             text(log_str)
                 .size(11)
@@ -184,4 +185,17 @@ pub fn terminal_box<'a, Message: Clone + 'a>(
         .width(Length::Fill)
         .style(terminal_container_style)
         .into()
+}
+
+pub fn glass_scrollable<'a, Message: 'a>(
+    content: impl Into<Element<'a, Message>>,
+) -> iced::widget::Scrollable<'a, Message> {
+    let scrollbar = Scrollbar::new()
+        .width(5.0)
+        .scroller_width(5.0)
+        .margin(6.0);
+
+    iced::widget::scrollable(content)
+        .direction(Direction::Vertical(scrollbar))
+        .style(glass_scrollable_style)
 }

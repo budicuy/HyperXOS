@@ -1,8 +1,8 @@
-use iced::widget::{button, column, container, row, scrollable, text, text_input};
+use iced::widget::{button, column, container, row, text, text_input};
 use iced::{Alignment, Element, Length};
 
 use crate::core::snapshot_manager::SnapshotRecord;
-use crate::ui::components::{status_pill, terminal_box};
+use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
@@ -155,5 +155,5 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(14)
         .padding(20);
 
-    scrollable(content).height(Length::Fill).into()
+    glass_scrollable(content).height(Length::Fill).into()
 }

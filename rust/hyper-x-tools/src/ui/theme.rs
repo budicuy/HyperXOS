@@ -1,5 +1,6 @@
 use iced::border::Radius;
 use iced::gradient::Linear;
+use iced::widget::scrollable::{self, Rail, Scroller};
 use iced::widget::{button, container, progress_bar, text_input};
 use iced::{Background, Border, Color, Radians};
 
@@ -308,5 +309,41 @@ pub fn glass_input_style(_theme: &iced::Theme, status: text_input::Status) -> te
         placeholder: TEXT_MUTED,
         value: TEXT_MAIN,
         selection: Color::from_rgba(0.54, 0.71, 0.98, 0.35),
+    }
+}
+
+// --- Glassmorphic Scrollbar Style (Floating Frosted Capsule) ---
+pub fn glass_scrollable_style(_theme: &iced::Theme, status: scrollable::Status) -> scrollable::Style {
+    let scroller_color = match status {
+        scrollable::Status::Hovered { .. } => Color::from_rgba(0.54, 0.71, 0.98, 0.45),
+        scrollable::Status::Dragged { .. } => Color::from_rgba(0.54, 0.71, 0.98, 0.70),
+        _ => Color::from_rgba(1.0, 1.0, 1.0, 0.20),
+    };
+
+    scrollable::Style {
+        container: container::Style::default(),
+        vertical_rail: Rail {
+            background: None,
+            border: Border::default(),
+            scroller: Scroller {
+                background: Background::Color(scroller_color),
+                border: Border::default().rounded(Radius::from(3.0)),
+            },
+        },
+        horizontal_rail: Rail {
+            background: None,
+            border: Border::default(),
+            scroller: Scroller {
+                background: Background::Color(scroller_color),
+                border: Border::default().rounded(Radius::from(3.0)),
+            },
+        },
+        gap: None,
+        auto_scroll: scrollable::AutoScroll {
+            background: Background::Color(Color::TRANSPARENT),
+            border: Border::default(),
+            shadow: iced::Shadow::default(),
+            icon: Color::TRANSPARENT,
+        },
     }
 }

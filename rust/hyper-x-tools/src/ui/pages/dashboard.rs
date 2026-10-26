@@ -1,8 +1,8 @@
-use iced::widget::{button, column, container, row, scrollable, text};
+use iced::widget::{button, column, container, row, text};
 use iced::{Alignment, Color, Element, Length};
 
 use crate::core::system_monitor::SystemMetrics;
-use crate::ui::components::metric_card;
+use crate::ui::components::{glass_scrollable, metric_card};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
@@ -180,5 +180,5 @@ pub fn view<'a, Message: Clone + 'a>(
     .spacing(18)
     .padding(20);
 
-    scrollable(content).height(Length::Fill).into()
+    glass_scrollable(content).height(Length::Fill).into()
 }
