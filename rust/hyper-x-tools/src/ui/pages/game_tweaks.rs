@@ -22,6 +22,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let top_bar = column![
         text("Tweak Gaming & Optimasi Latensi")
             .size(16)
+            .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
                 color: Some(TEXT_MAIN),
             }),
@@ -51,6 +52,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 column![
                     text("Profil CPU Governor")
                         .size(13)
+                        .font(FONT_DISPLAY_BOLD)
                         .style(|_| text::Style {
                             color: Some(TEXT_MAIN),
                         }),
@@ -88,6 +90,7 @@ pub fn view<'a, Message: Clone + 'a>(
             column![
                 text("Memori Game (vm.max_map_count)")
                     .size(13)
+                    .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
                         color: Some(TEXT_MAIN),
                     }),
@@ -140,6 +143,7 @@ pub fn view<'a, Message: Clone + 'a>(
             column![
                 text("Mitigasi Split Lock (Anti-Stuttering)")
                     .size(13)
+                    .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
                         color: Some(TEXT_MAIN),
                     }),
@@ -189,6 +193,7 @@ pub fn view<'a, Message: Clone + 'a>(
             column![
                 text("Feral GameMode Daemon")
                     .size(13)
+                    .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
                         color: Some(TEXT_MAIN),
                     }),
@@ -240,6 +245,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 column![
                     text("Pasang Ekosistem Gaming Lengkap")
                         .size(13)
+                        .font(FONT_DISPLAY_BOLD)
                         .style(|_| text::Style {
                             color: Some(TEXT_MAIN),
                         }),

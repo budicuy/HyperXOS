@@ -21,6 +21,7 @@ pub fn view<'a, Message: Clone + 'a>(
         column![
             text("CachyOS Kernel Manager")
                 .size(16)
+                .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
@@ -76,6 +77,7 @@ pub fn view<'a, Message: Clone + 'a>(
     // 3. Catalog List
     let catalog_title = text("Katalog Kernel Performa & Komunitas:")
         .size(13)
+        .font(FONT_DISPLAY_BOLD)
         .style(|_| text::Style {
             color: Some(TEXT_MAIN),
         });
@@ -97,7 +99,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
         let mut desc_col = column![
             row![
-                text(&k.name).size(13).style(|_| text::Style {
+                text(&k.name).size(13).font(FONT_DISPLAY_SEMIBOLD).style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
                 badges,

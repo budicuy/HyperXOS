@@ -22,6 +22,7 @@ pub fn view<'a, Message: Clone + 'a>(
         column![
             text("Snapshot Btrfs & Pemulihan Sistem")
                 .size(16)
+                .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
@@ -60,6 +61,7 @@ pub fn view<'a, Message: Clone + 'a>(
         column![
             text("Buat Snapshot Baru:")
                 .size(13)
+                .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
@@ -74,6 +76,7 @@ pub fn view<'a, Message: Clone + 'a>(
     // Snapshots History List
     let history_title = text("Daftar Riwayat Snapshot Tersedia:")
         .size(13)
+        .font(FONT_DISPLAY_BOLD)
         .style(|_| text::Style {
             color: Some(TEXT_MAIN),
         });
@@ -100,7 +103,7 @@ pub fn view<'a, Message: Clone + 'a>(
             let row_item = row![
                 column![
                     row![
-                        text(&s.name).size(12).style(|_| text::Style {
+                        text(&s.name).size(12).font(FONT_DISPLAY_SEMIBOLD).style(|_| text::Style {
                             color: Some(TEXT_MAIN),
                         }),
                         text(&s.date).size(10).style(|_| text::Style {

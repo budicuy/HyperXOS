@@ -23,7 +23,7 @@ pub fn metric_card<'a, Message: 'a>(
             svg_icon(icon_svg, 18.0, accent_color),
             text(title)
                 .size(13)
-                .font(FONT_DISPLAY_SEMIBOLD)
+                .font(FONT_DISPLAY_BOLD)
                 .style(move |_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
@@ -31,8 +31,8 @@ pub fn metric_card<'a, Message: 'a>(
         .spacing(8)
         .align_y(Alignment::Center),
         text(val_str)
-            .size(22)
-            .font(FONT_DISPLAY_BOLD)
+            .size(24)
+            .font(FONT_DISPLAY_EXTRABOLD)
             .style(move |_| text::Style {
                 color: Some(accent_color),
             }),
@@ -45,13 +45,13 @@ pub fn metric_card<'a, Message: 'a>(
         .girth(6.0)
         .style(glass_progress_bar_style(accent_color));
 
-    let mut footer = row![text(sub_str).size(11).style(|_| text::Style {
+    let mut footer = row![text(sub_str).size(11).font(FONT_BODY_MEDIUM).style(|_| text::Style {
         color: Some(TEXT_SUB),
     })]
     .spacing(8);
 
     if let Some(extra) = extratext {
-        footer = footer.push(text(extra.into()).size(11).style(move |_| text::Style {
+        footer = footer.push(text(extra.into()).size(11).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
             color: Some(ACCENT_PURPLE),
         }));
     }
@@ -102,7 +102,7 @@ pub fn status_pill<'a, Message: 'a>(
                 border: Border::default().rounded(Radius::from(3.0)),
                 ..container::Style::default()
             }),
-        text(lbl).size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+        text(lbl).size(11).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
             color: Some(txt),
         }),
     ]

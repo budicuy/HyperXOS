@@ -6,6 +6,12 @@ use iced::widget::{button, container, progress_bar, text_input};
 use iced::{Background, Border, Color, Font, Radians};
 
 // --- Typography: Plus Jakarta Sans (Headings & Brand) + Inter (Body & UI) ---
+pub const FONT_DISPLAY_EXTRABOLD: Font = Font {
+    family: Family::Name("Plus Jakarta Sans"),
+    weight: Weight::ExtraBold,
+    ..Font::DEFAULT
+};
+
 pub const FONT_DISPLAY_BOLD: Font = Font {
     family: Family::Name("Plus Jakarta Sans"),
     weight: Weight::Bold,
@@ -18,6 +24,12 @@ pub const FONT_DISPLAY_SEMIBOLD: Font = Font {
     ..Font::DEFAULT
 };
 
+pub const FONT_BODY_SEMIBOLD: Font = Font {
+    family: Family::Name("Inter"),
+    weight: Weight::Semibold,
+    ..Font::DEFAULT
+};
+
 pub const FONT_BODY_MEDIUM: Font = Font {
     family: Family::Name("Inter"),
     weight: Weight::Medium,
@@ -26,7 +38,7 @@ pub const FONT_BODY_MEDIUM: Font = Font {
 
 pub const FONT_BODY: Font = Font {
     family: Family::Name("Inter"),
-    weight: Weight::Normal,
+    weight: Weight::Medium, // Upgraded from Normal (400) to Medium (500) for thick, bold clarity
     ..Font::DEFAULT
 };
 
@@ -38,9 +50,9 @@ pub const ACCENT_GREEN: Color = Color::from_rgb(0.65, 0.89, 0.63); // #a6e3a1
 pub const ACCENT_RED: Color = Color::from_rgb(0.95, 0.55, 0.66); // #f38ba8
 pub const ACCENT_AMBER: Color = Color::from_rgb(0.98, 0.89, 0.69); // #f9e2af
 
-pub const TEXT_MAIN: Color = Color::from_rgb(0.95, 0.96, 0.99);
-pub const TEXT_SUB: Color = Color::from_rgb(0.68, 0.72, 0.84);
-pub const TEXT_MUTED: Color = Color::from_rgb(0.44, 0.48, 0.60);
+pub const TEXT_MAIN: Color = Color::from_rgb(0.98, 0.99, 1.0);
+pub const TEXT_SUB: Color = Color::from_rgb(0.80, 0.84, 0.94);
+pub const TEXT_MUTED: Color = Color::from_rgb(0.60, 0.65, 0.78);
 
 // --- Window & Container Glass Styles (Frosted Gradient Translucency) ---
 pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {

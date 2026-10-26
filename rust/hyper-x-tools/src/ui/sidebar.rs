@@ -64,7 +64,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         let icon_col = if is_active { ACCENT_CYAN } else { TEXT_SUB };
         let content = row![
             svg_icon(icon_svg, 15.0, icon_col),
-            text(label).size(12).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+            text(label).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
                 color: Some(if is_active { ACCENT_CYAN } else { TEXT_MAIN }),
             }),
         ]

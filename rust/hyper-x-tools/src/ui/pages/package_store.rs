@@ -20,6 +20,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let top_bar = column![
         text("HyperX Software Store")
             .size(16)
+            .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
                 color: Some(TEXT_MAIN),
             }),
@@ -111,7 +112,7 @@ pub fn view<'a, Message: Clone + 'a>(
             row![
                 column![
                     row![
-                        text(&p.display_name).size(13).style(|_| text::Style {
+                        text(&p.display_name).size(13).font(FONT_DISPLAY_BOLD).style(|_| text::Style {
                             color: Some(TEXT_MAIN),
                         }),
                         badges,
