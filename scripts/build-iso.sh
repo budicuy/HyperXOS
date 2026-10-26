@@ -37,6 +37,18 @@ mkdir -p "${OUT_DIR}"
 echo "==> [1/4] Ensuring HyperXOS custom packages repository is updated..."
 "${PROJECT_ROOT}/repo/build-repo.sh"
 
+# Dynamically ensure archiso pacman.conf points to current workspace repo
+if [ -f "${PROFILE_DIR}/pacman.conf" ]; then
+    sed -i -E "s|Server = file://.*/repo/\\\$arch|Server = file://${PROJECT_ROOT}/repo/\\\$arch|" "${PROFILE_DIR}/pacman.conf"
+fi
+
+# Ensure CachyOS mirrorlists are present on build host /etc/pacman.d
+if [ -d "${PROFILE_DIR}/airootfs/etc/pacman.d" ]; then
+    echo "  -> Ensuring CachyOS mirrorlists are present in /etc/pacman.d/..."
+    sudo mkdir -p /etc/pacman.d
+    sudo cp -f "${PROFILE_DIR}/airootfs/etc/pacman.d/cachyos"* /etc/pacman.d/ 2>/dev/null || true
+fi
+
 echo "  -> Mirroring HyperXOS custom packages to archiso/airootfs/opt/hyperxos-repo/x86_64..."
 mkdir -p "${PROFILE_DIR}/airootfs/opt/hyperxos-repo/x86_64"
 cp -af "${PROJECT_ROOT}/repo/x86_64/"* "${PROFILE_DIR}/airootfs/opt/hyperxos-repo/x86_64/"

@@ -40,16 +40,13 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
 
 ## 💾 Berkas Rilis & Checksum
 
-| Nama Berkas | Deskripsi | Ukuran | Checksum SHA-256 |
-| :--- | :--- | :--- | :--- |
-| `hyperxos-2026.10.26-x86_64.iso` | ISO Image Live & Instalasi Resmi (Production) | **1678 MB** (1,760,542,720 bytes) | `5f20654d764c8a146c4e8b3e234e997c995e81f75c3d54cfdca172a1cdc9a88d` |
-| `hyperxos-2026.10.26-x86_64.iso.sha256` | Verifikasi Integritas SHA256 | 97 B | — |
-| `hyperxos-2026.10.26-x86_64.iso.b2sum` | Verifikasi Integritas BLAKE2b | 161 B | — |
-| `hyperxos-2026.10.26-x86_64.pkglist` | Daftar Lengkap Paket Software | ~16 KB | — |
+Seluruh berkas ISO dan checksum dikompilasi secara otomatis dan bersih langsung di lingkungan CI/CD resmi GitHub Actions:
 
-### Checksum Resmi
-- **SHA-256:** `5f20654d764c8a146c4e8b3e234e997c995e81f75c3d54cfdca172a1cdc9a88d`
-- **BLAKE2b:** `794844c9cbb8eed3e033fb47bea173fe43496678f983cbf0ceedd5b182941cab9747fa0628b6ee9b73fa93298bcaebff84067d08ab17f5b70ed898ae3ad3d7d8`
+| Nama Berkas | Deskripsi | Verifikasi |
+| :--- | :--- | :--- |
+| `hyperxos-2026.10.26-x86_64.iso` | ISO Image Live & Instalasi Resmi (Production) | Checksum otomatis dari GitHub Runner |
+| `hyperxos-2026.10.26-x86_64.iso.sha256` | Berkas Verifikasi Integritas SHA-256 | `sha256sum -c hyperxos-*.iso.sha256` |
+| `hyperxos-2026.10.26-x86_64.iso.b2sum` | Berkas Verifikasi Integritas BLAKE2b | `b2sum -c hyperxos-*.iso.b2sum` |
 
 ### Cara Verifikasi Checksum
 

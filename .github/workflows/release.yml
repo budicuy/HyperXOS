@@ -1,4 +1,4 @@
-name: HyperXOS Release Pipeline
+name: HyperXOS Production CI/CD & Release Pipeline
 
 on:
   push:
@@ -10,28 +10,99 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Publish GitHub Release
+  build-and-release:
+    name: Build Production ISO & Publish Release
     runs-on: ubuntu-latest
+    timeout-minutes: 180
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Generate Release Notes
-        id: release_notes
+      - name: Free Disk Space for ISO Build
         run: |
-          if [ -f "RELEASE_NOTES.md" ]; then
-            echo "notes_file=RELEASE_NOTES.md" >> $GITHUB_OUTPUT
-          else
-            echo "notes_file=" >> $GITHUB_OUTPUT
+          echo "==> Freeing disk space on GitHub Actions runner..."
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/share/swift
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build Production ISO in Arch Linux Container
+        run: |
+          echo "==> Starting isolated Arch Linux Docker container with full privileged access..."
+          docker run --rm --privileged \
+            -v /dev:/dev \
+            -v "${GITHUB_WORKSPACE}:/workspace" \
+            -w /workspace \
+            archlinux:base-devel \
+            bash -c '
+              set -euo pipefail
+              git config --global --add safe.directory "*" || true
+
+              echo "==> Configuring pacman mirrors..."
+              echo "Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+              sed -i "s/^#Server/Server/" /etc/pacman.d/mirrorlist.pacnew 2>/dev/null || true
+
+              echo "==> Initializing pacman keys..."
+              pacman-key --init
+              pacman-key --populate archlinux
+              pacman -Sy --noconfirm archlinux-keyring
+
+              echo "==> Installing build dependencies..."
+              pacman -S --noconfirm --needed archiso git make sudo dosfstools e2fsprogs squashfs-tools libarchive
+
+              echo "==> Ensuring build directories..."
+              mkdir -p out work /var/tmp/hyperxos-work
+              chmod 0777 /var/tmp/hyperxos-work
+
+              echo "==> Compiling HyperXOS Production ISO (make build-production)..."
+              make build-production
+
+              echo "==> Ensuring proper file permissions for host runner..."
+              chmod -R 0777 /workspace/out
+            '
+
+      - name: Verify ISO Artifacts & Append Checksums
+        id: verify_artifacts
+        run: |
+          ls -lh out/
+          ISO_FILE=$(ls out/hyperxos-*.iso 2>/dev/null | head -n 1)
+          if [ -z "${ISO_FILE}" ] || [ ! -f "${ISO_FILE}" ]; then
+            echo "[-] Error: ISO image was not found in out/ directory!"
+            exit 1
           fi
 
-      - name: Create GitHub Release Draft
+          ISO_NAME=$(basename "${ISO_FILE}")
+          ISO_SIZE=$(stat -c%s "${ISO_FILE}")
+          ISO_SIZE_MB=$(( ISO_SIZE / 1024 / 1024 ))
+          SHA256_VAL=$(cat "${ISO_FILE}.sha256" | awk '{print $1}')
+          B2SUM_VAL=$(cat "${ISO_FILE}.b2sum" | awk '{print $1}')
+
+          echo "iso_name=${ISO_NAME}" >> $GITHUB_OUTPUT
+          echo "iso_size_mb=${ISO_SIZE_MB}" >> $GITHUB_OUTPUT
+
+          echo "" >> RELEASE_NOTES.md
+          echo "### 🛡️ Checksum Resmi dari GitHub Actions Runner" >> RELEASE_NOTES.md
+          echo "- **Nama Berkas:** \`${ISO_NAME}\`" >> RELEASE_NOTES.md
+          echo "- **Ukuran File:** ${ISO_SIZE_MB} MB (${ISO_SIZE} bytes)" >> RELEASE_NOTES.md
+          echo "- **SHA-256:** \`${SHA256_VAL}\`" >> RELEASE_NOTES.md
+          echo "- **BLAKE2b:** \`${B2SUM_VAL}\`" >> RELEASE_NOTES.md
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: HyperXOS ${{ github.ref_name }} — Official Release
-          body_path: ${{ steps.release_notes.outputs.notes_file }}
+          name: HyperXOS ${{ github.ref_name }} — Official Production Release
+          body_path: RELEASE_NOTES.md
+          files: |
+            out/hyperxos-*.iso
+            out/hyperxos-*.iso.sha256
+            out/hyperxos-*.iso.b2sum
           draft: false
           prerelease: false
-          generate_release_notes: true
+          fail_on_unmatched_files: true
