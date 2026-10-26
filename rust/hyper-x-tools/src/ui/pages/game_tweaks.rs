@@ -1,7 +1,8 @@
 use iced::widget::{button, column, container, row, scrollable, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::ui::components::{status_pill, terminal_box};
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -39,7 +40,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .style(primary_button_style(if is_active {
                 ACCENT_CYAN
             } else {
-                BORDER_GLASS
+                Color::from_rgba(1.0, 1.0, 1.0, 0.12)
             }))
             .on_press(on_set_governor(gov))
     };
@@ -69,9 +70,9 @@ pub fn view<'a, Message: Clone + 'a>(
             ]
             .align_y(Alignment::Center),
             row![
-                gov_btn("performance", "🔥 Performance", current_governor == "performance"),
-                gov_btn("schedutil", "⚖️ Schedutil", current_governor == "schedutil"),
-                gov_btn("powersave", "🌱 Powersave", current_governor == "powersave"),
+                gov_btn("performance", "Performance", current_governor == "performance"),
+                gov_btn("schedutil", "Schedutil", current_governor == "schedutil"),
+                gov_btn("powersave", "Powersave", current_governor == "powersave"),
             ]
             .spacing(10),
         ]
@@ -102,12 +103,21 @@ pub fn view<'a, Message: Clone + 'a>(
             .spacing(2),
             container("").width(Length::Fill),
             button(
-                text(if is_max_map_opt {
-                    "✓ Sudah Optimal (2.1M)"
-                } else {
-                    "Terapkan Tweak (2147483642)"
-                })
-                .size(11)
+                row![
+                    svg_icon(
+                        if is_max_map_opt { icons::CHECK } else { icons::ZAP },
+                        12.0,
+                        if is_max_map_opt { ACCENT_GREEN } else { ACCENT_CYAN }
+                    ),
+                    text(if is_max_map_opt {
+                        "Sudah Optimal (2.1M)"
+                    } else {
+                        "Terapkan Tweak (2147483642)"
+                    })
+                    .size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
             )
             .padding([6, 12])
             .style(primary_button_style(if is_max_map_opt {
@@ -142,18 +152,27 @@ pub fn view<'a, Message: Clone + 'a>(
             .spacing(2),
             container("").width(Length::Fill),
             button(
-                text(if is_split_lock_disabled {
-                    "✓ Nonaktif (Optimal)"
-                } else {
-                    "Nonaktifkan Mitigasi"
-                })
-                .size(11)
+                row![
+                    svg_icon(
+                        if is_split_lock_disabled { icons::CHECK } else { icons::SHIELD },
+                        12.0,
+                        if is_split_lock_disabled { ACCENT_GREEN } else { TEXT_SUB }
+                    ),
+                    text(if is_split_lock_disabled {
+                        "Nonaktif (Optimal)"
+                    } else {
+                        "Nonaktifkan Mitigasi"
+                    })
+                    .size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
             )
             .padding([6, 12])
             .style(primary_button_style(if is_split_lock_disabled {
                 ACCENT_GREEN
             } else {
-                BORDER_GLASS
+                Color::from_rgba(1.0, 1.0, 1.0, 0.12)
             }))
             .on_press(on_toggle_split_lock),
         ]
@@ -182,18 +201,27 @@ pub fn view<'a, Message: Clone + 'a>(
             .spacing(2),
             container("").width(Length::Fill),
             button(
-                text(if is_gamemode_active {
-                    "✓ Aktif (Running)"
-                } else {
-                    "Aktifkan Service"
-                })
-                .size(11)
+                row![
+                    svg_icon(
+                        if is_gamemode_active { icons::CHECK } else { icons::GAMING },
+                        12.0,
+                        if is_gamemode_active { ACCENT_GREEN } else { TEXT_SUB }
+                    ),
+                    text(if is_gamemode_active {
+                        "Aktif (Running)"
+                    } else {
+                        "Aktifkan Service"
+                    })
+                    .size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
             )
             .padding([6, 12])
             .style(primary_button_style(if is_gamemode_active {
                 ACCENT_GREEN
             } else {
-                BORDER_GLASS
+                Color::from_rgba(1.0, 1.0, 1.0, 0.12)
             }))
             .on_press(on_toggle_gamemode),
         ]
@@ -207,24 +235,36 @@ pub fn view<'a, Message: Clone + 'a>(
     // 5. Gaming Toolchain
     let toolchain_card = container(
         row![
-            column![
-                text("📦 Pasang Ekosistem Gaming Lengkap")
-                    .size(13)
-                    .style(|_| text::Style {
-                        color: Some(TEXT_MAIN),
-                    }),
-                text("Pasang Wine, Proton-GE, MangoHud, GOverlay, Gamemode, dan Vulkan Tools.")
-                    .size(11)
-                    .style(|_| text::Style {
-                        color: Some(TEXT_SUB),
-                    }),
+            row![
+                svg_icon(icons::STORE, 18.0, ACCENT_PURPLE),
+                column![
+                    text("Pasang Ekosistem Gaming Lengkap")
+                        .size(13)
+                        .style(|_| text::Style {
+                            color: Some(TEXT_MAIN),
+                        }),
+                    text("Pasang Wine, Proton-GE, MangoHud, GOverlay, Gamemode, dan Vulkan Tools.")
+                        .size(11)
+                        .style(|_| text::Style {
+                            color: Some(TEXT_SUB),
+                        }),
+                ]
+                .spacing(2),
             ]
-            .spacing(2),
+            .spacing(10)
+            .align_y(Alignment::Center),
             container("").width(Length::Fill),
-            button(text("Pasang Toolchain Gaming").size(11))
-                .padding([6, 12])
-                .style(primary_button_style(ACCENT_PURPLE))
-                .on_press(on_install_runtimes),
+            button(
+                row![
+                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_PURPLE),
+                    text("Pasang Toolchain Gaming").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
+            )
+            .padding([6, 12])
+            .style(primary_button_style(ACCENT_PURPLE))
+            .on_press(on_install_runtimes),
         ]
         .spacing(12)
         .align_y(Alignment::Center)

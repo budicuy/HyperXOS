@@ -2,11 +2,12 @@ use iced::border::Radius;
 use iced::widget::{button, column, container, progress_bar, row, scrollable, text};
 use iced::{Alignment, Border, Color, Element, Length};
 
+use crate::ui::icons::svg_icon;
 use crate::ui::theme::*;
 
 pub fn metric_card<'a, Message: 'a>(
     title: &'static str,
-    icon: &'static str,
+    icon_svg: &'static str,
     value_text: impl Into<String>,
     progress_val: f32, // 0.0 to 1.0
     subtext: impl Into<String>,
@@ -18,7 +19,7 @@ pub fn metric_card<'a, Message: 'a>(
 
     let header = row![
         row![
-            text(icon).size(18),
+            svg_icon(icon_svg, 18.0, accent_color),
             text(title)
                 .size(13)
                 .style(move |_| text::Style {
@@ -58,7 +59,7 @@ pub fn metric_card<'a, Message: 'a>(
 
     container(card_content)
         .width(Length::Fill)
-        .style(glass_card_style)
+        .style(glass_card_accent_style(accent_color))
         .into()
 }
 
@@ -84,7 +85,7 @@ pub fn status_pill<'a, Message: 'a>(
     } else {
         (
             Color::from_rgba(1.0, 1.0, 1.0, 0.05),
-            BORDER_GLASS,
+            Color::from_rgba(1.0, 1.0, 1.0, 0.12),
             TEXT_MUTED,
         )
     };

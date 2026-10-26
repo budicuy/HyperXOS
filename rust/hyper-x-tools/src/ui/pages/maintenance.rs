@@ -2,6 +2,7 @@ use iced::widget::{button, column, container, row, scrollable, text};
 use iced::{Alignment, Element, Length};
 
 use crate::ui::components::terminal_box;
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -27,23 +28,35 @@ pub fn view<'a, Message: Clone + 'a>(
     ]
     .spacing(2);
 
-    let action_card = |title: &'static str, desc: &'static str, btn_text: &'static str, accent: iced::Color, msg: Message| {
+    let action_card = |title: &'static str, desc: &'static str, btn_text: &'static str, icon_svg: &'static str, accent: iced::Color, msg: Message| {
         container(
             row![
-                column![
-                    text(title).size(13).style(|_| text::Style {
-                        color: Some(TEXT_MAIN),
-                    }),
-                    text(desc).size(11).style(|_| text::Style {
-                        color: Some(TEXT_SUB),
-                    }),
+                row![
+                    svg_icon(icon_svg, 18.0, accent),
+                    column![
+                        text(title).size(13).style(|_| text::Style {
+                            color: Some(TEXT_MAIN),
+                        }),
+                        text(desc).size(11).style(|_| text::Style {
+                            color: Some(TEXT_SUB),
+                        }),
+                    ]
+                    .spacing(2),
                 ]
-                .spacing(2),
+                .spacing(12)
+                .align_y(Alignment::Center),
                 container("").width(Length::Fill),
-                button(text(btn_text).size(11))
-                    .padding([6, 12])
-                    .style(primary_button_style(accent))
-                    .on_press(msg),
+                button(
+                    row![
+                        svg_icon(icon_svg, 12.0, accent),
+                        text(btn_text).size(11)
+                    ]
+                    .spacing(6)
+                    .align_y(Alignment::Center)
+                )
+                .padding([6, 12])
+                .style(primary_button_style(accent))
+                .on_press(msg),
             ]
             .spacing(12)
             .align_y(Alignment::Center)
@@ -58,6 +71,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Bersihkan Cache Paket Pacman",
             "Menghapus installer paket lama di /var/cache/pacman/pkg (menyisakan 2 versi terakhir).",
             "Bersihkan Cache",
+            icons::TRASH,
             ACCENT_CYAN,
             on_clean_cache,
         ),
@@ -65,6 +79,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Vakum Log Sistem (Systemd Journal)",
             "Mengompresi dan memangkas ukuran riwayat log sistem hingga di bawah 100 MB.",
             "Vakum Log",
+            icons::MAINTENANCE,
             ACCENT_TEAL,
             on_vacuum_journal,
         ),
@@ -72,6 +87,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Hapus Paket Yatim (Orphan Packages)",
             "Mencari dan mencopot dependensi yang sudah tidak lagi digunakan oleh aplikasi manapun.",
             "Copot Orphans",
+            icons::SPARKLES,
             ACCENT_AMBER,
             on_remove_orphans,
         ),
@@ -79,6 +95,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Urutkan Cermin Repositori Tercepat",
             "Menjalankan Reflector untuk menguji unduhan dan memilih mirror pacman tercepat.",
             "Uji & Urutkan Mirror",
+            icons::REFRESH,
             ACCENT_PURPLE,
             on_rank_mirrors,
         ),
@@ -86,6 +103,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Perbaiki & Sinkronisasi Pacman Keyrings",
             "Menginisialisasi ulang kunci GPG archlinux, cachyos, dan hyperxos jika ada error signature.",
             "Perbaiki Kunci GPG",
+            icons::SHIELD,
             ACCENT_GREEN,
             on_fix_keyrings,
         ),

@@ -1,6 +1,7 @@
 use iced::widget::{button, container, row, text};
 use iced::{Alignment, Element, Length};
 
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::sidebar::Page;
 use crate::ui::theme::*;
 
@@ -29,7 +30,7 @@ pub fn header<'a, Message: Clone + 'a>(
 
     let refresh_btn = button(
         row![
-            text("🔄").size(12),
+            svg_icon(icons::REFRESH, 13.0, TEXT_MAIN),
             text("Segarkan")
                 .size(11)
                 .style(|_| text::Style {

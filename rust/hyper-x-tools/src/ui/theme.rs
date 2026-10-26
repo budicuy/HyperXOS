@@ -1,19 +1,9 @@
 use iced::border::Radius;
+use iced::gradient::Linear;
 use iced::widget::{button, container, progress_bar, text_input};
-use iced::{Background, Border, Color};
+use iced::{Background, Border, Color, Radians};
 
-// --- Glassmorphism Color Palette ---
-pub const BG_WINDOW: Color = Color::from_rgba(0.06, 0.07, 0.11, 0.85);
-pub const BG_SIDEBAR: Color = Color::from_rgba(0.04, 0.05, 0.08, 0.92);
-pub const BG_CARD: Color = Color::from_rgba(0.12, 0.14, 0.22, 0.55);
-#[allow(dead_code)]
-pub const BG_CARD_HOVER: Color = Color::from_rgba(0.18, 0.21, 0.32, 0.65);
-pub const BG_INPUT: Color = Color::from_rgba(0.08, 0.09, 0.15, 0.70);
-pub const BG_TERMINAL: Color = Color::from_rgba(0.05, 0.05, 0.09, 0.90);
-
-pub const BORDER_GLASS: Color = Color::from_rgba(1.0, 1.0, 1.0, 0.10);
-pub const BORDER_LIGHT: Color = Color::from_rgba(1.0, 1.0, 1.0, 0.16);
-
+// --- Glassmorphism Accent & Text Colors ---
 pub const ACCENT_CYAN: Color = Color::from_rgb(0.54, 0.71, 0.98); // #89b4fa
 pub const ACCENT_PURPLE: Color = Color::from_rgb(0.80, 0.65, 0.97); // #cba6f7
 pub const ACCENT_TEAL: Color = Color::from_rgb(0.58, 0.89, 0.84); // #94e2d5
@@ -22,67 +12,111 @@ pub const ACCENT_RED: Color = Color::from_rgb(0.95, 0.55, 0.66); // #f38ba8
 pub const ACCENT_AMBER: Color = Color::from_rgb(0.98, 0.89, 0.69); // #f9e2af
 
 pub const TEXT_MAIN: Color = Color::from_rgb(0.95, 0.96, 0.99);
-pub const TEXT_SUB: Color = Color::from_rgb(0.65, 0.68, 0.78);
-pub const TEXT_MUTED: Color = Color::from_rgb(0.42, 0.44, 0.55);
-#[allow(dead_code)]
-pub const TEXT_DARK: Color = Color::from_rgb(0.07, 0.07, 0.11);
+pub const TEXT_SUB: Color = Color::from_rgb(0.68, 0.72, 0.84);
+pub const TEXT_MUTED: Color = Color::from_rgb(0.44, 0.48, 0.60);
 
-// --- Container Styles ---
-pub fn glass_card_style(_theme: &iced::Theme) -> container::Style {
+// --- Window & Container Glass Styles (Frosted Gradient Translucency) ---
+pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {
+    let gradient = Linear::new(Radians(0.785)) // 45 degrees
+        .add_stop(0.0, Color::from_rgba(0.06, 0.09, 0.18, 0.38))
+        .add_stop(0.5, Color::from_rgba(0.04, 0.06, 0.12, 0.28))
+        .add_stop(1.0, Color::from_rgba(0.02, 0.03, 0.07, 0.42));
+
     container::Style {
-        background: Some(Background::Color(BG_CARD)),
+        background: Some(Background::from(gradient)),
         border: Border::default()
-            .rounded(Radius::from(12.0))
+            .rounded(Radius::from(16.0))
+            .width(1.2)
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.16)),
+        ..container::Style::default()
+    }
+}
+
+pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
+    let gradient = Linear::new(Radians(1.571)) // 90 degrees (top to bottom)
+        .add_stop(0.0, Color::from_rgba(0.05, 0.07, 0.15, 0.42))
+        .add_stop(1.0, Color::from_rgba(0.02, 0.03, 0.08, 0.55));
+
+    container::Style {
+        background: Some(Background::from(gradient)),
+        border: Border::default()
             .width(1.0)
-            .color(BORDER_GLASS),
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.10)),
+        ..container::Style::default()
+    }
+}
+
+pub fn header_container_style(_theme: &iced::Theme) -> container::Style {
+    let gradient = Linear::new(Radians(0.0)) // left to right
+        .add_stop(0.0, Color::from_rgba(0.06, 0.10, 0.20, 0.30))
+        .add_stop(1.0, Color::from_rgba(0.03, 0.05, 0.10, 0.15));
+
+    container::Style {
+        background: Some(Background::from(gradient)),
+        border: Border::default()
+            .width(1.0)
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.08)),
+        ..container::Style::default()
+    }
+}
+
+pub fn glass_card_style(_theme: &iced::Theme) -> container::Style {
+    let gradient = Linear::new(Radians(0.6))
+        .add_stop(0.0, Color::from_rgba(0.14, 0.19, 0.34, 0.28))
+        .add_stop(1.0, Color::from_rgba(0.07, 0.10, 0.18, 0.20));
+
+    container::Style {
+        background: Some(Background::from(gradient)),
+        border: Border::default()
+            .rounded(Radius::from(14.0))
+            .width(1.2)
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.15)),
         text_color: Some(TEXT_MAIN),
         ..container::Style::default()
     }
 }
 
 pub fn glass_card_accent_style(accent_color: Color) -> impl Fn(&iced::Theme) -> container::Style {
-    move |_theme| container::Style {
-        background: Some(Background::Color(BG_CARD)),
-        border: Border::default()
-            .rounded(Radius::from(12.0))
-            .width(1.0)
-            .color(Color {
-                a: 0.35,
-                ..accent_color
-            }),
-        text_color: Some(TEXT_MAIN),
-        ..container::Style::default()
+    move |_theme| {
+        let gradient = Linear::new(Radians(0.6))
+            .add_stop(
+                0.0,
+                Color {
+                    r: (accent_color.r * 0.3 + 0.10).min(1.0),
+                    g: (accent_color.g * 0.3 + 0.12).min(1.0),
+                    b: (accent_color.b * 0.3 + 0.24).min(1.0),
+                    a: 0.26,
+                },
+            )
+            .add_stop(1.0, Color::from_rgba(0.06, 0.08, 0.16, 0.22));
+
+        container::Style {
+            background: Some(Background::from(gradient)),
+            border: Border::default()
+                .rounded(Radius::from(14.0))
+                .width(1.2)
+                .color(Color {
+                    a: 0.40,
+                    ..accent_color
+                }),
+            text_color: Some(TEXT_MAIN),
+            ..container::Style::default()
+        }
     }
 }
 
 pub fn terminal_container_style(_theme: &iced::Theme) -> container::Style {
+    let gradient = Linear::new(Radians(1.571))
+        .add_stop(0.0, Color::from_rgba(0.03, 0.04, 0.08, 0.60))
+        .add_stop(1.0, Color::from_rgba(0.01, 0.02, 0.05, 0.75));
+
     container::Style {
-        background: Some(Background::Color(BG_TERMINAL)),
+        background: Some(Background::from(gradient)),
         border: Border::default()
             .rounded(Radius::from(10.0))
             .width(1.0)
-            .color(BORDER_GLASS),
+            .color(Color::from_rgba(0.65, 0.89, 0.63, 0.25)),
         text_color: Some(ACCENT_GREEN),
-        ..container::Style::default()
-    }
-}
-
-pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
-    container::Style {
-        background: Some(Background::Color(BG_SIDEBAR)),
-        border: Border::default()
-            .width(1.0)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.06)),
-        ..container::Style::default()
-    }
-}
-
-pub fn header_container_style(_theme: &iced::Theme) -> container::Style {
-    container::Style {
-        background: Some(Background::Color(Color::from_rgba(0.05, 0.06, 0.10, 0.70))),
-        border: Border::default()
-            .width(1.0)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.06)),
         ..container::Style::default()
     }
 }
@@ -90,60 +124,69 @@ pub fn header_container_style(_theme: &iced::Theme) -> container::Style {
 // --- Button Styles ---
 pub fn nav_button_style(is_active: bool) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
     move |_theme, status| {
-        let (bg, border_color, text_color) = if is_active {
-            (
-                Color::from_rgba(0.54, 0.71, 0.98, 0.18),
-                Color::from_rgba(0.54, 0.71, 0.98, 0.40),
-                ACCENT_CYAN,
-            )
+        if is_active {
+            let gradient = Linear::new(Radians(0.0)) // left to right
+                .add_stop(0.0, Color::from_rgba(0.54, 0.71, 0.98, 0.35))
+                .add_stop(1.0, Color::from_rgba(0.80, 0.65, 0.97, 0.15));
+
+            button::Style {
+                background: Some(Background::from(gradient)),
+                text_color: Color::WHITE,
+                border: Border::default()
+                    .rounded(Radius::from(10.0))
+                    .width(1.2)
+                    .color(Color::from_rgba(0.54, 0.71, 0.98, 0.50)),
+                ..button::Style::default()
+            }
         } else {
-            match status {
+            let (bg, border_color, text_color) = match status {
                 button::Status::Hovered => (
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.08),
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.12),
+                    Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
+                    Color::from_rgba(1.0, 1.0, 1.0, 0.14),
                     TEXT_MAIN,
                 ),
                 button::Status::Pressed => (
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.12),
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.18),
+                    Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.14))),
+                    Color::from_rgba(1.0, 1.0, 1.0, 0.20),
                     TEXT_MAIN,
                 ),
-                _ => (Color::TRANSPARENT, Color::TRANSPARENT, TEXT_SUB),
-            }
-        };
+                _ => (None, Color::TRANSPARENT, TEXT_SUB),
+            };
 
-        button::Style {
-            background: Some(Background::Color(bg)),
-            text_color,
-            border: Border::default()
-                .rounded(Radius::from(8.0))
-                .width(1.0)
-                .color(border_color),
-            ..button::Style::default()
+            button::Style {
+                background: bg,
+                text_color,
+                border: Border::default()
+                    .rounded(Radius::from(10.0))
+                    .width(1.0)
+                    .color(border_color),
+                ..button::Style::default()
+            }
         }
     }
 }
 
 pub fn primary_button_style(accent: Color) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
     move |_theme, status| {
-        let (alpha, text_col) = match status {
-            button::Status::Hovered => (0.35, TEXT_MAIN),
-            button::Status::Pressed => (0.50, TEXT_MAIN),
-            button::Status::Disabled => (0.08, TEXT_MUTED),
-            _ => (0.20, accent),
+        let (alpha, border_alpha, text_col) = match status {
+            button::Status::Hovered => (0.40, 0.65, TEXT_MAIN),
+            button::Status::Pressed => (0.55, 0.80, TEXT_MAIN),
+            button::Status::Disabled => (0.08, 0.12, TEXT_MUTED),
+            _ => (0.24, 0.45, accent),
         };
 
+        let gradient = Linear::new(Radians(0.785))
+            .add_stop(0.0, Color { a: alpha, ..accent })
+            .add_stop(1.0, Color { a: alpha * 0.6, ..accent });
+
         button::Style {
-            background: Some(Background::Color(Color {
-                a: alpha,
-                ..accent
-            })),
+            background: Some(Background::from(gradient)),
             text_color: text_col,
             border: Border::default()
-                .rounded(Radius::from(8.0))
+                .rounded(Radius::from(10.0))
                 .width(1.0)
                 .color(Color {
-                    a: alpha + 0.2,
+                    a: border_alpha,
                     ..accent
                 }),
             ..button::Style::default()
@@ -152,29 +195,58 @@ pub fn primary_button_style(accent: Color) -> impl Fn(&iced::Theme, button::Stat
 }
 
 pub fn glass_action_button(_theme: &iced::Theme, status: button::Status) -> button::Style {
-    let (bg, text) = match status {
-        button::Status::Hovered => (Color::from_rgba(1.0, 1.0, 1.0, 0.12), TEXT_MAIN),
-        button::Status::Pressed => (Color::from_rgba(1.0, 1.0, 1.0, 0.18), TEXT_MAIN),
-        _ => (Color::from_rgba(1.0, 1.0, 1.0, 0.06), TEXT_SUB),
+    let (gradient, text, border) = match status {
+        button::Status::Hovered => {
+            let g = Linear::new(Radians(0.785))
+                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.16))
+                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.08));
+            (g, TEXT_MAIN, Color::from_rgba(1.0, 1.0, 1.0, 0.22))
+        }
+        button::Status::Pressed => {
+            let g = Linear::new(Radians(0.785))
+                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.22))
+                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.12));
+            (g, TEXT_MAIN, Color::from_rgba(1.0, 1.0, 1.0, 0.30))
+        }
+        _ => {
+            let g = Linear::new(Radians(0.785))
+                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.09))
+                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.03));
+            (g, TEXT_SUB, Color::from_rgba(1.0, 1.0, 1.0, 0.12))
+        }
     };
 
     button::Style {
-        background: Some(Background::Color(bg)),
+        background: Some(Background::from(gradient)),
         text_color: text,
         border: Border::default()
-            .rounded(Radius::from(8.0))
+            .rounded(Radius::from(10.0))
             .width(1.0)
-            .color(BORDER_GLASS),
+            .color(border),
         ..button::Style::default()
     }
 }
 
-// --- Progress Bar Style ---
+// --- Progress Bar Style (Gradient Glow Bar) ---
 pub fn glass_progress_bar_style(accent: Color) -> impl Fn(&iced::Theme) -> progress_bar::Style {
-    move |_theme| progress_bar::Style {
-        background: Background::Color(Color::from_rgba(0.04, 0.05, 0.08, 0.70)),
-        bar: Background::Color(accent),
-        border: Border::default().rounded(Radius::from(4.0)),
+    move |_theme| {
+        let bar_gradient = Linear::new(Radians(0.0)) // left to right glow
+            .add_stop(0.0, accent)
+            .add_stop(
+                1.0,
+                Color {
+                    r: (accent.r * 0.7 + 0.3).min(1.0),
+                    g: (accent.g * 0.7 + 0.3).min(1.0),
+                    b: (accent.b * 0.7 + 0.3).min(1.0),
+                    a: 1.0,
+                },
+            );
+
+        progress_bar::Style {
+            background: Background::Color(Color::from_rgba(0.04, 0.05, 0.10, 0.45)),
+            bar: Background::from(bar_gradient),
+            border: Border::default().rounded(Radius::from(6.0)),
+        }
     }
 }
 
@@ -182,12 +254,12 @@ pub fn glass_progress_bar_style(accent: Color) -> impl Fn(&iced::Theme) -> progr
 pub fn glass_input_style(_theme: &iced::Theme, status: text_input::Status) -> text_input::Style {
     let border_color = match status {
         text_input::Status::Focused { .. } => ACCENT_CYAN,
-        text_input::Status::Hovered => BORDER_LIGHT,
-        _ => BORDER_GLASS,
+        text_input::Status::Hovered => Color::from_rgba(1.0, 1.0, 1.0, 0.25),
+        _ => Color::from_rgba(1.0, 1.0, 1.0, 0.12),
     };
 
     text_input::Style {
-        background: Background::Color(BG_INPUT),
+        background: Background::Color(Color::from_rgba(0.06, 0.08, 0.14, 0.40)),
         border: Border::default()
             .rounded(Radius::from(8.0))
             .width(1.0)

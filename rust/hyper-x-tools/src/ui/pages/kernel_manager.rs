@@ -3,6 +3,7 @@ use iced::{Alignment, Element, Length};
 
 use crate::core::kernel_manager::KernelEntry;
 use crate::ui::components::{status_pill, terminal_box};
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -32,9 +33,12 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(2),
         container("").width(Length::Fill),
         button(
-            row![text("⚙️").size(12), text("Rebuild Initramfs").size(11)]
-                .spacing(6)
-                .align_y(Alignment::Center),
+            row![
+                svg_icon(icons::SLIDERS, 13.0, ACCENT_PURPLE),
+                text("Rebuild Initramfs").size(11)
+            ]
+            .spacing(6)
+            .align_y(Alignment::Center),
         )
         .padding([6, 12])
         .style(primary_button_style(ACCENT_PURPLE))
@@ -45,7 +49,7 @@ pub fn view<'a, Message: Clone + 'a>(
     // 2. Active Running Kernel Banner
     let running_banner = container(
         row![
-            text("🚀").size(24),
+            svg_icon(icons::KERNEL, 22.0, ACCENT_GREEN),
             column![
                 text(format!("Kernel Aktif: {}", running_name))
                     .size(13)
@@ -117,19 +121,40 @@ pub fn view<'a, Message: Clone + 'a>(
         }
 
         let action_btn = if !k.installed {
-            button(text("Pasang (+Headers)").size(11))
-                .padding([6, 12])
-                .style(primary_button_style(ACCENT_CYAN))
-                .on_press(on_install(pkg))
+            button(
+                row![
+                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_CYAN),
+                    text("Pasang (+Headers)").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center),
+            )
+            .padding([6, 12])
+            .style(primary_button_style(ACCENT_CYAN))
+            .on_press(on_install(pkg))
         } else if !k.is_running {
-            button(text("Hapus").size(11))
-                .padding([6, 12])
-                .style(primary_button_style(ACCENT_RED))
-                .on_press(on_remove(pkg))
+            button(
+                row![
+                    svg_icon(icons::TRASH, 12.0, ACCENT_RED),
+                    text("Hapus").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center),
+            )
+            .padding([6, 12])
+            .style(primary_button_style(ACCENT_RED))
+            .on_press(on_remove(pkg))
         } else {
-            button(text("Kernel Aktif").size(11))
-                .padding([6, 12])
-                .style(nav_button_style(false))
+            button(
+                row![
+                    svg_icon(icons::CHECK, 12.0, ACCENT_GREEN),
+                    text("Kernel Aktif").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center),
+            )
+            .padding([6, 12])
+            .style(nav_button_style(false))
         };
 
         let card = container(

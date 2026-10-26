@@ -3,6 +3,7 @@ use iced::{Alignment, Color, Element, Length};
 
 use crate::core::system_monitor::SystemMetrics;
 use crate::ui::components::metric_card;
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -26,7 +27,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let cpu_val = format!("{:.1}%", metrics.cpu_usage_percent);
     let cpu_card = metric_card(
         "Prosesor (CPU)",
-        "⚡",
+        icons::CPU,
         cpu_val,
         metrics.cpu_usage_percent / 100.0,
         cpu_sub,
@@ -47,7 +48,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let ram_val = format!("{:.1}%", metrics.ram_usage_percent);
     let ram_card = metric_card(
         "Memori (RAM & Swap)",
-        "🧠",
+        icons::RAM,
         &ram_val,
         metrics.ram_usage_percent / 100.0,
         ram_sub,
@@ -63,7 +64,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let disk_val = format!("{:.1}%", metrics.disk_usage_percent);
     let disk_card = metric_card(
         "Penyimpanan Disk (Root /)",
-        "💾",
+        icons::DISK,
         disk_val,
         metrics.disk_usage_percent / 100.0,
         disk_sub,
@@ -83,7 +84,7 @@ pub fn view<'a, Message: Clone + 'a>(
     };
     let gpu_card = metric_card(
         "Akselerasi Grafis (GPU)",
-        "🎮",
+        icons::GPU,
         gpu_val,
         metrics.gpu_usage_percent / 100.0,
         gpu_sub,
@@ -95,11 +96,16 @@ pub fn view<'a, Message: Clone + 'a>(
     let row2 = row![disk_card, gpu_card].spacing(16);
 
     // 2. System Information Glass Panel
-    let info_header = text("ℹ️ Informasi Sistem Operasi & Sesi")
-        .size(13)
-        .style(|_| text::Style {
-            color: Some(ACCENT_CYAN),
-        });
+    let info_header = row![
+        svg_icon(icons::INFO, 15.0, ACCENT_CYAN),
+        text("Informasi Sistem Operasi & Sesi")
+            .size(13)
+            .style(|_| text::Style {
+                color: Some(ACCENT_CYAN),
+            }),
+    ]
+    .spacing(8)
+    .align_y(Alignment::Center);
 
     let info_item = |label: &'static str, val: String, accent: Option<Color>| -> Element<'a, Message> {
         column![
@@ -131,11 +137,14 @@ pub fn view<'a, Message: Clone + 'a>(
         .style(glass_card_style);
 
     // 3. Quick Action Buttons
-    let action_btn = |label: &'static str, icon: &'static str, msg: Message| {
+    let action_btn = |label: &'static str, icon_svg: &'static str, msg: Message| {
         button(
-            row![text(icon).size(13), text(label).size(11)]
-                .spacing(8)
-                .align_y(Alignment::Center),
+            row![
+                svg_icon(icon_svg, 14.0, ACCENT_CYAN),
+                text(label).size(11)
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
         )
         .padding([8, 14])
         .style(glass_action_button)
@@ -143,9 +152,9 @@ pub fn view<'a, Message: Clone + 'a>(
     };
 
     let quick_actions = row![
-        action_btn("Bersihkan Cache Sistem", "🧹", on_quick_clean),
-        action_btn("Buka Tweak Gaming", "🚀", on_quick_tweaks),
-        action_btn("Kelola Kernel CachyOS", "🐧", on_quick_kernel),
+        action_btn("Bersihkan Cache Sistem", icons::MAINTENANCE, on_quick_clean),
+        action_btn("Buka Tweak Gaming", icons::GAMING, on_quick_tweaks),
+        action_btn("Kelola Kernel CachyOS", icons::KERNEL, on_quick_kernel),
     ]
     .spacing(12);
 

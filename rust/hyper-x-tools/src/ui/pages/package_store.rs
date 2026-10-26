@@ -3,6 +3,7 @@ use iced::{Alignment, Element, Length};
 
 use crate::core::package_manager::StorePackage;
 use crate::ui::components::{status_pill, terminal_box};
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -31,7 +32,7 @@ pub fn view<'a, Message: Clone + 'a>(
     .spacing(2);
 
     // Search bar
-    let search = text_input("🔍 Cari aplikasi di store...", search_query)
+    let search = text_input("Cari aplikasi di store...", search_query)
         .padding([8, 12])
         .size(12)
         .style(glass_input_style)
@@ -45,7 +46,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .style(primary_button_style(if is_act {
                 ACCENT_CYAN
             } else {
-                BORDER_GLASS
+                iced::Color::from_rgba(1.0, 1.0, 1.0, 0.12)
             }))
             .on_press(on_select_cat(cat))
     };
@@ -81,15 +82,29 @@ pub fn view<'a, Message: Clone + 'a>(
         );
 
         let action_btn = if !p.installed {
-            button(text("Pasang").size(11))
-                .padding([5, 12])
-                .style(primary_button_style(ACCENT_CYAN))
-                .on_press(on_install(pkg_name))
+            button(
+                row![
+                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_CYAN),
+                    text("Pasang").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
+            )
+            .padding([5, 12])
+            .style(primary_button_style(ACCENT_CYAN))
+            .on_press(on_install(pkg_name))
         } else {
-            button(text("Copot").size(11))
-                .padding([5, 12])
-                .style(primary_button_style(ACCENT_RED))
-                .on_press(on_remove(pkg_name))
+            button(
+                row![
+                    svg_icon(icons::TRASH, 12.0, ACCENT_RED),
+                    text("Copot").size(11)
+                ]
+                .spacing(6)
+                .align_y(Alignment::Center)
+            )
+            .padding([5, 12])
+            .style(primary_button_style(ACCENT_RED))
+            .on_press(on_remove(pkg_name))
         };
 
         let card = container(
@@ -99,11 +114,6 @@ pub fn view<'a, Message: Clone + 'a>(
                         text(&p.display_name).size(13).style(|_| text::Style {
                             color: Some(TEXT_MAIN),
                         }),
-                        text(format!("({})", p.package_name))
-                            .size(11)
-                            .style(|_| text::Style {
-                                color: Some(TEXT_MUTED),
-                            }),
                         badges,
                     ]
                     .spacing(8)

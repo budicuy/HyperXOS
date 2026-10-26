@@ -1,7 +1,7 @@
 # HyperXOS Project Central Orchestration Makefile
 # Defines build, configuration, testing, and virtualization targets.
 
-.PHONY: help setup check build build-production test install vm-install run dev clean checksum release
+.PHONY: help setup check build build-production test install vm-install run dev clean checksum release hyperx
 
 SHELL := /usr/bin/env bash
 PROJECT_DIR := $(shell pwd)
@@ -30,6 +30,7 @@ help:
 	@echo "  make dev              Menjalankan ISO secara live di QEMU tanpa install"
 	@echo "  make clean            Membersihkan direktori kerja build sementara"
 	@echo "  make checksum         Menghasilkan checksum resmi ISO (SHA256 & B2SUM)"
+	@echo "  make hyperx           Menjalankan & menguji HyperXTools secara langsung"
 	@echo "======================================================================"
 
 setup:
@@ -103,3 +104,7 @@ checksum:
 		(cd $(OUT_DIR) && b2sum "$$(basename $$iso)" > "$$(basename $$iso).b2sum"); \
 	done
 	@echo "[✓] Pembuatan checksum selesai."
+
+hyperx:
+	@echo "==> [HyperXOS] Menjalankan HyperXTools secara langsung..."
+	@cd rust/hyper-x-tools && cargo run --release

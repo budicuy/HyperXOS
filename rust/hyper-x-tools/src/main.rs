@@ -35,6 +35,10 @@ fn main() -> iced::Result {
     .window(window_settings)
     .subscription(App::subscription)
     .theme(|_: &App| iced::Theme::Dark)
+    .style(|_: &App, _: &iced::Theme| iced::theme::Style {
+        background_color: iced::Color::TRANSPARENT,
+        text_color: crate::ui::theme::TEXT_MAIN,
+    })
     .run()
 }
 
@@ -524,10 +528,7 @@ impl App {
         container(app_layout)
             .width(Length::Fill)
             .height(Length::Fill)
-            .style(|_| container::Style {
-                background: Some(iced::Background::Color(crate::ui::theme::BG_WINDOW)),
-                ..container::Style::default()
-            })
+            .style(crate::ui::theme::glass_window_style)
             .into()
     }
 }

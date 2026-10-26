@@ -3,6 +3,7 @@ use iced::{Alignment, Element, Length};
 
 use crate::core::snapshot_manager::SnapshotRecord;
 use crate::ui::components::{status_pill, terminal_box};
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
@@ -43,10 +44,17 @@ pub fn view<'a, Message: Clone + 'a>(
         .style(glass_input_style)
         .on_input(on_input_change);
 
-    let create_btn = button(text("📸 Ambil Snapshot").size(11))
-        .padding([8, 14])
-        .style(primary_button_style(ACCENT_CYAN))
-        .on_press(on_create);
+    let create_btn = button(
+        row![
+            svg_icon(icons::SNAPSHOT, 13.0, ACCENT_CYAN),
+            text("Ambil Snapshot").size(11)
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([8, 14])
+    .style(primary_button_style(ACCENT_CYAN))
+    .on_press(on_create);
 
     let create_card = container(
         column![
@@ -108,14 +116,28 @@ pub fn view<'a, Message: Clone + 'a>(
                 .spacing(2),
                 container("").width(Length::Fill),
                 row![
-                    button(text("Pulihkan").size(10))
-                        .padding([5, 10])
-                        .style(primary_button_style(ACCENT_GREEN))
-                        .on_press(on_restore(snap_name.clone())),
-                    button(text("Hapus").size(10))
-                        .padding([5, 10])
-                        .style(primary_button_style(ACCENT_RED))
-                        .on_press(on_delete(snap_name)),
+                    button(
+                        row![
+                            svg_icon(icons::CHECK, 11.0, ACCENT_GREEN),
+                            text("Pulihkan").size(10)
+                        ]
+                        .spacing(5)
+                        .align_y(Alignment::Center)
+                    )
+                    .padding([5, 10])
+                    .style(primary_button_style(ACCENT_GREEN))
+                    .on_press(on_restore(snap_name.clone())),
+                    button(
+                        row![
+                            svg_icon(icons::TRASH, 11.0, ACCENT_RED),
+                            text("Hapus").size(10)
+                        ]
+                        .spacing(5)
+                        .align_y(Alignment::Center)
+                    )
+                    .padding([5, 10])
+                    .style(primary_button_style(ACCENT_RED))
+                    .on_press(on_delete(snap_name)),
                 ]
                 .spacing(6),
             ]

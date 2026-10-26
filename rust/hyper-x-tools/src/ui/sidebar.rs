@@ -1,6 +1,7 @@
 use iced::widget::{button, column, container, image, row, text};
 use iced::{Alignment, Element, Length};
 
+use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,15 +48,16 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         .width(Length::Fill)
         .height(1)
         .style(|_| container::Style {
-            background: Some(iced::Background::Color(BORDER_GLASS)),
+            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
             ..container::Style::default()
         });
 
-    // Helper to build a styled navigation button
-    let nav_item = |page: Page, label: &'static str, icon: &'static str| -> Element<'a, Message> {
+    // Helper to build a styled navigation button with open-source SVG icons
+    let nav_item = |page: Page, label: &'static str, icon_svg: &'static str| -> Element<'a, Message> {
         let is_active = current_page == page;
+        let icon_col = if is_active { ACCENT_CYAN } else { TEXT_SUB };
         let content = row![
-            text(icon).size(15),
+            svg_icon(icon_svg, 15.0, icon_col),
             text(label).size(12).style(move |_| text::Style {
                 color: Some(if is_active { ACCENT_CYAN } else { TEXT_MAIN }),
             }),
@@ -84,18 +86,18 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     let nav_links = column![
         // Group: SISTEM
         section_header("SISTEM"),
-        nav_item(Page::Dashboard, "Dashboard Metrik", "📊"),
+        nav_item(Page::Dashboard, "Dashboard Metrik", icons::DASHBOARD),
         // Group: PERFORMA & KERNEL
         section_header("PERFORMA & KERNEL"),
-        nav_item(Page::KernelManager, "Kernel Manager", "🐧"),
-        nav_item(Page::GameTweaks, "Tweak Gaming", "⚡"),
+        nav_item(Page::KernelManager, "Kernel Manager", icons::KERNEL),
+        nav_item(Page::GameTweaks, "Tweak Gaming", icons::GAMING),
         // Group: CADANGAN & PERAWATAN
         section_header("CADANGAN & PERAWATAN"),
-        nav_item(Page::Snapshots, "Snapshot & Restore", "🛡️"),
-        nav_item(Page::Maintenance, "Perawatan Sistem", "🧹"),
+        nav_item(Page::Snapshots, "Snapshot & Restore", icons::SNAPSHOT),
+        nav_item(Page::Maintenance, "Perawatan Sistem", icons::MAINTENANCE),
         // Group: PERANGKAT LUNAK
         section_header("PERANGKAT LUNAK"),
-        nav_item(Page::PackageStore, "Software Store", "🛍️"),
+        nav_item(Page::PackageStore, "Software Store", icons::STORE),
     ]
     .spacing(6);
 
