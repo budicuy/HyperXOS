@@ -100,6 +100,7 @@ pub fn view<'a, Message: Clone + 'a>(
         svg_icon(icons::INFO, 15.0, ACCENT_CYAN),
         text("Informasi Sistem Operasi & Sesi")
             .size(13)
+            .font(FONT_DISPLAY_SEMIBOLD)
             .style(|_| text::Style {
                 color: Some(ACCENT_CYAN),
             }),
@@ -109,10 +110,10 @@ pub fn view<'a, Message: Clone + 'a>(
 
     let info_item = |label: &'static str, val: String, accent: Option<Color>| -> Element<'a, Message> {
         column![
-            text(label).size(10).style(|_| text::Style {
+            text(label).size(10).font(FONT_BODY_MEDIUM).style(|_| text::Style {
                 color: Some(TEXT_MUTED),
             }),
-            text(val).size(12).style(move |_| text::Style {
+            text(val).size(12).font(FONT_DISPLAY_SEMIBOLD).style(move |_| text::Style {
                 color: Some(accent.unwrap_or(TEXT_MAIN)),
             }),
         ]
@@ -141,7 +142,7 @@ pub fn view<'a, Message: Clone + 'a>(
         button(
             row![
                 svg_icon(icon_svg, 14.0, ACCENT_CYAN),
-                text(label).size(11)
+                text(label).size(11).font(FONT_BODY_MEDIUM)
             ]
             .spacing(8)
             .align_y(Alignment::Center),
@@ -162,6 +163,7 @@ pub fn view<'a, Message: Clone + 'a>(
         column![
             text("Pemantauan Perangkat Keras Real-time")
                 .size(16)
+                .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),

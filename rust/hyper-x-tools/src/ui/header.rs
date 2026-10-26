@@ -24,7 +24,8 @@ pub fn header<'a, Message: Clone + 'a>(
 
     let title_breadcrumb = row![
         text(page_title)
-            .size(14)
+            .size(15)
+            .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
                 color: Some(TEXT_MAIN),
             }),
@@ -45,6 +46,7 @@ pub fn header<'a, Message: Clone + 'a>(
             svg_icon(icons::REFRESH, 12.0, TEXT_MAIN),
             text("Segarkan")
                 .size(11)
+                .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),

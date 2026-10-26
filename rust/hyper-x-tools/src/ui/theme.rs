@@ -1,8 +1,34 @@
 use iced::border::Radius;
+use iced::font::{Family, Weight};
 use iced::gradient::Linear;
 use iced::widget::scrollable::{self, Rail, Scroller};
 use iced::widget::{button, container, progress_bar, text_input};
-use iced::{Background, Border, Color, Radians};
+use iced::{Background, Border, Color, Font, Radians};
+
+// --- Typography: Plus Jakarta Sans (Headings & Brand) + Inter (Body & UI) ---
+pub const FONT_DISPLAY_BOLD: Font = Font {
+    family: Family::Name("Plus Jakarta Sans"),
+    weight: Weight::Bold,
+    ..Font::DEFAULT
+};
+
+pub const FONT_DISPLAY_SEMIBOLD: Font = Font {
+    family: Family::Name("Plus Jakarta Sans"),
+    weight: Weight::Semibold,
+    ..Font::DEFAULT
+};
+
+pub const FONT_BODY_MEDIUM: Font = Font {
+    family: Family::Name("Inter"),
+    weight: Weight::Medium,
+    ..Font::DEFAULT
+};
+
+pub const FONT_BODY: Font = Font {
+    family: Family::Name("Inter"),
+    weight: Weight::Normal,
+    ..Font::DEFAULT
+};
 
 // --- Glassmorphism Accent & Text Colors ---
 pub const ACCENT_CYAN: Color = Color::from_rgb(0.54, 0.71, 0.98); // #89b4fa

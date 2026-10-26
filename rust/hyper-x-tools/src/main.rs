@@ -45,6 +45,9 @@ fn main() -> iced::Result {
         App::view,
     )
     .title("HyperXTools — Control Center & System Dashboard")
+    .font(include_bytes!("../assets/fonts/PlusJakartaSans.ttf").as_slice())
+    .font(include_bytes!("../assets/fonts/Inter.ttf").as_slice())
+    .default_font(crate::ui::theme::FONT_BODY)
     .window(window_settings)
     .subscription(App::subscription)
     .theme(|_: &App| iced::Theme::Dark)

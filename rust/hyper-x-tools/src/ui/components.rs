@@ -23,6 +23,7 @@ pub fn metric_card<'a, Message: 'a>(
             svg_icon(icon_svg, 18.0, accent_color),
             text(title)
                 .size(13)
+                .font(FONT_DISPLAY_SEMIBOLD)
                 .style(move |_| text::Style {
                     color: Some(TEXT_MAIN),
                 }),
@@ -30,7 +31,8 @@ pub fn metric_card<'a, Message: 'a>(
         .spacing(8)
         .align_y(Alignment::Center),
         text(val_str)
-            .size(20)
+            .size(22)
+            .font(FONT_DISPLAY_BOLD)
             .style(move |_| text::Style {
                 color: Some(accent_color),
             }),
@@ -100,7 +102,7 @@ pub fn status_pill<'a, Message: 'a>(
                 border: Border::default().rounded(Radius::from(3.0)),
                 ..container::Style::default()
             }),
-        text(lbl).size(11).style(move |_| text::Style {
+        text(lbl).size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
             color: Some(txt),
         }),
     ]

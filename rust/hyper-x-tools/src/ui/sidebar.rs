@@ -31,11 +31,13 @@ pub fn sidebar<'a, Message: Clone + 'a>(
             column![
                 text("HYPERX TOOLS")
                     .size(13)
+                    .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
                         color: Some(TEXT_MAIN),
                     }),
                 text("Pusat Kendali Sistem")
                     .size(10)
+                    .font(FONT_BODY_MEDIUM)
                     .style(|_| text::Style {
                         color: Some(ACCENT_CYAN),
                     }),
@@ -62,7 +64,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         let icon_col = if is_active { ACCENT_CYAN } else { TEXT_SUB };
         let content = row![
             svg_icon(icon_svg, 15.0, icon_col),
-            text(label).size(12).style(move |_| text::Style {
+            text(label).size(12).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
                 color: Some(if is_active { ACCENT_CYAN } else { TEXT_MAIN }),
             }),
         ]
@@ -80,6 +82,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     let section_header = |name: &'static str| -> Element<'a, Message> {
         text(name)
             .size(10)
+            .font(FONT_BODY_MEDIUM)
             .style(|_| text::Style {
                 color: Some(TEXT_MUTED),
             })
@@ -110,11 +113,13 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         column![
             text("HyperXOS Linux 2026.10")
                 .size(10)
+                .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
                     color: Some(TEXT_SUB),
                 }),
             text("Rust + Iced Glass v2.2")
                 .size(9)
+                .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
                     color: Some(ACCENT_PURPLE),
                 }),
