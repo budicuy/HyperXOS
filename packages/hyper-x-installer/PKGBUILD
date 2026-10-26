@@ -17,6 +17,8 @@ build() {
 
 package() {
     install -Dm755 "${startdir}/../../rust/hyper-x-installer/target/release/hyper-x-installer" "${pkgdir}/usr/bin/hyper-x-installer"
+    install -Dm755 "${startdir}/hyper-x-installer-launcher" "${pkgdir}/usr/bin/hyper-x-installer-launcher"
+    ln -sf hyper-x-installer-launcher "${pkgdir}/usr/bin/launch-installer"
     install -Dm644 "${startdir}/hyper-x-installer.desktop" "${pkgdir}/usr/share/applications/hyper-x-installer.desktop"
     install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-installer.png"
     install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/pixmaps/hyper-x-installer.png"

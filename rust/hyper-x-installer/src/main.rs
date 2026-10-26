@@ -81,6 +81,13 @@ pub enum Message {
     CompleteAndExit,
 }
 
+fn get_euid() -> u32 {
+    extern "C" {
+        fn geteuid() -> u32;
+    }
+    unsafe { geteuid() }
+}
+
 fn load_window_icon() -> Option<iced::window::Icon> {
     let bytes = include_bytes!("../assets/logo.png");
     let img = image::load_from_memory(bytes).ok()?;
@@ -127,6 +134,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         let _ = handle.join();
         return Ok(());
+    }
+
+    // Display environment auto-detection & fallback for Wayland & X11
+    let has_wayland = std::env::var("WAYLAND_DISPLAY").is_ok() || std::env::var("WAYLAND_SOCKET").is_ok();
+    let has_x11 = std::env::var("DISPLAY").is_ok();
+
+    if !has_wayland && !has_x11 {
+        let euid = get_euid();
+        let mut resolved = false;
+
+        // 1. Try finding Wayland sockets in current UID runtime dir or live user 1000
+        let runtimes = vec![
+            format!("/run/user/{}", euid),
+            "/run/user/1000".to_string(),
+        ];
+
+        for rdir in &runtimes {
+            if let Ok(entries) = std::fs::read_dir(rdir) {
+                for entry in entries.flatten() {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    if name.starts_with("wayland-") && !name.ends_with(".lock") {
+                        std::env::set_var("WAYLAND_DISPLAY", &name);
+                        std::env::set_var("XDG_RUNTIME_DIR", rdir);
+                        resolved = true;
+                        break;
+                    }
+                }
+            }
+            if resolved {
+                break;
+            }
+        }
+
+        // 2. If no Wayland socket found, check for X11 socket
+        if !resolved {
+            if std::path::Path::new("/tmp/.X11-unix/X0").exists() {
+                std::env::set_var("DISPLAY", ":0");
+                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+                resolved = true;
+            } else if std::path::Path::new("/tmp/.X11-unix/X1").exists() {
+                std::env::set_var("DISPLAY", ":1");
+                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+                resolved = true;
+            }
+        }
+
+        if !resolved {
+            // Default fallback
+            std::env::set_var("DISPLAY", ":0");
+        }
     }
 
     let window_settings = window::Settings {
