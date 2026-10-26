@@ -87,6 +87,9 @@ pub struct App {
     all_packages: Vec<StorePackage>,
     filtered_packages: Vec<StorePackage>,
 
+    // Header state
+    hovered_header_btn: Option<&'static str>,
+
     // Terminal Logging
     terminal_log: String,
     log_tx: Sender<String>,
@@ -139,6 +142,7 @@ pub enum Message {
 
     // External Links
     OpenUrl(&'static str),
+    HeaderBtnHovered(Option<&'static str>),
 }
 
 impl Default for App {
@@ -186,6 +190,8 @@ impl Default for App {
             store_search: String::new(),
             all_packages,
             filtered_packages,
+
+            hovered_header_btn: None,
 
             terminal_log: "HyperXTools v2.2.0 (Rust + Iced Glass WGPU) Siap.\n".to_string(),
             log_tx,
@@ -245,6 +251,10 @@ impl App {
                 let _ = std::process::Command::new("xdg-open")
                     .arg(url)
                     .spawn();
+                Task::none()
+            }
+            Message::HeaderBtnHovered(btn) => {
+                self.hovered_header_btn = btn;
                 Task::none()
             }
 
@@ -496,6 +506,8 @@ impl App {
     pub fn view(&self) -> Element<'_, Message> {
         let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
         let head = header(
+            self.hovered_header_btn,
+            Message::HeaderBtnHovered,
             Message::OpenUrl,
             Message::WindowDrag,
             Message::WindowMinimize,

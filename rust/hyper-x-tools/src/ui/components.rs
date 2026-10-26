@@ -148,9 +148,7 @@ pub fn terminal_box<'a, Message: Clone + 'a>(
         button(
             text("Bersihkan Log")
                 .size(10)
-                .style(|_| text::Style {
-                    color: Some(TEXT_SUB),
-                })
+                .font(FONT_BODY_SEMIBOLD),
         )
         .padding([3, 10])
         .style(glass_action_button)
