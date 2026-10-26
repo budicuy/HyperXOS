@@ -1,0 +1,23 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=hyper-x-hw
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Pure Rust Multi-Tier Hardware & GPU Auto-Detection Engine for HyperXOS Linux"
+arch=('x86_64')
+url="https://github.com/budicuy/HyperXOS"
+license=('GPL-3.0-or-later')
+depends=('glibc')
+makedepends=('cargo' 'rust')
+provides=('hw-detect-gpu')
+conflicts=('hw-detect-gpu')
+
+build() {
+    cd "${startdir}/../../rust/hyper-x-hw"
+    cargo build --release --locked
+}
+
+package() {
+    install -Dm755 "${startdir}/../../rust/hyper-x-hw/target/release/hyper-x-hw" "${pkgdir}/usr/bin/hyper-x-hw"
+    install -d "${pkgdir}/usr/local/bin"
+    ln -sf /usr/bin/hyper-x-hw "${pkgdir}/usr/local/bin/hw-detect-gpu"
+}

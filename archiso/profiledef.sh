@@ -32,10 +32,5 @@ file_permissions=(
   ["/home/hyperxos/Desktop/hyper-x-installer.desktop"]="1000:1000:755"
   ["/home/hyperxos/Desktop/hyperxtools.desktop"]="1000:1000:755"
   ["/usr/share/applications/hyper-x-installer.desktop"]="0:0:755"
-  ["/usr/local/bin/choose-mirror"]="0:0:755"
-  ["/usr/local/bin/Installation_guide"]="0:0:755"
-  ["/usr/local/bin/livecd-sound"]="0:0:755"
   ["/usr/local/bin/launch-installer"]="0:0:755"
-  ["/usr/local/bin/hw-detect-gpu"]="0:0:755"
-  ["/usr/local/bin/hyperxos-postinstall"]="0:0:755"
 )

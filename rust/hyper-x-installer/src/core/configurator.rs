@@ -1,5 +1,6 @@
 use std::fs;
 use std::os::unix::fs::symlink;
+use std::path::Path;
 use std::process::Command;
 use crate::core::filesystem::FilesystemContext;
 
@@ -151,33 +152,71 @@ Relogin=false
         );
         let _ = fs::write("/mnt/etc/sddm.conf.d/autologin.conf", autologin_cfg);
 
-        // Enable services
-        let _ = Command::new("arch-chroot")
-            .args(["/mnt", "systemctl", "enable", "sddm.service", "NetworkManager.service", "qemu-guest-agent.service"])
-            .status();
+        // DNS Configuration
+        let _ = fs::write(
+            "/mnt/etc/resolv.conf",
+            "nameserver 1.1.1.1\nnameserver 8.8.8.8\nnameserver 1.0.0.1\n",
+        );
+
+        // Enable essential system services natively
+        for srv in [
+            "sddm.service",
+            "NetworkManager.service",
+            "systemd-resolved.service",
+            "systemd-timesyncd.service",
+            "bluetooth.service",
+            "qemu-guest-agent.service",
+        ] {
+            let _ = Command::new("arch-chroot")
+                .args(["/mnt", "systemctl", "enable", srv])
+                .status();
+        }
+
         let _ = Command::new("arch-chroot")
             .args(["/mnt", "systemctl", "set-default", "graphical.target"])
             .status();
 
-        // 8. Hardware Detection & Postinstall
-        if fs::metadata("/mnt/usr/local/bin/hw-detect-gpu").is_ok() {
-            progress_callback("Executing hardware & GPU driver auto-configuration...");
+        // 8. User Desktop Shortcuts & Keyring Setup
+        let user_desktop_dir = format!("/mnt/home/{}/Desktop", cfg.username);
+        let _ = fs::create_dir_all(&user_desktop_dir);
+        let user_tools_desktop = format!("{}/hyper-x-tools.desktop", user_desktop_dir);
+        if Path::new("/mnt/usr/share/applications/hyper-x-tools.desktop").exists() {
+            let _ = fs::copy("/mnt/usr/share/applications/hyper-x-tools.desktop", &user_tools_desktop);
+            let _ = Command::new("chmod").args(["755", &user_tools_desktop]).status();
+            let chown_arg = format!("{}:{}", cfg.username, cfg.username);
             let _ = Command::new("arch-chroot")
-                .args(["/mnt", "/usr/local/bin/hw-detect-gpu", "/"])
+                .args(["/mnt", "chown", "-R", &chown_arg, &format!("/home/{}/Desktop", cfg.username)])
                 .status();
         }
 
-        if fs::metadata("/mnt/usr/local/bin/hyperxos-postinstall").is_ok() {
-            progress_callback("Executing HyperXOS postinstall optimization hooks...");
+        // Initialize clean pacman keyring in target
+        let _ = Command::new("arch-chroot")
+            .args(["/mnt", "pacman-key", "--init"])
+            .status();
+        let _ = Command::new("arch-chroot")
+            .args(["/mnt", "pacman-key", "--populate", "archlinux", "cachyos", "hyperxos"])
+            .status();
+
+        // 9. Hardware & GPU Detection via Pure Rust hyper-x-hw
+        progress_callback("Executing native hardware & GPU driver auto-configuration (hyper-x-hw)...");
+        if Path::new("/usr/bin/hyper-x-hw").exists() {
+            let _ = Command::new("/usr/bin/hyper-x-hw")
+                .args(["apply", "--target", "/mnt", "--no-pkg"])
+                .status();
+        } else if Path::new("/mnt/usr/bin/hyper-x-hw").exists() {
             let _ = Command::new("arch-chroot")
-                .args(["/mnt", "/usr/local/bin/hyperxos-postinstall"])
+                .args(["/mnt", "/usr/bin/hyper-x-hw", "apply", "--no-pkg"])
+                .status();
+        } else if fs::metadata("/mnt/usr/local/bin/hw-detect-gpu").is_ok() {
+            let _ = Command::new("arch-chroot")
+                .args(["/mnt", "/usr/local/bin/hw-detect-gpu", "/"])
                 .status();
         }
 
         // 9. Rebuild mkinitcpio for target kernel (ensuring btrfs module is included)
         progress_callback("Configuring mkinitcpio modules and generating initramfs with mkinitcpio -P...");
         let _ = fs::create_dir_all("/mnt/etc/mkinitcpio.conf.d");
-        let _ = fs::write("/mnt/etc/mkinitcpio.conf.d/hyperxos.conf", "MODULES=(btrfs)\n");
+        let _ = fs::write("/mnt/etc/mkinitcpio.conf.d/hyperxos.conf", "MODULES+=(btrfs)\n");
         let mkinit_res = Command::new("arch-chroot")
             .args(["/mnt", "mkinitcpio", "-P"])
             .status()

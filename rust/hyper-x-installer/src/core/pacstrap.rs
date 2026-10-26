@@ -49,6 +49,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "hyperxos-mirrorlist",
     "paru",
     "hyper-x-tools",
+    "hyper-x-hw",
     // 7. Minimal Core KDE Plasma 6 Desktop
     "plasma-desktop",
     "plasma-workspace",
@@ -119,13 +120,10 @@ impl PacstrapInstaller {
                 .status();
         }
 
-        // Copy helper scripts
-        for script in ["/usr/local/bin/hw-detect-gpu", "/usr/local/bin/hyperxos-postinstall"] {
-            if Path::new(script).exists() {
-                let dest = format!("/mnt{}", script);
-                let _ = fs::copy(script, &dest);
-                let _ = Command::new("chmod").args(["755", &dest]).status();
-            }
+        // Copy hyper-x-hw binary if present in live environment
+        if Path::new("/usr/bin/hyper-x-hw").exists() && !Path::new("/mnt/usr/bin/hyper-x-hw").exists() {
+            let _ = fs::copy("/usr/bin/hyper-x-hw", "/mnt/usr/bin/hyper-x-hw");
+            let _ = Command::new("chmod").args(["755", "/mnt/usr/bin/hyper-x-hw"]).status();
         }
 
         // Initialize and populate pacman keys

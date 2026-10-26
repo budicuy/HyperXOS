@@ -69,6 +69,7 @@ qemu-guest-agent
 # HyperXOS Pure Rust Native Installer & System Tools
 hyper-x-installer
 hyper-x-tools
+hyper-x-hw
 hyperxos-branding
 hyperxos-default-settings
 hyperxos-hooks

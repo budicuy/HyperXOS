@@ -1,14 +1,14 @@
 # HyperXOS Project Central Orchestration Makefile
 # Defines build, configuration, testing, and virtualization targets.
 
-.PHONY: help setup check build build-production test install vm-install run dev clean checksum release hyperx
+.PHONY: help setup check build build-production test install vm-install run dev clean checksum release hyperx tools installer hw cli repo
 
 SHELL := /usr/bin/env bash
 PROJECT_DIR := $(shell pwd)
 OUT_DIR := $(PROJECT_DIR)/out
 SCRIPTS_DIR := $(PROJECT_DIR)/scripts
 ARCHISO_DIR := $(PROJECT_DIR)/archiso
-INSTALLER_DIR := $(PROJECT_DIR)/rust/hyper-x-installer
+CLI_BIN := $(PROJECT_DIR)/rust/hyperx-cli/target/release/hyperx
 
 # Default target: display help
 help:
@@ -19,19 +19,26 @@ help:
 	@echo ""
 	@echo "  make help             Menampilkan daftar perintah yang tersedia ini"
 	@echo "  make setup            Memeriksa dan menyiapkan dependensi host"
-	@echo "  make check            Memvalidasi konfigurasi, skrip, dan paket"
-	@echo "  make build            Membangun ISO HyperXOS (Development mode: fast zstd-3)"
-	@echo "  make build-production Membangun ISO HyperXOS (Production: zstd-22, stripped, clean)"
+	@echo "  make check            Memvalidasi konfigurasi, skrip, dan paket via Rust CLI"
+	@echo "  make repo             Memperbarui database repositori paket lokal"
+	@echo "  make build            Membangun ISO HyperXOS (Development mode: fast zstd-1)"
+	@echo "  make build-production Membangun ISO HyperXOS (Production: zstd-22, clean release)"
 	@echo "  make release          Mempersiapkan dan mempublikasikan rilis GitHub"
-	@echo "  make test             Menjalankan pengujian otomatis & headless smoke test"
+	@echo "  make test             Menjalankan pengujian otomatis QA"
 	@echo "  make install          Menjalankan ISO ke virtual disk 40GB (reset otomatis)"
 	@echo "  make vm-install       Alias untuk 'make install'"
 	@echo "  make run              Menjalankan sistem terinstal dari virtual disk (QEMU)"
 	@echo "  make dev              Menjalankan ISO secara live di QEMU tanpa install"
 	@echo "  make clean            Membersihkan direktori kerja build sementara"
 	@echo "  make checksum         Menghasilkan checksum resmi ISO (SHA256 & B2SUM)"
-	@echo "  make hyperx           Menjalankan & menguji HyperXTools secara langsung"
+	@echo "  make tools            Menjalankan & menguji HyperXTools secara langsung"
+	@echo "  make installer        Menjalankan & menguji HyperXInstaller secara langsung"
+	@echo "  make hw               Menjalankan modul pendeteksi hardware (hyper-x-hw)"
+	@echo "  make cli              Membangun binary CLI hyperx (Pure Rust)"
 	@echo "======================================================================"
+
+cli:
+	@cargo build --release --manifest-path rust/hyperx-cli/Cargo.toml
 
 setup:
 	@echo "==> [HyperXOS] Memeriksa dependensi sistem host..."
@@ -45,18 +52,11 @@ setup:
 	@mkdir -p out repo/x86_64 work
 	@echo "[✓] Lingkungan pengembangan siap."
 
-check:
-	@echo "==> [HyperXOS] Memvalidasi konfigurasi proyek..."
-	@test -f $(ARCHISO_DIR)/profiledef.sh || (echo "[-] profiledef.sh tidak ditemukan!" && exit 1)
-	@bash -n $(ARCHISO_DIR)/profiledef.sh && echo "[✓] Sintaks archiso/profiledef.sh valid."
-	@test -f $(ARCHISO_DIR)/packages.x86_64 || (echo "[-] packages.x86_64 tidak ditemukan!" && exit 1)
-	@echo "[✓] packages.x86_64 ditemukan ($$(grep -v -E '^#|^$$' $(ARCHISO_DIR)/packages.x86_64 | wc -l) paket terdaftar)."
-	@test -f packages/hyper-x-installer/PKGBUILD || (echo "[-] packages/hyper-x-installer/PKGBUILD tidak ditemukan!" && exit 1)
-	@echo "[✓] hyper-x-installer ditemukan."
-	@bash -n $(SCRIPTS_DIR)/hw-detect-gpu.sh && echo "[✓] Sintaks scripts/hw-detect-gpu.sh valid."
-	@bash -n $(SCRIPTS_DIR)/run-qemu.sh && echo "[✓] Sintaks scripts/run-qemu.sh valid."
-	@bash -n $(SCRIPTS_DIR)/build-iso.sh && echo "[✓] Sintaks scripts/build-iso.sh valid."
-	@echo "[✓] Semua validasi konfigurasi berhasil."
+check: cli
+	@$(CLI_BIN) check
+
+repo: cli
+	@$(CLI_BIN) repo
 
 build: check
 	@echo "==> [HyperXOS] Memulai proses kompilasi ISO (Mode Development)..."
@@ -105,10 +105,16 @@ checksum:
 	done
 	@echo "[✓] Pembuatan checksum selesai."
 
-hyperx:
+tools:
 	@echo "==> [HyperXOS] Menjalankan HyperXTools secara langsung..."
 	@cd rust/hyper-x-tools && cargo run --release
+
+hyperx: tools
 
 installer:
 	@echo "==> [HyperXOS] Menjalankan HyperXInstaller secara langsung..."
 	@cd rust/hyper-x-installer && cargo run --release
+
+hw:
+	@echo "==> [HyperXOS] Menjalankan Hardware & GPU Detector..."
+	@cargo run --release --manifest-path rust/hyper-x-hw/Cargo.toml -- detect
