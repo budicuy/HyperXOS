@@ -1,6 +1,5 @@
-use iced::border::Radius;
 use iced::widget::{button, column, container, row, text};
-use iced::{Alignment, Border, Color, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::core::system_monitor::SystemMetrics;
 use crate::ui::components::{glass_scrollable, metric_card};
@@ -14,18 +13,7 @@ pub fn view<'a, Message: Clone + 'a>(
     on_quick_kernel: Message,
 ) -> Element<'a, Message> {
     // --- 1. TOP BANNER: OS & Complete Hardware Specifications with Logo ---
-    let logo_img = icons::logo_image(60.0);
-
-    let logo_box = container(logo_img)
-        .padding(8)
-        .style(|_| container::Style {
-            background: Some(iced::Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.05))),
-            border: Border::default()
-                .rounded(Radius::from(12.0))
-                .width(1.0)
-                .color(Color::from_rgba(1.0, 1.0, 1.0, 0.15)),
-            ..container::Style::default()
-        });
+    let logo_img = icons::logo_image(145.0);
 
     let spec_row = |label: &'static str, val: String, accent: Color| -> Element<'a, Message> {
         row![
@@ -91,8 +79,8 @@ pub fn view<'a, Message: Clone + 'a>(
     .width(Length::Fill);
 
     let top_banner = container(
-        row![logo_box, banner_right]
-            .spacing(16)
+        row![logo_img, banner_right]
+            .spacing(18)
             .align_y(Alignment::Center)
             .padding(16)
     )
