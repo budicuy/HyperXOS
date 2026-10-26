@@ -1,0 +1,36 @@
+import { Theme } from "../theme.slint";
+
+export component StatusBadge inherits Rectangle {
+    in property <string> text: "Status";
+    in property <bool> active: false;
+    in property <bool> is-running: false;
+
+    border-radius: Theme.radius-sm;
+    background: root.is-running ? Theme.success.with-alpha(0.2) : (root.active ? Theme.accent.with-alpha(0.2) : Theme.bg-sidebar);
+    border-width: 1px;
+    border-color: root.is-running ? Theme.success : (root.active ? Theme.accent : Theme.border);
+    height: 24px;
+
+    HorizontalLayout {
+        padding-left: 8px;
+        padding-right: 8px;
+        spacing: 4px;
+        alignment: center;
+
+        // Status dot
+        Rectangle {
+            width: 6px;
+            height: 6px;
+            border-radius: 3px;
+            background: root.is-running ? Theme.success : (root.active ? Theme.accent : Theme.text-muted);
+        }
+
+        Text {
+            text: root.text;
+            font-size: 11px;
+            font-weight: 600;
+            color: root.is-running ? Theme.success : (root.active ? Theme.accent : Theme.text-sub);
+            vertical-alignment: center;
+        }
+    }
+}

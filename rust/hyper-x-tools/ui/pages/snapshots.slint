@@ -1,0 +1,250 @@
+import { Theme } from "../theme.slint";
+import { StatusBadge } from "../components/status_badge.slint";
+import { TerminalBox } from "../components/terminal_box.slint";
+
+export struct SnapshotItem {
+    id: string,
+    name: string,
+    date: string,
+    description: string,
+    path: string,
+}
+
+export component SnapshotsPage inherits Flickable {
+    in property <bool> is-btrfs: true;
+    in property <string> fs-type-name: "BTRFS";
+    in property <[SnapshotItem]> snapshot-list: [];
+    in property <string> terminal-log: "Siap.";
+    in-out property <string> new-snapshot-desc: "";
+
+    callback create-snapshot(string);
+    callback restore-snapshot(string);
+    callback delete-snapshot(string);
+    callback clear-log();
+
+    VerticalLayout {
+        padding: 24px;
+        spacing: 18px;
+
+        // Header
+        HorizontalLayout {
+            alignment: space-between;
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "🛡️ Snapshot Btrfs & Pemulihan Sistem";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.text-main;
+                }
+                Text {
+                    text: "Cadangkan kondisi sistem secara instan dengan teknologi Copy-on-Write (CoW).";
+                    font-size: 12px;
+                    color: Theme.text-sub;
+                }
+            }
+
+            StatusBadge {
+                text: "Filesystem: " + root.fs-type-name;
+                active: root.is-btrfs;
+                is-running: root.is-btrfs;
+            }
+        }
+
+        // Create Snapshot Card
+        Rectangle {
+            background: Theme.bg-card;
+            border-radius: Theme.radius-md;
+            border-width: 1px;
+            border-color: Theme.border;
+
+            VerticalLayout {
+                padding: 16px;
+                spacing: 12px;
+
+                Text {
+                    text: "Buat Snapshot Baru:";
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: Theme.text-main;
+                }
+
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    // Text Input
+                    Rectangle {
+                        height: 36px;
+                        background: Theme.bg-input;
+                        border-radius: Theme.radius-sm;
+                        border-width: 1px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            TextInput {
+                                text <=> root.new-snapshot-desc;
+                                font-size: 12px;
+                                color: Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    // Create Button
+                    Rectangle {
+                        height: 36px;
+                        background: Theme.accent;
+                        border-radius: Theme.radius-sm;
+
+                        HorizontalLayout {
+                            padding-left: 16px;
+                            padding-right: 16px;
+                            Text {
+                                text: "📸 Ambil Snapshot";
+                                font-size: 11px;
+                                font-weight: 700;
+                                color: Theme.text-dark;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.create-snapshot(root.new-snapshot-desc);
+                                root.new-snapshot-desc = "";
+                            }
+                            mouse-cursor: pointer;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Snapshot History List
+        Text {
+            text: "Daftar Riwayat Snapshot Tersedia:";
+            font-size: 14px;
+            font-weight: 600;
+            color: Theme.text-main;
+        }
+
+        VerticalLayout {
+            spacing: 10px;
+
+            if root.snapshot-list.length == 0: Rectangle {
+                height: 60px;
+                background: Theme.bg-card;
+                border-radius: Theme.radius-md;
+                border-width: 1px;
+                border-color: Theme.border;
+                Text {
+                    text: "Belum ada snapshot yang tersimpan di /.snapshots.";
+                    font-size: 12px;
+                    color: Theme.text-muted;
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                }
+            }
+
+            for item[idx] in root.snapshot-list: Rectangle {
+                background: Theme.bg-card;
+                border-radius: Theme.radius-md;
+                border-width: 1px;
+                border-color: Theme.border;
+
+                HorizontalLayout {
+                    padding: 14px;
+                    spacing: 12px;
+                    alignment: space-between;
+
+                    VerticalLayout {
+                        spacing: 4px;
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Text {
+                                text: item.name;
+                                font-size: 13px;
+                                font-weight: 700;
+                                color: Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                            Text {
+                                text: item.date;
+                                font-size: 11px;
+                                color: Theme.text-muted;
+                                vertical-alignment: center;
+                            }
+                        }
+                        Text {
+                            text: item.description != "" ? item.description : "Snapshot Sistem Otomatis";
+                            font-size: 11px;
+                            color: Theme.text-sub;
+                        }
+                    }
+
+                    // Action buttons
+                    HorizontalLayout {
+                        spacing: 8px;
+                        alignment: center;
+
+                        Rectangle {
+                            height: 28px;
+                            background: Theme.success.with-alpha(0.15);
+                            border-radius: Theme.radius-sm;
+                            border-width: 1px;
+                            border-color: Theme.success;
+
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                Text {
+                                    text: "Pulihkan (Restore)";
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    color: Theme.success;
+                                    vertical-alignment: center;
+                                }
+                            }
+                            TouchArea {
+                                clicked => { root.restore-snapshot(item.name); }
+                                mouse-cursor: pointer;
+                            }
+                        }
+
+                        Rectangle {
+                            height: 28px;
+                            background: Theme.danger.with-alpha(0.15);
+                            border-radius: Theme.radius-sm;
+                            border-width: 1px;
+                            border-color: Theme.danger;
+
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                Text {
+                                    text: "Hapus";
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    color: Theme.danger;
+                                    vertical-alignment: center;
+                                }
+                            }
+                            TouchArea {
+                                clicked => { root.delete-snapshot(item.name); }
+                                mouse-cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Terminal Log Console
+        TerminalBox {
+            log-text: root.terminal-log;
+            clear-clicked => { root.clear-log(); }
+        }
+    }
+}

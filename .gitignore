@@ -24,12 +24,13 @@ work/
 archiso/airootfs/opt/hyperxos-repo/
 
 # 5. Makepkg Temporary Build Directories & Intermediate Artifacts
-**/pkg/
-**/src/
+packages/*/pkg/
+packages/*/src/
 packages/*/*.pkg.tar.*
 !packages/hyperxos-calamares/cachyos-calamares-*.pkg.tar.zst
 
-# 6. Qt & C++ Compilation Objects (HyperXTools)
+# 6. Rust & C++ Compilation Objects (HyperXTools)
+**/target/
 *.o
 *.a
 *.so

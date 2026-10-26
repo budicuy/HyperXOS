@@ -1,0 +1,80 @@
+import { Theme } from "../theme.slint";
+
+export component TerminalBox inherits Rectangle {
+    in property <string> log-text: "Menunggu perintah...";
+    callback clear-clicked();
+
+    background: Theme.bg-terminal;
+    border-radius: Theme.radius-md;
+    border-width: 1px;
+    border-color: Theme.border;
+
+    VerticalLayout {
+        padding: 12px;
+        spacing: 8px;
+
+        // Terminal Top Bar
+        HorizontalLayout {
+            alignment: space-between;
+            HorizontalLayout {
+                spacing: 6px;
+                alignment: start;
+                // Mac/Linux style window dots
+                Rectangle { width: 10px; height: 10px; border-radius: 5px; background: #f38ba8; }
+                Rectangle { width: 10px; height: 10px; border-radius: 5px; background: #f9e2af; }
+                Rectangle { width: 10px; height: 10px; border-radius: 5px; background: #a6e3a1; }
+                Text {
+                    text: "   Terminal Eksekusi (Polkit / Bash)";
+                    font-size: 11px;
+                    color: Theme.text-muted;
+                    font-weight: 600;
+                    vertical-alignment: center;
+                }
+            }
+
+            Rectangle {
+                border-radius: 4px;
+                background: Theme.bg-card;
+                border-width: 1px;
+                border-color: Theme.border;
+                height: 22px;
+
+                HorizontalLayout {
+                    padding-left: 8px;
+                    padding-right: 8px;
+                    Text {
+                        text: "Bersihkan";
+                        font-size: 10px;
+                        color: Theme.text-sub;
+                        vertical-alignment: center;
+                    }
+                }
+
+                TouchArea {
+                    clicked => { root.clear-clicked(); }
+                    mouse-cursor: pointer;
+                }
+            }
+        }
+
+        // Terminal Content
+        Rectangle {
+            height: 100px;
+            background: #0c0c14;
+            border-radius: 4px;
+
+            Flickable {
+                VerticalLayout {
+                    padding: 8px;
+                    Text {
+                        text: root.log-text;
+                        font-size: 11px;
+                        font-family: "monospace";
+                        color: #a6da95;
+                        wrap: word-wrap;
+                    }
+                }
+            }
+        }
+    }
+}

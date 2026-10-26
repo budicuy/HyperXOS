@@ -1,25 +1,25 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyper-x-tools
-pkgver=2.0.0
+pkgver=2.1.0
 pkgrel=1
-pkgdesc="All-in-One Dashboard, Gaming Tweaker, CachyOS Kernel Manager & Snapshot Center for HyperXOS (Qt 6 Native)"
+pkgdesc="Modern System Dashboard, Gaming Tweaker, CachyOS Kernel Manager & Snapshot Center for HyperXOS (Rust + Slint + WGPU)"
 arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
-depends=('qt6-base')
+depends=('fontconfig' 'freetype2' 'libxkbcommon' 'polkit')
+makedepends=('cargo' 'rust')
 provides=('hyperxtools')
 
 build() {
-    cd "${startdir}"
-    qmake6
-    make -j$(nproc)
+    cd "${startdir}/../../rust/hyper-x-tools"
+    cargo build --release --locked
 }
 
 package() {
-    cd "${startdir}"
-    install -Dm755 hyper-x-tools "${pkgdir}/usr/bin/hyper-x-tools"
+    install -Dm755 "${startdir}/../../rust/hyper-x-tools/target/release/hyper-x-tools" "${pkgdir}/usr/bin/hyper-x-tools"
     install -d "${pkgdir}/usr/local/bin"
     ln -sf /usr/bin/hyper-x-tools "${pkgdir}/usr/local/bin/hyperxtools"
-    install -Dm644 hyper-x-tools.desktop "${pkgdir}/usr/share/applications/hyper-x-tools.desktop"
-    install -Dm644 logo.png "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-tools.png"
+    install -Dm644 "${startdir}/hyper-x-tools.desktop" "${pkgdir}/usr/share/applications/hyper-x-tools.desktop"
+    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-tools.png"
+    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/pixmaps/hyper-x-tools.png"
 }

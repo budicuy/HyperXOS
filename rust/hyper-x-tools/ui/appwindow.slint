@@ -1,0 +1,572 @@
+import { Theme } from "theme.slint";
+import { DashboardPage } from "pages/dashboard.slint";
+import { KernelManagerPage, KernelItem } from "pages/kernel_manager.slint";
+import { GameTweaksPage } from "pages/game_tweaks.slint";
+import { SnapshotsPage, SnapshotItem } from "pages/snapshots.slint";
+import { MaintenancePage } from "pages/maintenance.slint";
+import { PackageStorePage, StoreItem } from "pages/package_store.slint";
+
+export { KernelItem, SnapshotItem, StoreItem }
+
+export component AppWindow inherits Window {
+    title: "HyperXTools — Control Center & System Dashboard";
+    preferred-width: 1040px;
+    preferred-height: 700px;
+    min-width: 900px;
+    min-height: 600px;
+    background: Theme.bg-main;
+    default-font-family: "Noto Sans, Inter, Roboto, sans-serif";
+
+    // Active Navigation Index (0: Dashboard, 1: Kernel, 2: Tweaks, 3: Snapshots, 4: Maintenance, 5: Store)
+    in-out property <int> current-page: 0;
+
+    // Quick Stats Pill in Header
+    in property <string> quick-cpu: "CPU: 0%";
+    in property <string> quick-ram: "RAM: 0%";
+    in property <string> quick-kernel: "Kernel: -";
+
+    // Dashboard Properties
+    in property <string> cpu-usage-text: "0.0%";
+    in property <float> cpu-progress: 0.0;
+    in property <string> cpu-subtext: "-";
+    in property <string> cpu-extratext: "";
+
+    in property <string> ram-usage-text: "0.0%";
+    in property <float> ram-progress: 0.0;
+    in property <string> ram-subtext: "-";
+    in property <string> ram-extratext: "";
+
+    in property <string> disk-usage-text: "0.0%";
+    in property <float> disk-progress: 0.0;
+    in property <string> disk-subtext: "-";
+    in property <string> disk-extratext: "";
+
+    in property <string> gpu-usage-text: "0.0%";
+    in property <float> gpu-progress: 0.0;
+    in property <string> gpu-subtext: "-";
+    in property <string> gpu-extratext: "";
+
+    in property <string> os-name: "HyperXOS Linux 2026.10";
+    in property <string> kernel-ver: "-";
+    in property <string> uptime-str: "0j 0m";
+    in property <string> session-type: "Wayland";
+
+    // Kernel Manager Properties
+    in property <string> running-kernel-name: "linux-cachyos";
+    in property <string> running-kernel-ver: "-";
+    in property <[KernelItem]> kernels: [];
+
+    // Gaming Tweaks Properties
+    in property <string> current-governor: "powersave";
+    in property <string> max-map-count-value: "65530";
+    in property <bool> is-max-map-optimized: false;
+    in property <bool> is-split-lock-disabled: false;
+    in property <bool> is-gamemode-active: false;
+
+    // Snapshot Properties
+    in property <bool> is-btrfs: true;
+    in property <string> fs-type-name: "BTRFS";
+    in property <[SnapshotItem]> snapshot-list: [];
+
+    // Software Store Properties
+    in property <string> active-category: "Semua";
+    in property <[StoreItem]> store-items: [];
+
+    // Terminal Log for each tab / global
+    in property <string> terminal-log: "HyperXTools v2.1.0 (Rust + Slint + WGPU) Siap.";
+
+    // Callbacks to Rust backend
+    callback refresh-metrics();
+    callback switch-page(int);
+
+    callback install-kernel(string);
+    callback remove-kernel(string);
+    callback rebuild-initramfs();
+
+    callback set-governor(string);
+    callback toggle-max-map-count();
+    callback toggle-split-lock();
+    callback toggle-gamemode();
+    callback install-gaming-runtimes();
+
+    callback create-snapshot(string);
+    callback restore-snapshot(string);
+    callback delete-snapshot(string);
+
+    callback clean-cache();
+    callback clean-journal();
+    callback remove-orphans();
+    callback rank-mirrors();
+    callback fix-keyrings();
+
+    callback set-store-category(string);
+    callback search-store(string);
+    callback install-package(string);
+    callback remove-package(string);
+    callback clear-log();
+
+    HorizontalLayout {
+        // Left Modern Sidebar
+        Rectangle {
+            width: 230px;
+            background: Theme.bg-sidebar;
+            border-width: 1px;
+            border-color: Theme.border;
+
+            VerticalLayout {
+                padding: 16px;
+                spacing: 14px;
+
+                // Brand Header
+                HorizontalLayout {
+                    spacing: 10px;
+                    alignment: start;
+                    Rectangle {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 8px;
+                        background: Theme.accent;
+                        Text {
+                            text: "HX";
+                            font-size: 14px;
+                            font-weight: 800;
+                            color: Theme.text-dark;
+                            vertical-alignment: center;
+                            horizontal-alignment: center;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 1px;
+                        alignment: center;
+                        Text {
+                            text: "HYPERX TOOLS";
+                            font-size: 13px;
+                            font-weight: 800;
+                            color: Theme.text-main;
+                        }
+                        Text {
+                            text: "Pusat Kontrol Sistem";
+                            font-size: 10px;
+                            color: Theme.accent;
+                            font-weight: 600;
+                        }
+                    }
+                }
+
+                Rectangle { height: 1px; background: Theme.border; }
+
+                // Group: SISTEM
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "SISTEM"; font-size: 10px; font-weight: 700; color: Theme.text-muted; }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 0 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 0 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "📊"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Dashboard Metrik";
+                                font-size: 12px;
+                                font-weight: root.current-page == 0 ? 700 : 500;
+                                color: root.current-page == 0 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 0; root.switch-page(0); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+                }
+
+                // Group: PERFORMA & KERNEL
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "PERFORMA & KERNEL"; font-size: 10px; font-weight: 700; color: Theme.text-muted; }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 1 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 1 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "🐧"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Kernel Manager";
+                                font-size: 12px;
+                                font-weight: root.current-page == 1 ? 700 : 500;
+                                color: root.current-page == 1 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 1; root.switch-page(1); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 2 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 2 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "⚡"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Tweak Gaming";
+                                font-size: 12px;
+                                font-weight: root.current-page == 2 ? 700 : 500;
+                                color: root.current-page == 2 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 2; root.switch-page(2); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+                }
+
+                // Group: CADANGAN & PERAWATAN
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "CADANGAN & PERAWATAN"; font-size: 10px; font-weight: 700; color: Theme.text-muted; }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 3 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 3 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "🛡️"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Snapshot & Restore";
+                                font-size: 12px;
+                                font-weight: root.current-page == 3 ? 700 : 500;
+                                color: root.current-page == 3 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 3; root.switch-page(3); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 4 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 4 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "🧹"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Perawatan Sistem";
+                                font-size: 12px;
+                                font-weight: root.current-page == 4 ? 700 : 500;
+                                color: root.current-page == 4 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 4; root.switch-page(4); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+                }
+
+                // Group: PERANGKAT LUNAK
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "PERANGKAT LUNAK"; font-size: 10px; font-weight: 700; color: Theme.text-muted; }
+
+                    Rectangle {
+                        height: 34px;
+                        background: root.current-page == 5 ? Theme.bg-card : Colors.transparent;
+                        border-radius: Theme.radius-sm;
+                        border-width: root.current-page == 5 ? 1px : 0px;
+                        border-color: Theme.border;
+
+                        HorizontalLayout {
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            spacing: 8px;
+                            Text { text: "🛍️"; font-size: 14px; vertical-alignment: center; }
+                            Text {
+                                text: "Software Store";
+                                font-size: 12px;
+                                font-weight: root.current-page == 5 ? 700 : 500;
+                                color: root.current-page == 5 ? Theme.accent : Theme.text-main;
+                                vertical-alignment: center;
+                            }
+                        }
+                        TouchArea {
+                            clicked => { root.current-page = 5; root.switch-page(5); }
+                            mouse-cursor: pointer;
+                        }
+                    }
+                }
+
+                // Push sidebar footer to bottom
+                Rectangle { vertical-stretch: 1; }
+
+                // Sidebar Footer
+                Rectangle {
+                    height: 48px;
+                    background: Theme.bg-card;
+                    border-radius: Theme.radius-sm;
+                    border-width: 1px;
+                    border-color: Theme.border;
+
+                    VerticalLayout {
+                        padding: 8px;
+                        alignment: center;
+                        spacing: 2px;
+                        Text {
+                            text: "HyperXOS 2026.10";
+                            font-size: 11px;
+                            font-weight: 700;
+                            color: Theme.text-main;
+                            horizontal-alignment: center;
+                        }
+                        Text {
+                            text: "Rust v2.1.0 • WGPU";
+                            font-size: 10px;
+                            color: Theme.accent-purple;
+                            horizontal-alignment: center;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Right Main Work Area
+        VerticalLayout {
+            horizontal-stretch: 1;
+
+            // Top Header Bar
+            Rectangle {
+                height: 52px;
+                background: Theme.bg-sidebar;
+                border-width: 1px;
+                border-color: Theme.border;
+
+                HorizontalLayout {
+                    padding-left: 20px;
+                    padding-right: 20px;
+                    alignment: space-between;
+
+                    // Breadcrumb or Active Page Label
+                    HorizontalLayout {
+                        spacing: 6px;
+                        alignment: start;
+                        Text {
+                            text: root.current-page == 0 ? "Dashboard" : (
+                                  root.current-page == 1 ? "CachyOS Kernel Manager" : (
+                                  root.current-page == 2 ? "Tweak Gaming" : (
+                                  root.current-page == 3 ? "Snapshot & Restore" : (
+                                  root.current-page == 4 ? "Perawatan Sistem" : "Software Store"))));
+                            font-size: 14px;
+                            font-weight: 700;
+                            color: Theme.text-main;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    // Live Quick Stat Pills
+                    HorizontalLayout {
+                        spacing: 10px;
+                        alignment: center;
+
+                        Rectangle {
+                            height: 26px;
+                            background: Theme.bg-card;
+                            border-radius: 13px;
+                            border-width: 1px;
+                            border-color: Theme.border;
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                Text {
+                                    text: root.quick-cpu;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    color: Theme.accent;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            height: 26px;
+                            background: Theme.bg-card;
+                            border-radius: 13px;
+                            border-width: 1px;
+                            border-color: Theme.border;
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                Text {
+                                    text: root.quick-ram;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    color: Theme.accent-purple;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            height: 26px;
+                            background: Theme.bg-card;
+                            border-radius: 13px;
+                            border-width: 1px;
+                            border-color: Theme.border;
+                            HorizontalLayout {
+                                padding-left: 10px;
+                                padding-right: 10px;
+                                Text {
+                                    text: root.quick-kernel;
+                                    font-size: 11px;
+                                    font-weight: 600;
+                                    color: Theme.success;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Stacked Pages Content Area
+            Rectangle {
+                vertical-stretch: 1;
+                background: Theme.bg-main;
+
+                if root.current-page == 0: DashboardPage {
+                    cpu-usage-text: root.cpu-usage-text;
+                    cpu-progress: root.cpu-progress;
+                    cpu-subtext: root.cpu-subtext;
+                    cpu-extratext: root.cpu-extratext;
+
+                    ram-usage-text: root.ram-usage-text;
+                    ram-progress: root.ram-progress;
+                    ram-subtext: root.ram-subtext;
+                    ram-extratext: root.ram-extratext;
+
+                    disk-usage-text: root.disk-usage-text;
+                    disk-progress: root.disk-progress;
+                    disk-subtext: root.disk-subtext;
+                    disk-extratext: root.disk-extratext;
+
+                    gpu-usage-text: root.gpu-usage-text;
+                    gpu-progress: root.gpu-progress;
+                    gpu-subtext: root.gpu-subtext;
+                    gpu-extratext: root.gpu-extratext;
+
+                    os-name: root.os-name;
+                    kernel-ver: root.kernel-ver;
+                    uptime-str: root.uptime-str;
+                    session-type: root.session-type;
+
+                    refresh-clicked => { root.refresh-metrics(); }
+                    quick-clean-clicked => { root.clean-cache(); }
+                    quick-gametweaks-clicked => { root.current-page = 2; root.switch-page(2); }
+                    quick-kernel-clicked => { root.current-page = 1; root.switch-page(1); }
+                }
+
+                if root.current-page == 1: KernelManagerPage {
+                    running-kernel-name: root.running-kernel-name;
+                    running-kernel-ver: root.running-kernel-ver;
+                    kernels: root.kernels;
+                    terminal-log: root.terminal-log;
+
+                    install-kernel(pkg) => { root.install-kernel(pkg); }
+                    remove-kernel(pkg) => { root.remove-kernel(pkg); }
+                    rebuild-initramfs => { root.rebuild-initramfs(); }
+                    clear-log => { root.clear-log(); }
+                }
+
+                if root.current-page == 2: GameTweaksPage {
+                    current-governor: root.current-governor;
+                    max-map-count-value: root.max-map-count-value;
+                    is-max-map-optimized: root.is-max-map-optimized;
+                    is-split-lock-disabled: root.is-split-lock-disabled;
+                    is-gamemode-active: root.is-gamemode-active;
+                    terminal-log: root.terminal-log;
+
+                    set-governor(gov) => { root.set-governor(gov); }
+                    toggle-max-map-count => { root.toggle-max-map-count(); }
+                    toggle-split-lock => { root.toggle-split-lock(); }
+                    toggle-gamemode => { root.toggle-gamemode(); }
+                    install-gaming-runtimes => { root.install-gaming-runtimes(); }
+                    clear-log => { root.clear-log(); }
+                }
+
+                if root.current-page == 3: SnapshotsPage {
+                    is-btrfs: root.is-btrfs;
+                    fs-type-name: root.fs-type-name;
+                    snapshot-list: root.snapshot-list;
+                    terminal-log: root.terminal-log;
+
+                    create-snapshot(desc) => { root.create-snapshot(desc); }
+                    restore-snapshot(name) => { root.restore-snapshot(name); }
+                    delete-snapshot(name) => { root.delete-snapshot(name); }
+                    clear-log => { root.clear-log(); }
+                }
+
+                if root.current-page == 4: MaintenancePage {
+                    terminal-log: root.terminal-log;
+
+                    clean-cache => { root.clean-cache(); }
+                    clean-journal => { root.clean-journal(); }
+                    remove-orphans => { root.remove-orphans(); }
+                    rank-mirrors => { root.rank-mirrors(); }
+                    fix-keyrings => { root.fix-keyrings(); }
+                    clear-log => { root.clear-log(); }
+                }
+
+                if root.current-page == 5: PackageStorePage {
+                    active-category: root.active-category;
+                    store-items: root.store-items;
+                    terminal-log: root.terminal-log;
+
+                    set-category(cat) => { root.set-store-category(cat); }
+                    search-changed(q) => { root.search-store(q); }
+                    install-package(pkg) => { root.install-package(pkg); }
+                    remove-package(pkg) => { root.remove-package(pkg); }
+                    clear-log => { root.clear-log(); }
+                }
+            }
+        }
+    }
+}
