@@ -3,7 +3,7 @@ use iced::widget::{button, column, container, row, text};
 use iced::{Alignment, Border, Color, Element, Length};
 
 use crate::core::system_monitor::SystemMetrics;
-use crate::ui::components::{glass_scrollable, metric_card, status_pill};
+use crate::ui::components::{glass_scrollable, metric_card};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
@@ -75,18 +75,12 @@ pub fn view<'a, Message: Clone + 'a>(
         .width(Length::Fill);
 
     let banner_right = column![
-        row![
-            text("HyperXOS Linux")
-                .size(16)
-                .font(FONT_DISPLAY_BOLD)
-                .style(|_| text::Style {
-                    color: Some(Color::WHITE),
-                }),
-            status_pill("Sistem Aktif", ACCENT_GREEN, true),
-            status_pill("Edisi Rolling", ACCENT_CYAN, true),
-        ]
-        .spacing(10)
-        .align_y(Alignment::Center),
+        text("HyperXOS Linux")
+            .size(16)
+            .font(FONT_DISPLAY_BOLD)
+            .style(|_| text::Style {
+                color: Some(Color::WHITE),
+            }),
         container("").height(1).width(Length::Fill).style(|_| container::Style {
             background: Some(iced::Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.12))),
             ..container::Style::default()

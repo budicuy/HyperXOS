@@ -129,24 +129,12 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     // Sidebar Footer
     let footer = container(
         column![
-            row![
-                container("")
-                    .width(6)
-                    .height(6)
-                    .style(|_| container::Style {
-                        background: Some(iced::Background::Color(ACCENT_GREEN)),
-                        border: Border::default().rounded(Radius::from(3.0)),
-                        ..container::Style::default()
-                    }),
-                text("HyperXOS Linux 2026.10")
-                    .size(11)
-                    .font(FONT_DISPLAY_BOLD)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::WHITE),
-                    }),
-            ]
-            .spacing(8)
-            .align_y(Alignment::Center),
+            text("HyperXOS Linux 2026.10")
+                .size(11)
+                .font(FONT_DISPLAY_BOLD)
+                .style(|_| text::Style {
+                    color: Some(iced::Color::WHITE),
+                }),
             text("Rust + Iced Glass v2.2")
                 .size(10)
                 .font(FONT_BODY_MEDIUM)

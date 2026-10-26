@@ -7,7 +7,6 @@ use crate::ui::theme::*;
 
 pub fn header<'a, Message: Clone + 'a>(
     current_page: Page,
-    on_refresh: Message,
     on_drag: Message,
     on_minimize: Message,
     on_maximize: Message,
@@ -41,31 +40,6 @@ pub fn header<'a, Message: Clone + 'a>(
     )
     .on_press(on_drag);
 
-    let refresh_btn = button(
-        row![
-            svg_icon(icons::REFRESH, 12.0, TEXT_MAIN),
-            text("Segarkan")
-                .size(11)
-                .font(FONT_BODY_MEDIUM)
-                .style(|_| text::Style {
-                    color: Some(TEXT_MAIN),
-                }),
-        ]
-        .spacing(6)
-        .align_y(Alignment::Center),
-    )
-    .padding([5, 11])
-    .style(glass_action_button)
-    .on_press(on_refresh);
-
-    let divider = container("")
-        .width(1)
-        .height(16)
-        .style(|_| container::Style {
-            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.12))),
-            ..container::Style::default()
-        });
-
     // Custom Window Controls (Minimize, Maximize, Close)
     let win_min = button(svg_icon(icons::MINUS, 12.0, ACCENT_AMBER))
         .padding([5, 8])
@@ -89,8 +63,6 @@ pub fn header<'a, Message: Clone + 'a>(
     let bar = row![
         title_breadcrumb,
         drag_area,
-        refresh_btn,
-        divider,
         window_controls,
     ]
     .spacing(12)

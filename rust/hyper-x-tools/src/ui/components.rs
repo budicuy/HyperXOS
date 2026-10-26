@@ -93,21 +93,12 @@ pub fn status_pill<'a, Message: 'a>(
         )
     };
 
-    let content = row![
-        container("")
-            .width(6)
-            .height(6)
-            .style(move |_| container::Style {
-                background: Some(iced::Background::Color(txt)),
-                border: Border::default().rounded(Radius::from(3.0)),
-                ..container::Style::default()
-            }),
-        text(lbl).size(11).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
+    let content = text(lbl)
+        .size(11)
+        .font(FONT_BODY_SEMIBOLD)
+        .style(move |_| text::Style {
             color: Some(txt),
-        }),
-    ]
-    .spacing(6)
-    .align_y(Alignment::Center);
+        });
 
     container(content)
         .padding([4, 10])

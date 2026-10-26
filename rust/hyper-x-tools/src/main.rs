@@ -488,7 +488,6 @@ impl App {
         let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
         let head = header(
             self.current_page,
-            Message::RefreshMetrics,
             Message::WindowDrag,
             Message::WindowMinimize,
             Message::WindowMaximize,
