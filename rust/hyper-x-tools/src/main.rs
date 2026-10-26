@@ -16,6 +16,14 @@ use crate::core::system_tweaker::SystemTweaker;
 use crate::ui::header::header;
 use crate::ui::sidebar::{sidebar, Page};
 
+fn load_window_icon() -> Option<iced::window::Icon> {
+    let bytes = include_bytes!("../assets/logo.png");
+    let img = image::load_from_memory(bytes).ok()?;
+    let rgba = img.to_rgba8();
+    let (width, height) = rgba.dimensions();
+    iced::window::icon::from_rgba(rgba.into_raw(), width, height).ok()
+}
+
 fn main() -> iced::Result {
     let window_settings = window::Settings {
         size: Size::new(1060.0, 720.0),
@@ -23,6 +31,11 @@ fn main() -> iced::Result {
         transparent: true,
         blur: true,
         decorations: false,
+        icon: load_window_icon(),
+        platform_specific: iced::window::settings::PlatformSpecific {
+            application_id: "hyper-x-tools".to_string(),
+            override_redirect: false,
+        },
         ..Default::default()
     };
 
@@ -546,7 +559,15 @@ impl App {
 
         let right_panel = column![head, main_content].width(Length::Fill);
 
-        let app_layout = row![side, right_panel]
+        let divider = container("")
+            .width(1)
+            .height(Length::Fill)
+            .style(|_| container::Style {
+                background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
+                ..container::Style::default()
+            });
+
+        let app_layout = row![side, divider, right_panel]
             .width(Length::Fill)
             .height(Length::Fill);
 

@@ -40,8 +40,7 @@ pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::from(gradient)),
         border: Border::default()
-            .width(1.0)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.10)),
+            .rounded(Radius::default().left(16.0)),
         ..container::Style::default()
     }
 }
@@ -54,8 +53,7 @@ pub fn header_container_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::from(gradient)),
         border: Border::default()
-            .width(1.0)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.08)),
+            .rounded(Radius::default().top_right(16.0)),
         ..container::Style::default()
     }
 }

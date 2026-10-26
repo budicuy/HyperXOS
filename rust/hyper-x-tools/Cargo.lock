@@ -1431,6 +1431,7 @@ version = "2.2.0"
 dependencies = [
  "crossbeam-channel",
  "iced",
+ "image",
  "serde",
  "serde_json",
  "sysinfo",
