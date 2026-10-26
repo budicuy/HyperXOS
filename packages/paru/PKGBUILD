@@ -1,0 +1,18 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=paru
+pkgver=2.1.0
+pkgrel=3
+pkgdesc="Feature packed AUR helper"
+arch=('x86_64')
+url="https://github.com/morganamilo/paru"
+license=('GPL-3.0-or-later')
+depends=('git' 'pacman')
+optdepends=('bat: colored pkgbuild printing' 'devtools: build in chroot')
+
+# Prebuilt binary packaging recipe
+package() {
+    install -Dm755 /usr/bin/paru "${pkgdir}/usr/bin/paru"
+    if [ -f /usr/share/man/man8/paru.8.gz ]; then
+        install -Dm644 /usr/share/man/man8/paru.8.gz "${pkgdir}/usr/share/man/man8/paru.8.gz"
+    fi
+}

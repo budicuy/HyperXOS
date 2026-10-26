@@ -1,0 +1,5 @@
+Welcome to \e[1;34mHyperXOS\e[0m Linux Live Environment!
+
+- Launch graphical installer: \e[1;32mlaunch-installer\e[0m (or click 'Install HyperXOS' on Desktop)
+- Hardware and GPU detection: \e[1;33m/usr/local/bin/hw-detect-gpu\e[0m
+- Community & Documentation: \e[1;36mhttps://github.com/hyperxos\e[0m

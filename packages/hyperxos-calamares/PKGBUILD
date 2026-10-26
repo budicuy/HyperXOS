@@ -1,0 +1,82 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=hyperxos-calamares
+pkgver=3.4.2
+pkgrel=20
+pkgdesc="Distribution-independent installer framework for HyperXOS"
+arch=('x86_64')
+url="https://github.com/hyperxos"
+license=('GPL-3.0-or-later')
+depends=(
+    'boost-libs' 'ckbcomp' 'cryptsetup' 'dmidecode' 'gptfdisk'
+    'hwinfo' 'kconfig' 'kcoreaddons' 'kcrash' 'ki18n' 'kparts'
+    'kpmcore' 'kservice' 'kwidgetsaddons' 'libpwquality'
+    'mkinitcpio-openswap' 'networkmanager' 'polkit-qt6' 'python'
+    'qt6-declarative' 'qt6-svg' 'rsync' 'solid' 'squashfs-tools'
+    'upower' 'yaml-cpp' 'qt6-imageformats'
+)
+provides=('calamares')
+conflicts=('calamares' 'cachyos-calamares')
+
+package() {
+    cd "${startdir}"
+    
+    # 1. Extract base binaries, libraries, standard modules, and polkit policy
+    local base_pkg="/var/cache/pacman/pkg/cachyos-calamares-3.4.2-4-x86_64.pkg.tar.zst"
+    if [ ! -f "${base_pkg}" ]; then
+        base_pkg="${startdir}/cachyos-calamares-3.4.2-4-x86_64.pkg.tar.zst"
+    fi
+    tar -xf "${base_pkg}" -C "${pkgdir}" usr/ etc/
+
+    # 1b. Install Boost 1.91.0 runtime compatibility libraries
+    if [ -d "${startdir}/boost191" ]; then
+        install -d "${pkgdir}/usr/lib"
+        cp -f "${startdir}/boost191"/libboost_*.so.1.91.0 "${pkgdir}/usr/lib/"
+    fi
+    
+    # 2. Clean out upstream CachyOS branding, netinstall, and upstream settings
+    rm -rf "${pkgdir}/usr/share/calamares/branding/"*
+    rm -rf "${pkgdir}/etc/calamares/branding/"*
+    rm -f "${pkgdir}/usr/share/calamares/settings"*.conf
+    rm -f "${pkgdir}/etc/calamares/settings"*.conf
+    rm -f "${pkgdir}/etc/calamares/modules/netinstall"*
+    rm -f "${pkgdir}/etc/calamares/modules/packages_online.conf"
+    rm -f "${pkgdir}/etc/calamares/modules/welcome_online.conf"
+    rm -f "${pkgdir}/etc/calamares/modules/shellprocess-"*.conf
+    rm -f "${pkgdir}/etc/calamares/modules/shellprocess_"*.conf
+    rm -f "${pkgdir}/etc/calamares/modules/packagechooser"*
+    rm -f "${pkgdir}/usr/share/calamares/modules/packagechooser"*
+
+    # 3. Install HyperXOS branding in both /usr/share/calamares/branding and /etc/calamares/branding
+    install -d "${pkgdir}/usr/share/calamares/branding/hyperxos"
+    cp -rf "${startdir}/../../calamares/branding/hyperxos/"* "${pkgdir}/usr/share/calamares/branding/hyperxos/"
+
+    install -d "${pkgdir}/etc/calamares/branding/hyperxos"
+    cp -rf "${startdir}/../../calamares/branding/hyperxos/"* "${pkgdir}/etc/calamares/branding/hyperxos/"
+
+    # 4. Install HyperXOS settings.conf in both /usr/share/calamares and /etc/calamares
+    install -Dm644 "${startdir}/../../calamares/settings.conf" "${pkgdir}/usr/share/calamares/settings.conf"
+    install -Dm644 "${startdir}/../../calamares/settings.conf" "${pkgdir}/etc/calamares/settings.conf"
+
+    # 4b. Install QML directory to both /usr/share/calamares and /etc/calamares
+    install -d "${pkgdir}/etc/calamares"
+    cp -rf "${pkgdir}/usr/share/calamares/qml" "${pkgdir}/etc/calamares/"
+
+    # 5. Overlay HyperXOS modules into both /usr/share/calamares/modules and /etc/calamares/modules
+    install -d "${pkgdir}/usr/share/calamares/modules"
+    cp -rf "${pkgdir}/etc/calamares/modules/"* "${pkgdir}/usr/share/calamares/modules/" 2>/dev/null || true
+    cp -rf "${startdir}/../../calamares/modules/"* "${pkgdir}/usr/share/calamares/modules/"
+    cp -rf "${startdir}/../../calamares/modules/"* "${pkgdir}/etc/calamares/modules/"
+
+    # 5b. Overlay custom Python modules into /usr/lib/calamares/modules
+    if [ -d "${startdir}/../../calamares/modules/bootloader" ]; then
+        install -d "${pkgdir}/usr/lib/calamares/modules/bootloader"
+        cp -rf "${startdir}/../../calamares/modules/bootloader/"* "${pkgdir}/usr/lib/calamares/modules/bootloader/"
+    fi
+    if [ -d "${startdir}/../../calamares/modules/pacstrap" ]; then
+        install -d "${pkgdir}/usr/lib/calamares/modules/pacstrap"
+        cp -rf "${startdir}/../../calamares/modules/pacstrap/"* "${pkgdir}/usr/lib/calamares/modules/pacstrap/"
+    fi
+
+    # 5c. Ensure helper scripts in /etc/calamares/scripts are executable
+    chmod +x "${pkgdir}/etc/calamares/scripts/"* 2>/dev/null || true
+}

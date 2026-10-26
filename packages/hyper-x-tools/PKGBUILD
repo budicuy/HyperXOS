@@ -1,0 +1,25 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=hyper-x-tools
+pkgver=1.0.0
+pkgrel=2
+pkgdesc="Modular Package Manager and Application Installer for HyperXOS (Qt 6 Native)"
+arch=('x86_64')
+url="https://github.com/hyperxos"
+license=('GPL-3.0-or-later')
+depends=('qt6-base')
+provides=('hyperxtools')
+
+build() {
+    cd "${startdir}"
+    qmake6
+    make -j$(nproc)
+}
+
+package() {
+    cd "${startdir}"
+    install -Dm755 hyper-x-tools "${pkgdir}/usr/bin/hyper-x-tools"
+    install -d "${pkgdir}/usr/local/bin"
+    ln -sf /usr/bin/hyper-x-tools "${pkgdir}/usr/local/bin/hyperxtools"
+    install -Dm644 hyper-x-tools.desktop "${pkgdir}/usr/share/applications/hyper-x-tools.desktop"
+    install -Dm644 logo.png "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-tools.png"
+}

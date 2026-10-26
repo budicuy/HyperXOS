@@ -1,0 +1,6 @@
+[General]
+ShowFullPath=true
+Version=24
+
+[PreviewSettings]
+Plugins=appimagethumbnail,audiothumbnail,comicbookthumbnail,djvuthumbnail,dvdthumbnail,ebookthumbnail,exrthumbnail,directorythumbnail,fontthumbnail,imagethumbnail,jpegthumbnail,kra_ora_thumbnail,svgthumbnail,videothumbnail

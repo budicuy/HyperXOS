@@ -1,0 +1,38 @@
+# HyperXOS Calamares Branding Descriptor
+---
+componentName:  hyperxos
+welcomeStyleCalamares:   false
+welcomeExpandingLogo:    true
+windowExpanding:         normal
+windowSize:              960px,580px
+windowPlacement:         center
+
+sidebar:                 widget,left
+navigation:              widget
+
+strings:
+    productName:         HyperXOS Linux
+    shortProductName:    HyperXOS
+    version:             2026.10
+    shortVersion:        2026.10
+    versionedName:       HyperXOS 2026.10
+    shortVersionedName:  HyperXOS 2026.10
+    bootloaderEntryName: HyperXOS
+    productUrl:          https://github.com/hyperxos
+    supportUrl:          https://github.com/hyperxos/issues
+    knownIssuesUrl:      https://github.com/hyperxos/issues
+    releaseNotesUrl:     https://github.com/hyperxos/releases
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "icon.png"
+    productWelcome:      "welcome.png"
+
+style:
+   SidebarBackground:        "#181b20"
+   SidebarText:              "#e6edf3"
+   SidebarTextCurrent:       "#ffffff"
+   SidebarBackgroundCurrent: "#388bfd"
+
+slideshow:               "show.qml"
+slideshowAPI:            2

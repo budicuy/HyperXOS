@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=HyperXTools
+GenericName=Package & Application Manager
+Comment=Pasang atau hapus web browser, office, development tools, gaming, dan aplikasi pendukung di HyperXOS
+Exec=/usr/bin/hyper-x-tools
+Icon=hyper-x-tools
+Terminal=false
+Categories=System;Utility;PackageManager;
+Keywords=package;install;app;tools;browser;office;gaming;uninstall;manager;
+StartupNotify=true

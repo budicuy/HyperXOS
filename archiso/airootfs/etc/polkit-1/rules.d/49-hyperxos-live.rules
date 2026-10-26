@@ -1,0 +1,6 @@
+/* Allow live session user hyperxos to perform administrative tasks without password */
+polkit.addRule(function(action, subject) {
+    if (subject.user == "hyperxos" || subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});

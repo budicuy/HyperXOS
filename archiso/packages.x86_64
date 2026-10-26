@@ -1,0 +1,82 @@
+# Core Kernel & System Base (Vital / Offline Guaranteed)
+amd-ucode
+intel-ucode
+arch-install-scripts
+base
+bash-completion
+btrfs-progs
+cryptsetup
+dosfstools
+e2fsprogs
+efibootmgr
+gptfdisk
+limine
+linux
+linux-firmware
+mkinitcpio
+mkinitcpio-archiso
+nano
+pciutils
+sudo
+syslinux
+usbutils
+which
+
+# Networking & Mirror Ranking
+curl
+networkmanager
+reflector
+rsync
+wireless-regdb
+
+# Audio Server (PipeWire Core Minimal)
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+
+# KDE Plasma 6 Minimal Wayland Desktop
+breeze
+breeze-gtk
+kde-gtk-config
+kpipewire
+kscreen
+kwin
+ocean-sound-theme
+plasma-desktop
+plasma-nm
+plasma-pa
+plasma-workspace
+powerdevil
+qt6-wayland
+sddm
+sddm-kcm
+polkit-kde-agent
+xdg-user-dirs
+xorg-xwayland
+
+# Core Desktop Utilities
+dolphin
+konsole
+kdialog
+
+# Open-Source Graphics Drivers (64-bit Only)
+mesa
+
+# Virtual Machine Guest Support
+qemu-guest-agent
+spice-vdagent
+
+# HyperXOS Installer & Custom Packages
+hyperxos-calamares
+hyper-x-tools
+ckbcomp
+xorg-xhost
+hyperxos-branding
+hyperxos-default-settings
+hyperxos-hooks
+archlinux-keyring
+cachyos-keyring
+hyperxos-keyring
+hyperxos-mirrorlist
+python-yaml

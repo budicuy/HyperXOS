@@ -1,0 +1,10 @@
+[General]
+ColorScheme=HyperXOSDark
+Name=HyperXOS Dark
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+SingleClick=true
+
+[Icons]
+Theme=breeze-dark

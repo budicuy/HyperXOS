@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# HyperXOS Calamares Launcher
+set -eo pipefail
+
+LOG_FILE="/tmp/calamares-launch.log"
+touch "${LOG_FILE}" && chmod 666 "${LOG_FILE}" 2>/dev/null || true
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+export QML_XHR_ALLOW_FILE_READ=1
+
+echo "==> [HyperXOS] Starting Calamares Installer..."
+echo "  -> Time: $(date)"
+echo "  -> User: $(id -un) (UID $(id -u))"
+
+DESKTOP_DIR="/home/hyperxos/Desktop"
+mkdir -p "${DESKTOP_DIR}"
+touch "${DESKTOP_DIR}/log-install.txt"
+chmod 666 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+chown 1000:1000 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+
+# Continuous background sync of the installation log to the main desktop
+(
+    while true; do
+        if [ -s "${LOG_FILE}" ]; then
+            cp -f "${LOG_FILE}" "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+            chmod 666 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+            chown 1000:1000 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+        fi
+        sleep 1
+    done
+) &
+SYNC_PID=$!
+
+# Prevent multiple simultaneous installer instances
+if pgrep -f "/usr/bin/calamares" >/dev/null 2>&1; then
+    echo "==> Calamares is already running. Please switch to the active window."
+    kill "${SYNC_PID}" 2>/dev/null || true
+    exit 0
+fi
+
+# Allow local root user access to the Xwayland display server
+if command -v xhost >/dev/null 2>&1; then
+    xhost +local:root >/dev/null 2>&1 || true
+    xhost +SI:localuser:root >/dev/null 2>&1 || true
+    xhost + >/dev/null 2>&1 || true
+fi
+
+export DISPLAY="${DISPLAY:-:0}"
+export QT_QPA_PLATFORM="xcb"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-KDE}"
+
+# Ready to launch Calamares installer
+echo "==> [HyperXOS] Menjalankan installer Calamares dengan logging transparan..."
+
+echo "==> [HyperXOS] Launching Calamares GUI instantly..."
+CALAMARES_EXIT=0
+if [ "$(id -u)" -eq 0 ]; then
+    /usr/bin/calamares -d "$@" || CALAMARES_EXIT=$?
+else
+    sudo -E /usr/bin/calamares -d "$@" || CALAMARES_EXIT=$?
+fi
+
+# Terminate continuous sync loop once Calamares closes
+kill "${SYNC_PID}" 2>/dev/null || true
+
+# Final complete sync to ensure 100% of the log is saved to the desktop
+cp -f "${LOG_FILE}" "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+chmod 666 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+chown 1000:1000 "${DESKTOP_DIR}/log-install.txt" 2>/dev/null || true
+
+echo "==> [HyperXOS] Seluruh log instalasi telah disimpan ke: ${DESKTOP_DIR}/log-install.txt"
+
+# Send desktop notification
+if command -v notify-send >/dev/null 2>&1; then
+    notify-send -i calamares "Instalasi HyperXOS Selesai" "Log instalasi telah disimpan di layar utama: log-install.txt." 2>/dev/null || true
+fi
+
+exit "${CALAMARES_EXIT}"

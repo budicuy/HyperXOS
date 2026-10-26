@@ -1,0 +1,11 @@
+root:x:0:root
+sys:x:3:bin
+wheel:x:998:hyperxos
+storage:x:997:hyperxos
+power:x:996:hyperxos
+network:x:995:hyperxos
+video:x:994:hyperxos
+audio:x:993:hyperxos
+input:x:992:hyperxos
+users:x:985:hyperxos
+hyperxos:x:1000:

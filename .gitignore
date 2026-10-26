@@ -1,0 +1,51 @@
+# ==============================================================================
+# HyperXOS Project .gitignore Specification
+# ==============================================================================
+
+# 1. Output Images & Built ISO Media
+out/
+*.iso
+*.iso.sha256
+*.iso.b2sum
+*.pkglist
+
+# 2. Virtual Machine & Hypervisor Disks / NVRAM
+*.qcow2
+*.img
+*.vmdk
+*.vdi
+OVMF_VARS*.fd
+
+# 3. Temporary Build Workspaces & Caches
+work/
+*.log
+
+# 4. Mirrored Local Repo inside airootfs (Auto-populated by scripts/build-iso.sh)
+archiso/airootfs/opt/hyperxos-repo/
+
+# 5. Makepkg Temporary Build Directories & Intermediate Artifacts
+**/pkg/
+**/src/
+packages/*/*.pkg.tar.*
+!packages/hyperxos-calamares/cachyos-calamares-*.pkg.tar.zst
+
+# 6. Qt & C++ Compilation Objects (HyperXTools)
+*.o
+*.a
+*.so
+moc_*
+qrc_*
+ui_*
+Makefile*
+!Makefile
+.qmake.stash
+packages/hyper-x-tools/hyper-x-tools
+
+# 7. OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.vscode/
+.idea/

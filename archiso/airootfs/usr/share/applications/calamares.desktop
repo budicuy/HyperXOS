@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install HyperXOS
+GenericName=Live System Installer
+Comment=Install HyperXOS permanently to disk
+Exec=/usr/local/bin/launch-installer
+Icon=hyperxos
+Terminal=false
+StartupNotify=true
+Categories=Qt;System;

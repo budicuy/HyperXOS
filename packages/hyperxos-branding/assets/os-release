@@ -1,0 +1,11 @@
+NAME="HyperXOS"
+PRETTY_NAME="HyperXOS Linux"
+ID=hyperxos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;88;166;255"
+HOME_URL="https://github.com/hyperxos"
+DOCUMENTATION_URL="https://github.com/hyperxos"
+SUPPORT_URL="https://github.com/hyperxos/issues"
+BUG_REPORT_URL="https://github.com/hyperxos/issues"
+LOGO=hyperxos
