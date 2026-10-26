@@ -3,6 +3,7 @@ use std::path::Path;
 use crate::core::kernel_manager::KernelManager;
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct SnapshotRecord {
     pub id: String,
     pub name: String,

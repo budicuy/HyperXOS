@@ -1,8 +1,8 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyper-x-tools
-pkgver=2.1.0
+pkgver=2.2.0
 pkgrel=1
-pkgdesc="Modern System Dashboard, Gaming Tweaker, CachyOS Kernel Manager & Snapshot Center for HyperXOS (Rust + Slint + WGPU)"
+pkgdesc="Modern Glassmorphism System Dashboard, Gaming Tweaker, CachyOS Kernel Manager & Snapshot Center for HyperXOS (Rust + Iced + WGPU)"
 arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')

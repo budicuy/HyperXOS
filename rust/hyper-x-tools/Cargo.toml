@@ -1,20 +1,17 @@
 [package]
 name = "hyper-x-tools"
-version = "2.1.0"
+version = "2.2.0"
 edition = "2021"
 authors = ["HyperXOS Team <budicuy@hyperxos.org>"]
-description = "Modern System Dashboard, Performance Tweaker & Kernel Manager for HyperXOS"
+description = "Modern Glassmorphism System Dashboard, Performance Tweaker & Kernel Manager for HyperXOS"
 license = "GPL-3.0-or-later"
 
 [dependencies]
-slint = { version = "1.18", features = ["backend-winit", "renderer-femtovg-wgpu", "renderer-software", "compat-1-2"] }
+iced = { version = "0.14", features = ["wgpu", "image", "svg", "wayland", "x11", "tokio"] }
 sysinfo = "0.33"
 crossbeam-channel = "0.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-[build-dependencies]
-slint-build = "1.18"
 
 [profile.release]
 opt-level = 3
