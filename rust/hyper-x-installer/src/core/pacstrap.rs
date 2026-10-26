@@ -8,6 +8,8 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "base",
     "linux",
     "linux-firmware",
+    "amd-ucode",
+    "intel-ucode",
     "mkinitcpio",
     "which",
     "nano",
@@ -66,7 +68,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "polkit-kde-agent",
     "xdg-user-dirs",
     "kpipewire",
-    "kdialog",
+    "ocean-sound-theme",
 ];
 
 pub struct PacstrapInstaller;

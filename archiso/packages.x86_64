@@ -58,7 +58,6 @@ xorg-xwayland
 # Core Desktop Utilities
 dolphin
 konsole
-kdialog
 firefox
 
 # Open-Source Graphics Drivers (64-bit Only)
@@ -66,7 +65,6 @@ mesa
 
 # Virtual Machine Guest Support
 qemu-guest-agent
-spice-vdagent
 
 # HyperXOS Pure Rust Native Installer & System Tools
 hyper-x-installer
