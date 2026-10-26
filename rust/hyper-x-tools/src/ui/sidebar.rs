@@ -1,4 +1,4 @@
-use iced::widget::{button, column, container, image, mouse_area, row, text};
+use iced::widget::{button, column, container, mouse_area, row, text};
 use iced::{Alignment, Element, Length};
 
 use crate::ui::icons::{self, svg_icon};
@@ -19,11 +19,8 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     on_select: impl Fn(Page) -> Message + 'a,
     on_drag: Message,
 ) -> Element<'a, Message> {
-    // 1. Brand Logo Header
-    let logo_data: &'static [u8] = include_bytes!("../../assets/logo.png");
-    let logo_img = image(image::Handle::from_bytes(logo_data))
-        .width(36)
-        .height(36);
+    // 1. Brand Logo Header (Using persistent cached GPU texture handle to avoid flickering)
+    let logo_img = icons::logo_image(36.0);
 
     let brand = mouse_area(
         row![

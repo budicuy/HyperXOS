@@ -1,5 +1,5 @@
 use iced::border::Radius;
-use iced::widget::{button, column, container, image, row, text};
+use iced::widget::{button, column, container, row, text};
 use iced::{Alignment, Border, Color, Element, Length};
 
 use crate::core::system_monitor::SystemMetrics;
@@ -14,10 +14,7 @@ pub fn view<'a, Message: Clone + 'a>(
     on_quick_kernel: Message,
 ) -> Element<'a, Message> {
     // --- 1. TOP BANNER: OS & Complete Hardware Specifications with Logo ---
-    let logo_data: &'static [u8] = include_bytes!("../../../assets/logo.png");
-    let logo_img = image(image::Handle::from_bytes(logo_data))
-        .width(60)
-        .height(60);
+    let logo_img = icons::logo_image(60.0);
 
     let logo_box = container(logo_img)
         .padding(8)
