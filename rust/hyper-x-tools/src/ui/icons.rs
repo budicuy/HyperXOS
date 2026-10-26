@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use iced::widget::svg::{Handle, Svg};
 use iced::{Color, Length};
 

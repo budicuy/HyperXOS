@@ -95,19 +95,10 @@ pub fn header<'a, Message: Clone + 'a>(
     ]
     .spacing(12)
     .align_y(Alignment::Center)
-    .padding([10, 16]);
+    .padding([12, 18]);
 
-    let bottom_divider = container("")
+    container(bar)
         .width(Length::Fill)
-        .height(1)
-        .style(|_| container::Style {
-            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
-            ..container::Style::default()
-        });
-
-    iced::widget::column![
-        container(bar).width(Length::Fill).style(header_container_style),
-        bottom_divider,
-    ]
-    .into()
+        .style(header_container_style)
+        .into()
 }

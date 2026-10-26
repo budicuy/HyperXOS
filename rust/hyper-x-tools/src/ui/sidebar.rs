@@ -33,13 +33,13 @@ pub fn sidebar<'a, Message: Clone + 'a>(
                     .size(13)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(TEXT_MAIN),
+                        color: Some(iced::Color::WHITE),
                     }),
                 text("Pusat Kendali Sistem")
                     .size(10)
-                    .font(FONT_BODY_MEDIUM)
+                    .font(FONT_BODY_SEMIBOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_CYAN),
+                        color: Some(iced::Color::from_rgb(1.0, 0.92, 0.82)),
                     }),
             ]
             .spacing(1)
@@ -54,18 +54,26 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         .width(Length::Fill)
         .height(1)
         .style(|_| container::Style {
-            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
+            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.20))),
             ..container::Style::default()
         });
 
     // Helper to build a styled navigation button with open-source SVG icons
     let nav_item = |page: Page, label: &'static str, icon_svg: &'static str| -> Element<'a, Message> {
         let is_active = current_page == page;
-        let icon_col = if is_active { ACCENT_CYAN } else { TEXT_SUB };
+        let active_fg = iced::Color::from_rgb(0.06, 0.07, 0.10); // Font & Icon Hitam saat aktif
+        let inactive_fg = iced::Color::WHITE; // Font & Icon Putih saat tidak aktif
+
+        let (icon_col, text_col, font_weight) = if is_active {
+            (active_fg, active_fg, FONT_DISPLAY_BOLD)
+        } else {
+            (inactive_fg, inactive_fg, FONT_BODY_SEMIBOLD)
+        };
+
         let content = row![
             svg_icon(icon_svg, 15.0, icon_col),
-            text(label).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
-                color: Some(if is_active { ACCENT_CYAN } else { TEXT_MAIN }),
+            text(label).size(12).font(font_weight).style(move |_| text::Style {
+                color: Some(text_col),
             }),
         ]
         .spacing(10)
@@ -73,7 +81,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
 
         button(content)
             .width(Length::Fill)
-            .padding([8, 12])
+            .padding([9, 12])
             .style(nav_button_style(is_active))
             .on_press(on_select(page))
             .into()
@@ -81,10 +89,10 @@ pub fn sidebar<'a, Message: Clone + 'a>(
 
     let section_header = |name: &'static str| -> Element<'a, Message> {
         text(name)
-            .size(10)
-            .font(FONT_BODY_MEDIUM)
+            .size(9)
+            .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
-                color: Some(TEXT_MUTED),
+                color: Some(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.72)),
             })
             .into()
     };
@@ -113,15 +121,15 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         column![
             text("HyperXOS Linux 2026.10")
                 .size(10)
-                .font(FONT_BODY_MEDIUM)
+                .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(TEXT_SUB),
+                    color: Some(iced::Color::WHITE),
                 }),
             text("Rust + Iced Glass v2.2")
                 .size(9)
-                .font(FONT_BODY_MEDIUM)
+                .font(FONT_BODY_SEMIBOLD)
                 .style(|_| text::Style {
-                    color: Some(ACCENT_PURPLE),
+                    color: Some(iced::Color::from_rgb(1.0, 0.90, 0.80)),
                 }),
         ]
         .spacing(2)

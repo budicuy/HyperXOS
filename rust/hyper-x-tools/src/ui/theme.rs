@@ -50,31 +50,33 @@ pub const ACCENT_GREEN: Color = Color::from_rgb(0.65, 0.89, 0.63); // #a6e3a1
 pub const ACCENT_RED: Color = Color::from_rgb(0.95, 0.55, 0.66); // #f38ba8
 pub const ACCENT_AMBER: Color = Color::from_rgb(0.98, 0.89, 0.69); // #f9e2af
 
-pub const TEXT_MAIN: Color = Color::from_rgb(0.98, 0.99, 1.0);
-pub const TEXT_SUB: Color = Color::from_rgb(0.80, 0.84, 0.94);
-pub const TEXT_MUTED: Color = Color::from_rgb(0.60, 0.65, 0.78);
+pub const TEXT_MAIN: Color = Color::WHITE;
+pub const TEXT_SUB: Color = Color::from_rgb(0.85, 0.88, 0.95);
+pub const TEXT_MUTED: Color = Color::from_rgb(0.65, 0.70, 0.82);
 
 // --- Window & Container Glass Styles (Frosted Gradient Translucency) ---
 pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {
     let gradient = Linear::new(Radians(0.785)) // 45 degrees
-        .add_stop(0.0, Color::from_rgba(0.06, 0.09, 0.18, 0.38))
-        .add_stop(0.5, Color::from_rgba(0.04, 0.06, 0.12, 0.28))
-        .add_stop(1.0, Color::from_rgba(0.02, 0.03, 0.07, 0.42));
+        .add_stop(0.0, Color::from_rgba(0.05, 0.06, 0.10, 0.92))
+        .add_stop(0.5, Color::from_rgba(0.03, 0.04, 0.08, 0.90))
+        .add_stop(1.0, Color::from_rgba(0.05, 0.04, 0.09, 0.92));
 
     container::Style {
         background: Some(Background::from(gradient)),
         border: Border::default()
             .rounded(Radius::from(16.0))
             .width(1.2)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.16)),
+            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.18)),
         ..container::Style::default()
     }
 }
 
 pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
+    // Gradasi dari Merah Crimson (#dc2626) ke Oren Fire (#ea580c)
     let gradient = Linear::new(Radians(1.571)) // 90 degrees (top to bottom)
-        .add_stop(0.0, Color::from_rgba(0.05, 0.07, 0.15, 0.42))
-        .add_stop(1.0, Color::from_rgba(0.02, 0.03, 0.08, 0.55));
+        .add_stop(0.0, Color::from_rgba(0.86, 0.14, 0.22, 0.96)) // Merah crimson
+        .add_stop(0.55, Color::from_rgba(0.92, 0.28, 0.12, 0.95)) // Merah-oren
+        .add_stop(1.0, Color::from_rgba(0.95, 0.44, 0.08, 0.95)); // Oren cerah
 
     container::Style {
         background: Some(Background::from(gradient)),
@@ -85,74 +87,44 @@ pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
 }
 
 pub fn header_container_style(_theme: &iced::Theme) -> container::Style {
-    let gradient = Linear::new(Radians(0.0)) // left to right
-        .add_stop(0.0, Color::from_rgba(0.06, 0.10, 0.20, 0.30))
-        .add_stop(1.0, Color::from_rgba(0.03, 0.05, 0.10, 0.15));
-
-    container::Style {
-        background: Some(Background::from(gradient)),
-        border: Border::default()
-            .rounded(Radius::default().top_right(16.0)),
-        ..container::Style::default()
-    }
+    container::Style::default()
 }
 
-pub fn glass_card_style(_theme: &iced::Theme) -> container::Style {
-    let gradient = Linear::new(Radians(0.6))
-        .add_stop(0.0, Color::from_rgba(0.14, 0.19, 0.34, 0.28))
-        .add_stop(1.0, Color::from_rgba(0.07, 0.10, 0.18, 0.20));
+pub const CARD_BG_BLACK: Color = Color::from_rgb(0.05, 0.06, 0.09); // Solid Deep Black
 
+pub fn glass_card_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
-        background: Some(Background::from(gradient)),
+        background: Some(Background::Color(CARD_BG_BLACK)),
         border: Border::default()
             .rounded(Radius::from(14.0))
-            .width(1.2)
-            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.15)),
-        text_color: Some(TEXT_MAIN),
+            .width(1.5)
+            .color(Color::from_rgba(0.35, 0.45, 0.65, 0.40)), // Colored border
+        text_color: Some(Color::WHITE),
         ..container::Style::default()
     }
 }
 
 pub fn glass_card_accent_style(accent_color: Color) -> impl Fn(&iced::Theme) -> container::Style {
     move |_theme| {
-        let gradient = Linear::new(Radians(0.6))
-            .add_stop(
-                0.0,
-                Color {
-                    r: (accent_color.r * 0.3 + 0.10).min(1.0),
-                    g: (accent_color.g * 0.3 + 0.12).min(1.0),
-                    b: (accent_color.b * 0.3 + 0.24).min(1.0),
-                    a: 0.26,
-                },
-            )
-            .add_stop(1.0, Color::from_rgba(0.06, 0.08, 0.16, 0.22));
-
         container::Style {
-            background: Some(Background::from(gradient)),
+            background: Some(Background::Color(CARD_BG_BLACK)),
             border: Border::default()
                 .rounded(Radius::from(14.0))
-                .width(1.2)
-                .color(Color {
-                    a: 0.40,
-                    ..accent_color
-                }),
-            text_color: Some(TEXT_MAIN),
+                .width(1.5)
+                .color(accent_color), // Vibrant colored border!
+            text_color: Some(Color::WHITE),
             ..container::Style::default()
         }
     }
 }
 
 pub fn terminal_container_style(_theme: &iced::Theme) -> container::Style {
-    let gradient = Linear::new(Radians(1.571))
-        .add_stop(0.0, Color::from_rgba(0.03, 0.04, 0.08, 0.60))
-        .add_stop(1.0, Color::from_rgba(0.01, 0.02, 0.05, 0.75));
-
     container::Style {
-        background: Some(Background::from(gradient)),
+        background: Some(Background::Color(Color::from_rgb(0.02, 0.03, 0.05))),
         border: Border::default()
             .rounded(Radius::from(10.0))
-            .width(1.0)
-            .color(Color::from_rgba(0.65, 0.89, 0.63, 0.25)),
+            .width(1.2)
+            .color(Color::from_rgba(0.65, 0.89, 0.63, 0.40)),
         text_color: Some(ACCENT_GREEN),
         ..container::Style::default()
     }
@@ -162,41 +134,66 @@ pub fn terminal_container_style(_theme: &iced::Theme) -> container::Style {
 pub fn nav_button_style(is_active: bool) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
     move |_theme, status| {
         if is_active {
-            let gradient = Linear::new(Radians(0.0)) // left to right
-                .add_stop(0.0, Color::from_rgba(0.54, 0.71, 0.98, 0.35))
-                .add_stop(1.0, Color::from_rgba(0.80, 0.65, 0.97, 0.15));
-
             button::Style {
-                background: Some(Background::from(gradient)),
-                text_color: Color::WHITE,
+                background: Some(Background::Color(Color::WHITE)), // Background Putih
+                text_color: Color::from_rgb(0.06, 0.07, 0.10), // Font Hitam
                 border: Border::default()
-                    .rounded(Radius::from(10.0))
-                    .width(1.2)
-                    .color(Color::from_rgba(0.54, 0.71, 0.98, 0.50)),
+                    .rounded(Radius::from(9.0)),
                 ..button::Style::default()
             }
         } else {
-            let (bg, border_color, text_color) = match status {
-                button::Status::Hovered => (
-                    Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.08))),
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.14),
-                    TEXT_MAIN,
-                ),
-                button::Status::Pressed => (
-                    Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.14))),
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.20),
-                    TEXT_MAIN,
-                ),
-                _ => (None, Color::TRANSPARENT, TEXT_SUB),
+            let bg = match status {
+                button::Status::Hovered => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.20))),
+                button::Status::Pressed => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.32))),
+                _ => None,
             };
 
             button::Style {
                 background: bg,
-                text_color,
+                text_color: Color::WHITE,
                 border: Border::default()
-                    .rounded(Radius::from(10.0))
-                    .width(1.0)
-                    .color(border_color),
+                    .rounded(Radius::from(9.0)),
+                ..button::Style::default()
+            }
+        }
+    }
+}
+
+pub fn active_toggle_button_style(is_active: bool, accent_color: Color) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
+    move |_theme, status| {
+        if is_active {
+            button::Style {
+                background: Some(Background::Color(Color::WHITE)), // Putih saat aktif
+                text_color: Color::from_rgb(0.06, 0.07, 0.10), // Hitam saat aktif
+                border: Border::default()
+                    .rounded(Radius::from(8.0))
+                    .width(1.2)
+                    .color(Color::WHITE),
+                ..button::Style::default()
+            }
+        } else {
+            let (bg, border_col) = match status {
+                button::Status::Hovered => (
+                    Color::from_rgba(1.0, 1.0, 1.0, 0.16),
+                    Color::WHITE,
+                ),
+                button::Status::Pressed => (
+                    Color::from_rgba(1.0, 1.0, 1.0, 0.24),
+                    Color::WHITE,
+                ),
+                _ => (
+                    Color::from_rgb(0.06, 0.07, 0.11),
+                    accent_color,
+                ),
+            };
+
+            button::Style {
+                background: Some(Background::Color(bg)),
+                text_color: Color::WHITE,
+                border: Border::default()
+                    .rounded(Radius::from(8.0))
+                    .width(1.2)
+                    .color(border_col),
                 ..button::Style::default()
             }
         }
@@ -205,60 +202,66 @@ pub fn nav_button_style(is_active: bool) -> impl Fn(&iced::Theme, button::Status
 
 pub fn primary_button_style(accent: Color) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
     move |_theme, status| {
-        let (alpha, border_alpha, text_col) = match status {
-            button::Status::Hovered => (0.40, 0.65, TEXT_MAIN),
-            button::Status::Pressed => (0.55, 0.80, TEXT_MAIN),
-            button::Status::Disabled => (0.08, 0.12, TEXT_MUTED),
-            _ => (0.24, 0.45, accent),
+        let (bg, border_col, text_col) = match status {
+            button::Status::Hovered => (
+                Color::WHITE,
+                Color::WHITE,
+                Color::from_rgb(0.06, 0.07, 0.10),
+            ),
+            button::Status::Pressed => (
+                Color::from_rgb(0.90, 0.90, 0.92),
+                Color::WHITE,
+                Color::from_rgb(0.06, 0.07, 0.10),
+            ),
+            button::Status::Disabled => (
+                Color::from_rgb(0.05, 0.06, 0.09),
+                Color::from_rgba(1.0, 1.0, 1.0, 0.10),
+                TEXT_MUTED,
+            ),
+            _ => (
+                Color::from_rgb(0.06, 0.08, 0.12),
+                accent,
+                Color::WHITE,
+            ),
         };
 
-        let gradient = Linear::new(Radians(0.785))
-            .add_stop(0.0, Color { a: alpha, ..accent })
-            .add_stop(1.0, Color { a: alpha * 0.6, ..accent });
-
         button::Style {
-            background: Some(Background::from(gradient)),
+            background: Some(Background::Color(bg)),
             text_color: text_col,
             border: Border::default()
-                .rounded(Radius::from(10.0))
-                .width(1.0)
-                .color(Color {
-                    a: border_alpha,
-                    ..accent
-                }),
+                .rounded(Radius::from(8.0))
+                .width(1.2)
+                .color(border_col),
             ..button::Style::default()
         }
     }
 }
 
 pub fn glass_action_button(_theme: &iced::Theme, status: button::Status) -> button::Style {
-    let (gradient, text, border) = match status {
-        button::Status::Hovered => {
-            let g = Linear::new(Radians(0.785))
-                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.16))
-                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.08));
-            (g, TEXT_MAIN, Color::from_rgba(1.0, 1.0, 1.0, 0.22))
-        }
-        button::Status::Pressed => {
-            let g = Linear::new(Radians(0.785))
-                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.22))
-                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.12));
-            (g, TEXT_MAIN, Color::from_rgba(1.0, 1.0, 1.0, 0.30))
-        }
-        _ => {
-            let g = Linear::new(Radians(0.785))
-                .add_stop(0.0, Color::from_rgba(1.0, 1.0, 1.0, 0.09))
-                .add_stop(1.0, Color::from_rgba(1.0, 1.0, 1.0, 0.03));
-            (g, TEXT_SUB, Color::from_rgba(1.0, 1.0, 1.0, 0.12))
-        }
+    let (bg, text, border) = match status {
+        button::Status::Hovered => (
+            Color::WHITE,
+            Color::from_rgb(0.06, 0.07, 0.10),
+            Color::WHITE,
+        ),
+        button::Status::Pressed => (
+            Color::from_rgb(0.90, 0.90, 0.92),
+            Color::from_rgb(0.06, 0.07, 0.10),
+            Color::WHITE,
+        ),
+        _ => (
+            Color::from_rgb(0.06, 0.08, 0.12),
+            Color::WHITE,
+            Color::from_rgba(1.0, 1.0, 1.0, 0.22),
+        ),
     };
 
     button::Style {
-        background: Some(Background::from(gradient)),
+        background: Some(Background::Color(bg)),
         text_color: text,
         border: Border::default()
-            .rounded(Radius::from(10.0))
-            .width(1.0)
+            .rounded(Radius::from(8.0))
+            .width(1.2)
             .color(border),
         ..button::Style::default()
     }

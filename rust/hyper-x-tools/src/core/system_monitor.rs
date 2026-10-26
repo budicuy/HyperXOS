@@ -30,11 +30,14 @@ pub struct SystemMetrics {
     pub vram_total_bytes: u64,
     pub vram_used_bytes: u64,
 
-    // OS Info
+    // OS Info & Hardware Specifications
     pub os_name: String,
     pub kernel_version: String,
     pub uptime_string: String,
     pub display_session: String,
+    pub host_name: String,
+    pub hardware_board: String,
+    pub desktop_env: String,
 }
 
 pub struct SystemMonitor {
@@ -43,6 +46,9 @@ pub struct SystemMonitor {
     cached_gpu_model: String,
     cached_os_name: String,
     cached_kernel: String,
+    cached_host_name: String,
+    cached_hardware_board: String,
+    cached_desktop_env: String,
 }
 
 impl SystemMonitor {
@@ -65,16 +71,72 @@ impl SystemMonitor {
 
         let os_name = "HyperXOS Linux 2026.10".to_string();
 
+        let host_name = System::host_name().unwrap_or_else(|| "hyperxos".to_string());
+        let hardware_board = Self::detect_hardware_board();
+        let desktop_env = Self::detect_desktop_env();
+
         let mut monitor = Self {
             sys,
             cached_cpu_model: cpu_model,
             cached_gpu_model: String::new(),
             cached_os_name: os_name,
             cached_kernel: kernel_version,
+            cached_host_name: host_name,
+            cached_hardware_board: hardware_board,
+            cached_desktop_env: desktop_env,
         };
 
         monitor.cached_gpu_model = monitor.detect_gpu_name();
         monitor
+    }
+
+    fn detect_hardware_board() -> String {
+        let vendor = fs::read_to_string("/sys/class/dmi/id/sys_vendor")
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let product = fs::read_to_string("/sys/class/dmi/id/product_name")
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let board = fs::read_to_string("/sys/class/dmi/id/board_name")
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+
+        let mut parts = Vec::new();
+        if !vendor.is_empty() && vendor != "System manufacturer" && vendor != "Default string" {
+            parts.push(vendor.clone());
+        }
+        if !board.is_empty() && board != "Base Board Product Name" && board != "Default string" {
+            if !vendor.is_empty() && !board.starts_with(&vendor) {
+                parts.push(board);
+            } else if vendor.is_empty() {
+                parts.push(board);
+            }
+        } else if !product.is_empty() && product != "System Product Name" && product != "Default string" {
+            parts.push(product);
+        }
+
+        if parts.is_empty() {
+            "PC Kompatibel x86_64".to_string()
+        } else {
+            parts.join(" ")
+        }
+    }
+
+    fn detect_desktop_env() -> String {
+        if let Ok(de) = std::env::var("XDG_CURRENT_DESKTOP") {
+            if !de.is_empty() {
+                return de;
+            }
+        }
+        if let Ok(de) = std::env::var("DESKTOP_SESSION") {
+            if !de.is_empty() {
+                return de;
+            }
+        }
+        "KDE Plasma".to_string()
     }
 
     pub fn collect_metrics(&mut self) -> SystemMetrics {
@@ -137,6 +199,9 @@ impl SystemMonitor {
             kernel_version: self.cached_kernel.clone(),
             uptime_string,
             display_session,
+            host_name: self.cached_host_name.clone(),
+            hardware_board: self.cached_hardware_board.clone(),
+            desktop_env: self.cached_desktop_env.clone(),
         }
     }
 

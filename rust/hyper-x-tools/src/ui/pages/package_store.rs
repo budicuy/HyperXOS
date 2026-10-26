@@ -42,14 +42,22 @@ pub fn view<'a, Message: Clone + 'a>(
     // Category pills
     let cat_btn = |cat: &'static str| {
         let is_act = active_cat == cat;
-        button(text(cat).size(11))
-            .padding([5, 12])
-            .style(primary_button_style(if is_act {
-                ACCENT_CYAN
-            } else {
-                iced::Color::from_rgba(1.0, 1.0, 1.0, 0.12)
-            }))
-            .on_press(on_select_cat(cat))
+        let fg = if is_act {
+            iced::Color::from_rgb(0.06, 0.07, 0.10)
+        } else {
+            iced::Color::WHITE
+        };
+        button(
+            text(cat)
+                .size(11)
+                .font(if is_act { FONT_DISPLAY_BOLD } else { FONT_BODY_SEMIBOLD })
+                .style(move |_| text::Style {
+                    color: Some(fg),
+                }),
+        )
+        .padding([5, 14])
+        .style(active_toggle_button_style(is_act, ACCENT_CYAN))
+        .on_press(on_select_cat(cat))
     };
 
     let categories = row![
