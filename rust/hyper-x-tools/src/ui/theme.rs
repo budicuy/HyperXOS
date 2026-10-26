@@ -72,11 +72,11 @@ pub fn glass_window_style(_theme: &iced::Theme) -> container::Style {
 }
 
 pub fn sidebar_container_style(_theme: &iced::Theme) -> container::Style {
-    // Gradasi elegan dari bawah (warm burnt orange/crimson) ke atas (dark obsidian)
+    // Gradasi dari bawah (Merah) ke atas (Oren), sedikit transparan (alpha ~0.80), murni tanpa warna hitam
     let gradient = Linear::new(Radians(1.571)) // 90 degrees (top to bottom)
-        .add_stop(0.0, Color::from_rgba(0.07, 0.08, 0.12, 0.90)) // Atas: dark obsidian
-        .add_stop(0.45, Color::from_rgba(0.36, 0.10, 0.12, 0.85)) // Tengah: deep wine crimson
-        .add_stop(1.0, Color::from_rgba(0.68, 0.22, 0.08, 0.88)); // Bawah: warm burnt orange-crimson
+        .add_stop(0.0, Color::from_rgba(0.96, 0.44, 0.08, 0.80))  // Atas: Oren cerah
+        .add_stop(0.5, Color::from_rgba(0.90, 0.26, 0.12, 0.80))  // Tengah: Transisi Oren-Merah
+        .add_stop(1.0, Color::from_rgba(0.85, 0.12, 0.20, 0.82)); // Bawah: Merah pekat
 
     container::Style {
         background: Some(Background::from(gradient)),
