@@ -17,7 +17,7 @@ echo "======================================================================"
 LATEST_ISO="$(ls -t "${OUT_DIR}"/hyperxos-*.iso 2>/dev/null | head -n 1 || true)"
 if [ -z "${LATEST_ISO}" ] || [ ! -f "${LATEST_ISO}" ]; then
     echo "[-] ERROR: Berkas ISO tidak ditemukan di direktori '${OUT_DIR}'!"
-    echo "    Harap jalankan terlebih dahulu: make build-production"
+    echo "    Harap jalankan terlebih dahulu: hyperx build --prod"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ PKGLIST_FILE="${OUT_DIR}/hyperxos-${VERSION}-x86_64.pkglist"
 
 if [ ! -f "${SHA256_FILE}" ] || [ ! -f "${B2SUM_FILE}" ]; then
     echo "[!] Checksum belum lengkap. Membuat checksum sekarang..."
-    make -C "${PROJECT_ROOT}" checksum
+    hyperx checksum
 fi
 
 ASSETS=("${LATEST_ISO}" "${SHA256_FILE}" "${B2SUM_FILE}")

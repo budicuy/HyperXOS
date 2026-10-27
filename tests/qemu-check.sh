@@ -18,7 +18,7 @@ ISO_FILES=("${OUT_DIR}"/hyperxos-*.iso)
 shopt -u nullglob
 
 if [ ${#ISO_FILES[@]} -eq 0 ]; then
-    echo "[-] Error: No HyperXOS ISO found in ${OUT_DIR}. Run 'make build' first." >&2
+    echo "[-] Error: No HyperXOS ISO found in ${OUT_DIR}. Run 'hyperx build' first." >&2
     exit 1
 fi
 

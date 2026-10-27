@@ -33,7 +33,7 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
 
 - **Dukungan Grafis & Driver:**
   - Driver grafis *open-source* Mesa 64-bit lengkap dengan akselerasi Vulkan: AMD (RADV), Intel (ANV), dan NVIDIA (NVK).
-  - Skrip pendeteksi perangkat keras otomatis (`hw-detect-gpu`) untuk konfigurasi driver optimal.
+  - Modul pendeteksi perangkat keras & GPU otomatis Pure Rust (`hyper-x-hw`) untuk konfigurasi driver optimal.
 
 - **Efisiensi & Ukuran ISO:**
   - Dibangun dengan kompresi produksi tingkat tinggi (SquashFS Zstandard level 22 & Initramfs XZ -9e) sehingga ukuran ISO tetap di bawah **2.0 GB**.

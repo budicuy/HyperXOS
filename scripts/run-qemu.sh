@@ -80,7 +80,7 @@ fi
 case "${MODE}" in
     dev|live)
         if [ -z "${LATEST_ISO}" ] || [ ! -f "${LATEST_ISO}" ]; then
-            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'make build' first." >&2
+            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'hyperx build' first." >&2
             exit 1
         fi
         # Always reset UEFI NVRAM for live dev mode so it cleanly boots the ISO
@@ -100,7 +100,7 @@ case "${MODE}" in
 
     install|vm-install)
         if [ -z "${LATEST_ISO}" ] || [ ! -f "${LATEST_ISO}" ]; then
-            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'make build' first." >&2
+            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'hyperx build' first." >&2
             exit 1
         fi
         echo "==> [HyperXOS] Resetting virtual disk ${DISK_IMAGE} to a clean ${DISK_SIZE} image..."
@@ -121,7 +121,7 @@ case "${MODE}" in
 
     run)
         if [ ! -f "${DISK_IMAGE}" ]; then
-            echo "Error: Virtual disk ${DISK_IMAGE} not found. Please install HyperXOS first using 'make install'." >&2
+            echo "Error: Virtual disk ${DISK_IMAGE} not found. Please install HyperXOS first using 'hyperx install'." >&2
             exit 1
         fi
         echo "==> [HyperXOS] Booting installed system from virtual disk: ${DISK_IMAGE}"
@@ -132,7 +132,7 @@ case "${MODE}" in
 
     test)
         if [ -z "${LATEST_ISO}" ] || [ ! -f "${LATEST_ISO}" ]; then
-            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'make build' first." >&2
+            echo "Error: No HyperXOS ISO found in ${PROJECT_ROOT}/out/. Please run 'hyperx build' first." >&2
             exit 1
         fi
         echo "==> [HyperXOS] Running automated non-interactive boot verification test..."

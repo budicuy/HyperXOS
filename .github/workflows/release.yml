@@ -66,14 +66,14 @@ jobs:
               pacman -Sy --noconfirm archlinux-keyring
 
               echo "==> Installing build dependencies..."
-              pacman -S --noconfirm --needed archiso git make sudo dosfstools e2fsprogs squashfs-tools libarchive
+              pacman -S --noconfirm --needed archiso git rust cargo sudo dosfstools e2fsprogs squashfs-tools libarchive
 
               echo "==> Ensuring build directories..."
               mkdir -p out work /var/tmp/hyperxos-work
               chmod 0777 /var/tmp/hyperxos-work
 
-              echo "==> Compiling HyperXOS Production ISO (make build-production)..."
-              make build-production
+              echo "==> Compiling HyperXOS Production ISO via hyperx CLI..."
+              cargo run --release --manifest-path rust/hyperx-cli/Cargo.toml -- production
 
               echo "==> Ensuring proper file permissions for host runner..."
               chmod -R 0777 /workspace/out

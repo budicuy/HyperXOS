@@ -42,48 +42,44 @@
 
 ---
 
-## 🛠️ Panduan Developer Toolchain & Build (`hyperx` / `Makefile`)
+## 🛠️ Panduan Developer Toolchain & Build (`hyperx`)
 
-HyperXOS menyediakan developer toolchain **100% Pure Rust Native (`hyperx`)** serta wrapper `Makefile` untuk orkestrasi perintah yang konsisten:
+HyperXOS sepenuhnya ditenagai oleh developer toolchain **100% Pure Rust Native (`hyperx`)**. Binary `hyperx` terpasang di sistem (`/usr/local/bin/hyperx`) atau dapat dijalankan via Cargo:
 
 ```bash
 # 1. Menampilkan seluruh perintah yang tersedia
 hyperx help
-# (atau 'make help')
 
 # 2. Memeriksa dependensi host dan konfigurasi /dev/kvm
 hyperx setup
-# (atau 'make setup')
 
 # 3. Memvalidasi integritas konfigurasi profiledef dan paket
 hyperx check
-# (atau 'make check')
 
-# 4. Membangun ISO versi Development (kompresi cepat zstd-1 & build caching)
+# 4. Memperbarui dan menyinkronkan database repositori paket lokal
+hyperx repo
+
+# 5. Membangun ISO versi Development (kompresi cepat zstd-1 & build caching)
 hyperx build
-# (atau 'make build')
 
-# 5. Membangun ISO versi Produksi (kompresi ultra zstd-22, initramfs xz-9e, batas ketat <2.0GB)
+# 6. Membangun ISO versi Produksi (kompresi ultra zstd-22, initramfs xz-9e, batas ketat <2.0GB)
 hyperx build --prod
-# (atau 'make build-production')
 
-# 6. Menghasilkan checksum resmi SHA256 dan B2SUM untuk ISO
+# 7. Menghasilkan checksum resmi SHA256 dan B2SUM untuk ISO
 hyperx checksum
-# (atau 'make checksum')
 
-# 7. Menjalankan pengujian otomatis QA dan non-interactive smoke test QEMU
+# 8. Menjalankan pengujian otomatis QA dan non-interactive smoke test QEMU
 hyperx test
-# (atau 'make test')
 
-# 8. Membersihkan direktori kerja build sementara
+# 9. Membersihkan direktori kerja build sementara
 hyperx clean
-# (atau 'make clean' / 'hyperx clean --all')
+# Gunakan flag --all untuk membersihkan ISO dan virtual disk:
+hyperx clean --all
 
-# 9. Menjalankan modul pendeteksi hardware & GPU secara langsung
+# 10. Menjalankan modul pendeteksi hardware & GPU secara langsung
 hyperx hw
-# (atau 'make hw')
 
-# 10. Menguji aplikasi GUI HyperXTools dan HyperXInstaller secara langsung
+# 11. Menguji aplikasi GUI HyperXTools dan HyperXInstaller secara langsung
 hyperx tools
 hyperx installer
 ```
@@ -95,15 +91,12 @@ hyperx installer
 ```bash
 # Menjalankan ISO secara Live murni tanpa menginstal
 hyperx dev
-# (atau 'make dev')
 
 # Menjalankan pengujian instalasi Native Installer ke virtual disk 40 GB (disk otomatis di-reset bersih)
 hyperx install
-# (atau 'make install' / 'hyperx vm-install')
 
 # Menjalankan sistem operasi yang sudah terinstal di dalam virtual disk 40 GB
 hyperx run
-# (atau 'make run')
 ```
 
 ---

@@ -26,7 +26,7 @@ echo "=================================================="
 
 # Check requirements
 if ! command -v mkarchiso >/dev/null 2>&1; then
-    echo "Error: mkarchiso is not installed. Please run 'sudo pacman -S archiso' or 'make setup'." >&2
+    echo "Error: mkarchiso is not installed. Please run 'sudo pacman -S archiso' or 'hyperx setup'." >&2
     exit 1
 fi
 

@@ -2,7 +2,7 @@
 
 This test matrix outlines the verification protocol for HyperXOS ISO builds, Pure Rust native installer behavior, GPU driver detection, and post-installation stability.
 
-## 1. Automated Verification (`make test`)
+## 1. Automated Verification (`hyperx test`)
 | Check Item | Acceptance Criteria | Status |
 | :--- | :--- | :--- |
 | ISO Image Format | Hybrid ISO 9660 with El Torito & GPT/MBR EFI system partition | PASS (1916 MB) |
@@ -10,7 +10,7 @@ This test matrix outlines the verification protocol for HyperXOS ISO builds, Pur
 | Kernel Smoke Test | QEMU boots `vmlinuz-linux` and `initramfs-linux.img` headlessly without panic | PASS (QEMU 8.x) |
 | Checksum Integrity | SHA256 and B2SUM checksums match ISO file | PASS |
 
-## 2. Live Environment Verification (`make dev`)
+## 2. Live Environment Verification (`hyperx dev`)
 | Check Item | Acceptance Criteria | Status |
 | :--- | :--- | :--- |
 | UEFI Boot | Boots cleanly using systemd-boot EFI menu entries | PASS (OVMF 4M) |
@@ -20,7 +20,7 @@ This test matrix outlines the verification protocol for HyperXOS ISO builds, Pur
 | Network | NetworkManager auto-connects to DHCP network | PASS |
 | Installer Launcher | `hyper-x-installer.desktop` launches Pure Rust Installer | PASS |
 
-## 3. Pure Rust Installer Verification (`make install`)
+## 3. Pure Rust Installer Verification (`hyperx install`)
 | Check Item | Acceptance Criteria | Status |
 | :--- | :--- | :--- |
 | Clean 40 GB Disk | Virtual disk `hyperxos-install.qcow2` reset and partitioned | PASS |
@@ -30,7 +30,7 @@ This test matrix outlines the verification protocol for HyperXOS ISO builds, Pur
 | Target Configuration | `/etc/fstab`, user credentials, wheel sudoers, and SDDM Wayland enabled | PASS |
 | Bootloader Deployment | Limine EFI binary deployed to `/boot/EFI/BOOT/` and registered in NVRAM | PASS (`BOOTX64.EFI`) |
 
-## 4. Installed System Verification (`make run`)
+## 4. Installed System Verification (`hyperx run`)
 | Check Item | Acceptance Criteria | Status |
 | :--- | :--- | :--- |
 | Target Boot | System boots directly from virtual disk using Limine without ISO mounted | PASS (OVMF NVRAM) |

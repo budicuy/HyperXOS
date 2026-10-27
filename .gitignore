@@ -37,8 +37,6 @@ packages/hyper-x-installer/hyper-x-installer
 moc_*
 qrc_*
 ui_*
-Makefile*
-!/Makefile
 .qmake.stash
 packages/hyper-x-tools/hyper-x-tools
 
