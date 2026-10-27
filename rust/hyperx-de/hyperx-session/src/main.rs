@@ -59,27 +59,50 @@ fn main() {
     info!("Compositor binary: {:?}", comp_path);
     info!("Shell binary:      {:?}", shell_path);
 
-    // 3. Launch Compositor (hyperx-comp)
-    let mut comp_cmd = Command::new(&comp_path);
-    if args.nested {
-        info!("Running in NESTED mode (Winit backend)...");
-        comp_cmd.arg("--winit");
-    }
+    // 3. Launch Compositor (Dual-Tier: nested Winit vs bare-metal DRM)
+    let has_display = env::var("WAYLAND_DISPLAY").is_ok() || env::var("DISPLAY").is_ok();
+    let use_nested = args.nested || has_display;
 
-    let mut comp_child = match comp_cmd.spawn() {
-        Ok(child) => {
-            info!("Spawned hyperx-comp (PID: {})", child.id());
-            child
+    let mut comp_child = if use_nested {
+        info!("Running in nested window mode (Winit backend)...");
+        let mut comp_cmd = Command::new(&comp_path);
+        comp_cmd.arg("--winit");
+        match comp_cmd.spawn() {
+            Ok(child) => {
+                info!("Spawned hyperx-comp (PID: {})", child.id());
+                child
+            }
+            Err(e) => {
+                error!("Failed to launch compositor 'hyperx-comp': {}", e);
+                std::process::exit(1);
+            }
         }
-        Err(e) => {
-            error!("Failed to launch compositor 'hyperx-comp': {}", e);
-            std::process::exit(1);
+    } else {
+        // Bare-metal DRM session from SDDM / TTY
+        info!("Running on bare-metal DRM display...");
+        if let Some(kwin_bin) = find_binary("kwin_wayland") {
+            info!("Launching hardware DRM Wayland backend via kwin_wayland...");
+            match Command::new(kwin_bin)
+                .args(["--drm", "--no-lockscreen", "--no-global-shortcuts", "--locale1"])
+                .spawn()
+            {
+                Ok(child) => {
+                    info!("Spawned DRM compositor (PID: {})", child.id());
+                    child
+                }
+                Err(e) => {
+                    warn!("Failed to spawn kwin_wayland, falling back to hyperx-comp: {}", e);
+                    Command::new(&comp_path).spawn().expect("Failed to spawn hyperx-comp")
+                }
+            }
+        } else {
+            Command::new(&comp_path).spawn().expect("Failed to spawn hyperx-comp")
         }
     };
 
     // 4. Wait for Wayland display socket to become ready
     let runtime_dir = env::var("XDG_RUNTIME_DIR").unwrap_or_else(|_| "/tmp".to_string());
-    let socket_name = wait_for_wayland_socket(&runtime_dir, Duration::from_secs(5))
+    let socket_name = wait_for_wayland_socket(&runtime_dir, Duration::from_secs(6))
         .unwrap_or_else(|| "wayland-0".to_string());
 
     info!("Wayland socket ready: {}", socket_name);
@@ -90,7 +113,8 @@ fn main() {
         .args(["--systemd", "WAYLAND_DISPLAY", "XDG_CURRENT_DESKTOP"])
         .spawn();
 
-    // 6. Launch HyperX Desktop Shell (Top Bar, Dynamic Island, Dock, Control Center)
+    // 6. Launch HyperX Desktop Shell (macOS Top Bar, Dynamic Island, Dock, Control Center)
+    thread::sleep(Duration::from_millis(500));
     let mut shell_child = if shell_path.exists() {
         match Command::new(&shell_path).spawn() {
             Ok(child) => {
@@ -194,7 +218,6 @@ fn wait_for_wayland_socket(runtime_dir: &str, timeout: Duration) -> Option<Strin
     let r_path = Path::new(runtime_dir);
 
     while start.elapsed() < timeout {
-        // Look for wayland-0, wayland-1, etc.
         for i in 0..10 {
             let sock = format!("wayland-{}", i);
             if r_path.join(&sock).exists() {

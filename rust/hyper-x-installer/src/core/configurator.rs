@@ -145,7 +145,7 @@ CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --loc
         let autologin_cfg = format!(
             r#"[Autologin]
 User={}
-Session=plasma
+Session=hyperx
 Relogin=false
 "#,
             cfg.username
