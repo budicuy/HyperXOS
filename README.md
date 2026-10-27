@@ -42,46 +42,51 @@
 
 ---
 
-## 🛠️ Panduan Developer Toolchain & Build (`hyperx`)
+## 🛠️ Panduan Developer Toolchain & Build (`./hyperx`)
 
-HyperXOS sepenuhnya ditenagai oleh developer toolchain **100% Pure Rust Native (`hyperx`)**. Binary `hyperx` terpasang di sistem (`/usr/local/bin/hyperx`) atau dapat dijalankan via Cargo:
+HyperXOS sepenuhnya ditenagai oleh developer toolchain **100% Pure Rust Native (`hyperx`)**. Terdapat runner mandiri **`./hyperx`** langsung di dalam folder root repositori.
+
+Setelah melakukan `git clone`, Anda (atau siapa pun) dapat langsung menjalankannya tanpa perlu setup manual — runner akan secara otomatis mengompilasi toolchain pada eksekusi pertama:
 
 ```bash
 # 1. Menampilkan seluruh perintah yang tersedia
-hyperx help
+./hyperx help
 
 # 2. Memeriksa dependensi host dan konfigurasi /dev/kvm
-hyperx setup
+./hyperx setup
 
 # 3. Memvalidasi integritas konfigurasi profiledef dan paket
-hyperx check
+./hyperx check
 
 # 4. Memperbarui dan menyinkronkan database repositori paket lokal
-hyperx repo
+./hyperx repo
 
 # 5. Membangun ISO versi Development (kompresi cepat zstd-1 & build caching)
-hyperx build
+./hyperx build
 
 # 6. Membangun ISO versi Produksi (kompresi ultra zstd-22, initramfs xz-9e, batas ketat <2.0GB)
-hyperx build --prod
+./hyperx build --prod
 
 # 7. Menghasilkan checksum resmi SHA256 dan B2SUM untuk ISO
-hyperx checksum
+./hyperx checksum
 
 # 8. Menjalankan pengujian otomatis QA dan non-interactive smoke test QEMU
-hyperx test
+./hyperx test
 
 # 9. Membersihkan direktori kerja build sementara
-hyperx clean
+./hyperx clean
 # Gunakan flag --all untuk membersihkan ISO dan virtual disk:
-hyperx clean --all
+./hyperx clean --all
 
 # 10. Menjalankan modul pendeteksi hardware & GPU secara langsung
-hyperx hw
+./hyperx hw
 
 # 11. Menguji aplikasi GUI HyperXTools dan HyperXInstaller secara langsung
-hyperx tools
-hyperx installer
+./hyperx tools
+./hyperx installer
+
+# 12. (Opsional) Memasang 'hyperx' secara global ke /usr/local/bin:
+./hyperx install-cli
 ```
 
 ---
@@ -90,13 +95,13 @@ hyperx installer
 
 ```bash
 # Menjalankan ISO secara Live murni tanpa menginstal
-hyperx dev
+./hyperx dev
 
 # Menjalankan pengujian instalasi Native Installer ke virtual disk 40 GB (disk otomatis di-reset bersih)
-hyperx install
+./hyperx install
 
 # Menjalankan sistem operasi yang sudah terinstal di dalam virtual disk 40 GB
-hyperx run
+./hyperx run
 ```
 
 ---

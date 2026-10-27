@@ -1,19 +1,31 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-/// Locate project root containing archiso/profiledef.sh
+/// Locate project root containing archiso/profiledef.sh dynamically
 pub fn get_project_root() -> PathBuf {
-    if let Ok(cur) = std::env::current_dir() {
-        if cur.join("archiso/profiledef.sh").exists() {
-            return cur;
-        }
-        if cur.join("../../archiso/profiledef.sh").exists() {
-            if let Ok(p) = cur.join("../..").canonicalize() {
-                return p;
+    // 1. Walk upwards from current working directory
+    if let Ok(mut cur) = std::env::current_dir() {
+        loop {
+            if cur.join("archiso/profiledef.sh").exists() {
+                return cur;
+            }
+            if !cur.pop() {
+                break;
             }
         }
     }
-    PathBuf::from("/home/budicuy/Dokumen/HyperXOS")
+
+    // 2. Walk upwards from current executable location
+    if let Ok(mut exe) = std::env::current_exe() {
+        while exe.pop() {
+            if exe.join("archiso/profiledef.sh").exists() {
+                return exe;
+            }
+        }
+    }
+
+    // Fallback to current working directory
+    PathBuf::from(".")
 }
 
 /// Execute a command streaming its output directly to stdout/stderr in real-time

@@ -1,0 +1,14 @@
+#!/bin/sh
+# HyperXOS Project Self-Bootstrapping CLI Runner
+# Automatically builds and executes the Pure Rust 'hyperx' developer toolchain.
+set -e
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+BIN="$SCRIPT_DIR/rust/hyperx-cli/target/release/hyperx"
+
+if [ ! -x "$BIN" ]; then
+    echo "==> [HyperXOS] Mengompilasi toolchain CLI 'hyperx' untuk pertama kali..."
+    cargo build --release --manifest-path "$SCRIPT_DIR/rust/hyperx-cli/Cargo.toml"
+fi
+
+exec "$BIN" "$@"
