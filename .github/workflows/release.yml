@@ -5,13 +5,18 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag Name (e.g. v2026.10.27)'
+        required: false
+        default: 'v2026.10.27'
 
 permissions:
   contents: write
 
 jobs:
   build-and-release:
-    name: Build Production ISO & Publish Release
+    name: Build Production ISO & Packages Unified Release
     runs-on: ubuntu-latest
     timeout-minutes: 180
 
@@ -33,7 +38,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build Production ISO in Arch Linux Container
+      - name: Build Official Packages and Production ISO in Arch Linux Container
         run: |
           echo "==> Starting isolated Arch Linux Docker container with full privileged access..."
           docker run --rm --privileged \
@@ -65,18 +70,50 @@ jobs:
               pacman-key --lsign-key F3B607488DB35A47 || true
               pacman -Sy --noconfirm archlinux-keyring
 
-              echo "==> Installing build dependencies..."
-              pacman -S --noconfirm --needed archiso git rust cargo sudo dosfstools e2fsprogs squashfs-tools libarchive curl
+              echo "==> Installing build dependencies for packages and ISO..."
+              pacman -S --noconfirm --needed archiso git rust cargo sudo pacman-contrib libarchive fontconfig freetype2 libxkbcommon polkit gptfdisk dosfstools btrfs-progs arch-install-scripts limine efibootmgr squashfs-tools curl
 
-              echo "==> Ensuring build directories..."
+              echo "==> Setting up unprivileged builder user for makepkg..."
+              useradd -m -G wheel builder
+              echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+              chown -R builder:builder /workspace
+
+              echo "==> [Phase 1/2] Compiling 8 official HyperXOS packages from source..."
+              mkdir -p /workspace/repo/x86_64
+              PACKAGES=(
+                "hyper-x-hw"
+                "hyper-x-installer"
+                "hyper-x-tools"
+                "hyperxos-branding"
+                "hyperxos-default-settings"
+                "hyperxos-hooks"
+                "hyperxos-keyring"
+                "hyperxos-mirrorlist"
+              )
+
+              for pkg in "${PACKAGES[@]}"; do
+                echo "--------------------------------------------------"
+                echo "==> Compiling and packaging: ${pkg} ..."
+                echo "--------------------------------------------------"
+                su builder -c "cd /workspace/packages/${pkg} && makepkg -f --noconfirm --nodeps"
+                cp -vf /workspace/packages/${pkg}/*.pkg.tar.zst /workspace/repo/x86_64/
+                rm -rf /workspace/packages/${pkg}/pkg /workspace/packages/${pkg}/src /workspace/packages/${pkg}/*.pkg.tar.zst
+              done
+
+              echo "==> Updating pacman repository database..."
+              cd /workspace/repo/x86_64
+              repo-add hyperxos.db.tar.gz *.pkg.tar.zst
+              sha256sum *.pkg.tar.zst hyperxos.db.tar.gz > SHA256SUMS
+
+              echo "==> [Phase 2/2] Compiling HyperXOS Production ISO via hyperx CLI..."
+              cd /workspace
               mkdir -p out work /var/tmp/hyperxos-work
               chmod 0777 /var/tmp/hyperxos-work
 
-              echo "==> Compiling HyperXOS Production ISO via hyperx CLI..."
               cargo run --release --manifest-path rust/hyperx-cli/Cargo.toml -- production
 
               echo "==> Ensuring proper file permissions for host runner..."
-              chmod -R 0777 /workspace/out
+              chmod -R 0777 /workspace/out /workspace/repo
             '
 
       - name: Verify ISO Artifacts & Append Checksums
@@ -99,21 +136,37 @@ jobs:
           echo "iso_size_mb=${ISO_SIZE_MB}" >> $GITHUB_OUTPUT
 
           echo "" >> RELEASE_NOTES.md
-          echo "### 🛡️ Checksum Resmi dari GitHub Actions Runner" >> RELEASE_NOTES.md
-          echo "- **Nama Berkas:** \`${ISO_NAME}\`" >> RELEASE_NOTES.md
+          echo "### 🛡️ Checksum & Spesifikasi Resmi dari GitHub Actions Runner" >> RELEASE_NOTES.md
+          echo "- **Nama Berkas ISO:** \`${ISO_NAME}\`" >> RELEASE_NOTES.md
           echo "- **Ukuran File:** ${ISO_SIZE_MB} MB (${ISO_SIZE} bytes)" >> RELEASE_NOTES.md
-          echo "- **SHA-256:** \`${SHA256_VAL}\`" >> RELEASE_NOTES.md
-          echo "- **BLAKE2b:** \`${B2SUM_VAL}\`" >> RELEASE_NOTES.md
+          echo "- **SHA-256 (ISO):** \`${SHA256_VAL}\`" >> RELEASE_NOTES.md
+          echo "- **BLAKE2b (ISO):** \`${B2SUM_VAL}\`" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 📦 Paket Resmi Termasuk (Included Packages in this Release):" >> RELEASE_NOTES.md
+          echo "- \`hyper-x-hw\`: Pure Rust Multi-Tier Hardware & GPU Auto-Detection Engine" >> RELEASE_NOTES.md
+          echo "- \`hyper-x-installer\`: Pure Rust Native System Installer (Iced 0.14 + WGPU)" >> RELEASE_NOTES.md
+          echo "- \`hyper-x-tools\`: Modern Glassmorphism System Dashboard & Tweaker" >> RELEASE_NOTES.md
+          echo "- \`hyperxos-branding\`: Wallpapers, SDDM theme, Plymouth boot splash" >> RELEASE_NOTES.md
+          echo "- \`hyperxos-default-settings\`: Desktop environments & skel configurations" >> RELEASE_NOTES.md
+          echo "- \`hyperxos-hooks\`: Pacman update and system trigger hooks" >> RELEASE_NOTES.md
+          echo "- \`hyperxos-keyring\`: HyperXOS pacman package signing keys" >> RELEASE_NOTES.md
+          echo "- \`hyperxos-mirrorlist\`: Official HyperXOS package server mirrorlist" >> RELEASE_NOTES.md
 
-      - name: Publish GitHub Release
+      - name: Publish Unified GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: HyperXOS ${{ github.ref_name }} — Official Production Release
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag_name || 'v2026.10.27' }}
+          name: HyperXOS ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag_name || 'v2026.10.27' }} — Official Production Release & Packages
           body_path: RELEASE_NOTES.md
+          make_latest: true
           files: |
             out/hyperxos-*.iso
             out/hyperxos-*.iso.sha256
             out/hyperxos-*.iso.b2sum
+            repo/x86_64/*.pkg.tar.zst
+            repo/x86_64/hyperxos.db.tar.gz
+            repo/x86_64/hyperxos.files.tar.gz
+            repo/x86_64/SHA256SUMS
           draft: false
           prerelease: false
           fail_on_unmatched_files: true

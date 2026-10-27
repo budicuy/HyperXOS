@@ -15,7 +15,7 @@ pub const OFFICIAL_PACKAGES: &[&str] = &[
     "hyperxos-mirrorlist-1.0.0-2-any.pkg.tar.zst",
 ];
 
-pub const RELEASE_BASE_URL: &str = "https://github.com/budicuy/HyperXOS/releases/download/packages";
+pub const RELEASE_BASE_URL: &str = "https://github.com/budicuy/HyperXOS/releases/latest/download";
 
 /// Ensure all 8 official HyperXOS packages exist locally in repo/x86_64/
 pub fn ensure_packages(root: &Path) -> Result<(), String> {
