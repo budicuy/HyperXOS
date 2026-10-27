@@ -11,19 +11,28 @@ pub fn run_check(root: &Path) -> Result<(), String> {
     // 1. Host tools
     let tools = [
         ("mkarchiso", "archiso"),
-        ("qemu-system-x86_64", "qemu-desktop"),
         ("xorriso", "xorriso"),
     ];
 
     for (tool, pkg) in tools {
         if command_exists(tool) {
-            println!("  [✓] Host dependency '{}' is installed.", tool);
+            println!("  [✓] Host build dependency '{}' is installed.", tool);
         } else {
             return Err(format!(
-                "Missing required dependency '{}'. Install via: sudo pacman -S {}",
+                "Missing required build dependency '{}'. Install via: sudo pacman -S {}",
                 tool, pkg
             ));
         }
+    }
+
+    // Check VMM engine (hermetic bundle or host qemu)
+    let bundled_vmm = root.join("rust/hyperx-vm/.bin/bin/qemu-system-x86_64");
+    if bundled_vmm.exists() {
+        println!("  [✓] Virtual Machine Engine: hyperx-vm (Hermetic 100% Self-Contained Bundle).");
+    } else if command_exists("qemu-system-x86_64") {
+        println!("  [✓] Virtual Machine Engine: System QEMU available.");
+    } else {
+        println!("  [✓] Virtual Machine Engine: hyperx-vm ready to auto-provision.");
     }
 
     // 2. KVM acceleration

@@ -76,7 +76,7 @@ fn run_check(root: &Path, config: &VmConfig) -> Result<(), String> {
     }
 
     // 4. Display & GPU Acceleration
-    let (backend, _) = DisplayManager::detect();
+    let (backend, _) = DisplayManager::detect(root);
     println!("  [✓] Detected Display Acceleration Backend: {:?}", backend);
 
     println!("[✓] All virtualization checks passed successfully.");

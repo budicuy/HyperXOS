@@ -1,3 +1,4 @@
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -12,7 +13,7 @@ pub struct DisplayManager;
 
 impl DisplayManager {
     /// Detect optimal display backend with Direct OpenGL Hardware Acceleration
-    pub fn detect() -> (DisplayBackend, Vec<String>) {
+    pub fn detect(root: &Path) -> (DisplayBackend, Vec<String>) {
         let has_display = std::env::var("DISPLAY").is_ok() || std::env::var("WAYLAND_DISPLAY").is_ok();
 
         if !has_display {
@@ -28,14 +29,27 @@ impl DisplayManager {
             );
         }
 
-        // Test SDL OpenGL (virtio-vga-gl)
-        let test_sdl = Command::new("qemu-system-x86_64")
-            .args(["-device", "virtio-vga-gl", "-display", "sdl,gl=on", "-help"])
-            .output()
-            .map(|o| o.status.success())
-            .unwrap_or(false);
+        let bundled_bin = root.join("rust/hyperx-vm/.bin/bin/qemu-system-x86_64");
+        let bin = if bundled_bin.exists() {
+            bundled_bin
+        } else {
+            PathBuf::from("qemu-system-x86_64")
+        };
 
-        if test_sdl {
+        let lib_dir = root.join("rust/hyperx-vm/.bin/lib/qemu");
+
+        let test_args = |args: &[&str]| -> bool {
+            let mut cmd = Command::new(&bin);
+            if lib_dir.exists() {
+                cmd.env("QEMU_MODULE_DIR", &lib_dir);
+                cmd.env("LD_LIBRARY_PATH", &lib_dir);
+            }
+            cmd.args(args);
+            cmd.output().map(|o| o.status.success()).unwrap_or(false)
+        };
+
+        // Test SDL OpenGL (virtio-vga-gl)
+        if test_args(&["-device", "virtio-vga-gl", "-display", "sdl,gl=on", "-help"]) {
             println!("  [✓] Direct Host GPU Acceleration: SDL2 OpenGL (virtio-vga-gl + sdl,gl=on)");
             return (
                 DisplayBackend::SdlOpenGL,
@@ -49,13 +63,7 @@ impl DisplayManager {
         }
 
         // Test GTK OpenGL
-        let test_gtk_gl = Command::new("qemu-system-x86_64")
-            .args(["-device", "virtio-vga-gl", "-display", "gtk,gl=on", "-help"])
-            .output()
-            .map(|o| o.status.success())
-            .unwrap_or(false);
-
-        if test_gtk_gl {
+        if test_args(&["-device", "virtio-vga-gl", "-display", "gtk,gl=on", "-help"]) {
             println!("  [✓] Direct Host GPU Acceleration: GTK OpenGL (virtio-vga-gl + gtk,gl=on)");
             return (
                 DisplayBackend::GtkOpenGL,

@@ -13,18 +13,27 @@ pub fn run_setup(root: &Path) -> Result<(), String> {
     println!("==> [1/3] Checking host system dependencies...");
     let dependencies = [
         ("mkarchiso", "archiso"),
-        ("qemu-system-x86_64", "qemu-desktop"),
         ("xorriso", "xorriso"),
     ];
 
     let mut missing = Vec::new();
     for (bin, pkg) in dependencies {
         if command_exists(bin) {
-            println!("  [✓] Required dependency '{}' is installed.", bin);
+            println!("  [✓] Required build dependency '{}' is installed.", bin);
         } else {
-            println!("  [-] Missing required dependency '{}'.", bin);
+            println!("  [-] Missing required build dependency '{}'.", bin);
             missing.push(pkg);
         }
+    }
+
+    // Check VMM engine (hermetic bundle or host qemu)
+    let bundled_vmm = root.join("rust/hyperx-vm/.bin/bin/qemu-system-x86_64");
+    if bundled_vmm.exists() {
+        println!("  [✓] Virtual Machine Engine: hyperx-vm (Hermetic 100% Self-Contained Bundle).");
+    } else if command_exists("qemu-system-x86_64") {
+        println!("  [✓] Virtual Machine Engine: System QEMU available.");
+    } else {
+        println!("  [✓] Virtual Machine Engine: hyperx-vm will auto-provision on first run (Zero host dependency).");
     }
 
     if !missing.is_empty() {

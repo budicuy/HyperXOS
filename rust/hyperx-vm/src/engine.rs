@@ -164,7 +164,7 @@ impl VmEngine {
         ]);
 
         // 7. Direct OpenGL Host GPU Display Acceleration
-        let (_backend, display_args) = DisplayManager::detect();
+        let (_backend, display_args) = DisplayManager::detect(root);
         for arg in display_args {
             cmd.arg(arg);
         }

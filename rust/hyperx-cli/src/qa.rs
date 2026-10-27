@@ -73,7 +73,23 @@ pub fn run_test(root: &Path) -> Result<(), String> {
 
     // 4. Non-interactive QEMU Headless Smoke Test
     println!("[+] Initiating QEMU headless kernel boot smoke test (25 seconds)...");
-    let mut qemu = Command::new("qemu-system-x86_64");
+    let bundled_qemu = root.join("rust/hyperx-vm/.bin/bin/qemu-system-x86_64");
+    let qemu_bin = if bundled_qemu.exists() {
+        bundled_qemu
+    } else {
+        std::path::PathBuf::from("qemu-system-x86_64")
+    };
+
+    let mut qemu = Command::new(&qemu_bin);
+    let lib_dir = root.join("rust/hyperx-vm/.bin/lib/qemu");
+    let share_dir = root.join("rust/hyperx-vm/.bin/share/qemu");
+    if lib_dir.exists() {
+        qemu.env("QEMU_MODULE_DIR", &lib_dir);
+        qemu.env("LD_LIBRARY_PATH", &lib_dir);
+    }
+    if share_dir.exists() {
+        qemu.args(["-L", share_dir.to_str().unwrap()]);
+    }
 
     let kvm = Path::new("/dev/kvm");
     if kvm.exists() {
