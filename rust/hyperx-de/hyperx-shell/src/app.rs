@@ -8,6 +8,7 @@ use crate::app_menu::{AppMenu, AppMenuAction};
 use crate::control_center::{ControlCenter, ControlCenterAction};
 use crate::dock::{Dock, DockAction};
 use crate::dynamic_island::{DynamicIsland, IslandAction};
+use crate::network_menu::{NetworkMenu, NetworkMenuAction};
 use crate::notifications::{NotifAction, NotificationCenter};
 use crate::top_bar::{TopBar, TopBarAction};
 
@@ -17,6 +18,7 @@ pub enum Message {
     Island(IslandAction),
     ControlCenter(ControlCenterAction),
     AppMenu(AppMenuAction),
+    NetworkMenu(NetworkMenuAction),
     Notifications(NotifAction),
     Dock(DockAction),
     Tick,
@@ -28,10 +30,12 @@ pub struct ShellApp {
     pub island: DynamicIsland,
     pub control_center: ControlCenter,
     pub notifications: NotificationCenter,
+    pub network_menu: NetworkMenu,
     pub dock: Dock,
     pub is_control_center_open: bool,
     pub is_app_menu_open: bool,
     pub is_notifications_open: bool,
+    pub is_network_menu_open: bool,
 }
 
 impl Default for ShellApp {
@@ -41,10 +45,12 @@ impl Default for ShellApp {
             island: DynamicIsland::default(),
             control_center: ControlCenter::default(),
             notifications: NotificationCenter::default(),
+            network_menu: NetworkMenu::default(),
             dock: Dock::default(),
             is_control_center_open: false,
             is_app_menu_open: false,
             is_notifications_open: false,
+            is_network_menu_open: false,
         }
     }
 }
@@ -73,16 +79,28 @@ impl ShellApp {
                     self.is_app_menu_open = !self.is_app_menu_open;
                     self.is_control_center_open = false;
                     self.is_notifications_open = false;
+                    self.is_network_menu_open = false;
                 }
                 TopBarAction::ToggleControlCenter => {
                     self.is_control_center_open = !self.is_control_center_open;
                     self.is_app_menu_open = false;
                     self.is_notifications_open = false;
+                    self.is_network_menu_open = false;
                 }
                 TopBarAction::ToggleNotifications => {
                     self.is_notifications_open = !self.is_notifications_open;
                     self.is_app_menu_open = false;
                     self.is_control_center_open = false;
+                    self.is_network_menu_open = false;
+                }
+                TopBarAction::ToggleNetworkMenu => {
+                    self.is_network_menu_open = !self.is_network_menu_open;
+                    if self.is_network_menu_open {
+                        self.network_menu.scan();
+                    }
+                    self.is_app_menu_open = false;
+                    self.is_control_center_open = false;
+                    self.is_notifications_open = false;
                 }
                 TopBarAction::Island(act) => {
                     self.island.update(act);
@@ -107,18 +125,35 @@ impl ShellApp {
                 }
                 self.control_center.update(action);
             }
+            Message::NetworkMenu(action) => match action {
+                NetworkMenuAction::ToggleWifi => {
+                    self.network_menu.wifi_enabled = !self.network_menu.wifi_enabled;
+                    let arg = if self.network_menu.wifi_enabled { "on" } else { "off" };
+                    let _ = Command::new("nmcli").args(["radio", "wifi", arg]).output();
+                    self.network_menu.scan();
+                }
+                NetworkMenuAction::ConnectWifi(ssid) => {
+                    let _ = Command::new("hyperx-settings").arg("--page").arg("network").spawn();
+                    self.is_network_menu_open = false;
+                    self.island.show_notification(
+                        "Network Manager",
+                        "Connecting to Wi-Fi",
+                        &format!("Opening network authentication for '{}'...", ssid),
+                    );
+                }
+                NetworkMenuAction::OpenNetworkSettings => {
+                    let _ = Command::new("hyperx-settings").arg("--page").arg("network").spawn();
+                    self.is_network_menu_open = false;
+                }
+            },
             Message::AppMenu(action) => {
                 self.is_app_menu_open = false;
                 match action {
                     AppMenuAction::AboutHyperX => {
-                        self.island.show_notification(
-                            "HyperXOS",
-                            "HyperXOS Desktop 2026",
-                            "Pure Rust Wayland Desktop Environment powered by Smithay & Iced.",
-                        );
+                        let _ = Command::new("hyperx-settings").arg("--page").arg("about").spawn();
                     }
                     AppMenuAction::SystemSettings => {
-                        self.is_control_center_open = true;
+                        let _ = Command::new("hyperx-settings").spawn();
                     }
                     AppMenuAction::PackageStore => {
                         let _ = Command::new("hyper-x-tools").spawn();
@@ -149,7 +184,7 @@ impl ShellApp {
                     if cmd == "hyperx-launcher" {
                         let _ = Command::new("hyperx-launcher").spawn();
                     } else if cmd == "hyperx-settings" {
-                        self.is_control_center_open = !self.is_control_center_open;
+                        let _ = Command::new("hyperx-settings").spawn();
                     } else {
                         let parts: Vec<&str> = cmd.split_whitespace().collect();
                         if let Some((bin, args)) = parts.split_first() {
@@ -162,6 +197,7 @@ impl ShellApp {
                 self.is_app_menu_open = false;
                 self.is_control_center_open = false;
                 self.is_notifications_open = false;
+                self.is_network_menu_open = false;
             }
         }
         Task::none()
@@ -201,7 +237,7 @@ impl ShellApp {
         .width(Length::Fill)
         .height(Length::Fill);
 
-        // Overlay popups (Control Center, App Menu, Notification Center)
+        // Overlay popups (Control Center, App Menu, Notification Center, Network Popover)
         let mut layers = vec![desktop_column.into()];
 
         if self.is_app_menu_open {
@@ -211,6 +247,19 @@ impl ShellApp {
                 row![Space::new().width(8), menu],
             ];
             layers.push(menu_overlay.into());
+        }
+
+        if self.is_network_menu_open {
+            let net = self.network_menu.view(Message::NetworkMenu);
+            let net_overlay = column![
+                Space::new().height(38),
+                row![
+                    Space::new().width(Length::Fill),
+                    net,
+                    Space::new().width(120),
+                ],
+            ];
+            layers.push(net_overlay.into());
         }
 
         if self.is_control_center_open {

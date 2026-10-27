@@ -10,6 +10,7 @@ pub enum TopBarAction {
     ToggleAppMenu,
     ToggleControlCenter,
     ToggleNotifications,
+    ToggleNetworkMenu,
     Island(IslandAction),
     MenuAction(&'static str),
 }
@@ -77,7 +78,13 @@ impl TopBar {
         let island_element = island.view(move |act| map_fn(TopBarAction::Island(act)));
 
         // Right side: System Status & Trays
-        let wifi_icon = text("📶").size(13);
+        let wifi_icon = button(
+            text("📶").size(13).color(TEXT_PRIMARY)
+        )
+        .padding([2, 6])
+        .style(button::text)
+        .on_press(map_fn(TopBarAction::ToggleNetworkMenu));
+
         let battery_str = format!("🔋 {}%", self.battery_level);
         let battery_elem = text(battery_str).size(12).color(TEXT_SECONDARY);
 

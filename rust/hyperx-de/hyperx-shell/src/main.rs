@@ -3,6 +3,7 @@ mod app_menu;
 mod control_center;
 mod dock;
 mod dynamic_island;
+mod network_menu;
 mod notifications;
 mod theme;
 mod top_bar;

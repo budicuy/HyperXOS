@@ -2,17 +2,17 @@
 pkgname=hyperx-de
 pkgver=1.0.0
 pkgrel=1
-pkgdesc="HyperXOS Complete Pure Rust Wayland Desktop Environment (Smithay Compositor, macOS Top Bar & Dock, Dynamic Island, Control Center, Spotlight Launcher & Session Manager)"
+pkgdesc="HyperXOS Complete Pure Rust Wayland Desktop Environment (Smithay Compositor, macOS Top Bar & Dock, Dynamic Island, Control Center, System Settings & Network Manager, Spotlight Launcher & Session Manager)"
 arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 depends=('seatd' 'libxkbcommon' 'fontconfig' 'freetype2' 'libinput' 'mesa' 'wayland')
 makedepends=('cargo' 'rust')
-provides=('hyperx-de' 'hyperx-comp' 'hyperx-shell' 'hyperx-launcher' 'hyperx-session')
+provides=('hyperx-de' 'hyperx-comp' 'hyperx-shell' 'hyperx-settings' 'hyperx-launcher' 'hyperx-session')
 
 build() {
     cd "${startdir}/../../rust/hyperx-de"
-    cargo build --release -p hyperx-comp -p hyperx-shell -p hyperx-launcher -p hyperx-session
+    cargo build --release -p hyperx-comp -p hyperx-shell -p hyperx-settings -p hyperx-launcher -p hyperx-session
 }
 
 package() {
@@ -21,12 +21,14 @@ package() {
     # Install core desktop binaries
     install -Dm755 "${target_dir}/hyperx-comp" "${pkgdir}/usr/bin/hyperx-comp"
     install -Dm755 "${target_dir}/hyperx-shell" "${pkgdir}/usr/bin/hyperx-shell"
+    install -Dm755 "${target_dir}/hyperx-settings" "${pkgdir}/usr/bin/hyperx-settings"
     install -Dm755 "${target_dir}/hyperx-launcher" "${pkgdir}/usr/bin/hyperx-launcher"
     install -Dm755 "${target_dir}/hyperx-session" "${pkgdir}/usr/bin/hyperx-session"
 
     # Install Wayland session descriptor for Display Managers (SDDM, GDM, greetd)
     install -Dm644 "${startdir}/hyperx.desktop" "${pkgdir}/usr/share/wayland-sessions/hyperx.desktop"
 
-    # Install launcher application shortcut
+    # Install desktop shortcuts
+    install -Dm644 "${startdir}/hyperx-settings.desktop" "${pkgdir}/usr/share/applications/hyperx-settings.desktop"
     install -Dm644 "${startdir}/hyperx-launcher.desktop" "${pkgdir}/usr/share/applications/hyperx-launcher.desktop"
 }
