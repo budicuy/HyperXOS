@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=System Settings
-Comment=HyperXOS macOS-style System Settings & Network Manager
-Exec=hyperx-settings %U
-Icon=preferences-system
-Terminal=false
-Type=Application
-Categories=Settings;HardwareSettings;DesktopSettings;Network;
-Keywords=settings;preferences;wifi;network;display;sound;power;bluetooth;appearance;

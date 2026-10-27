@@ -109,3 +109,6 @@ sudo dd if=hyperxos-2026.10.26-x86_64.iso of=/dev/sdX bs=4M status=progress ofla
 Jika Anda menemukan bug, kendala perangkat keras, atau ingin berkontribusi:
 - Repositori Utama: [https://github.com/budicuy/HyperXOS](https://github.com/budicuy/HyperXOS)
 - Pelaporan Isu: [https://github.com/budicuy/HyperXOS/issues](https://github.com/budicuy/HyperXOS/issues)
+sekarang saya ingin bangun ulang dari nol Desktop environtment saya saya yang nama hyperx-de, menggunakan compositor smithey saya ingin kamu bikin plan rencana untuk bangun sistem Desktop environtment yang lengkap dari taskbar bergaya mac os, controler center notifikasi dengan dymanic island mirip mac gitu dengan tampilan besih dan fitur penting lainnya sehingga bisa di secara stabil, ada fitur file manager juga dengan nama hyperx-file-manager, silahkan bikin plan rencana
+
+silahkan riset pakai context7 atau tools pencarian

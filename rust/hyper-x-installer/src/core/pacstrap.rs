@@ -49,10 +49,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "hyperxos-mirrorlist",
     "hyper-x-tools",
     "hyper-x-hw",
-    // 7. HyperXOS Native Desktop Environment & Shell
-    "hyperx-de",
-    "hyperx-file-manager",
-    // 8. Minimal Core Wayland & Display Manager
+    // 7. Minimal Core KDE Plasma 6 Desktop
     "plasma-desktop",
     "plasma-workspace",
     "kwin",

@@ -52,7 +52,6 @@ qt6-wayland
 sddm
 sddm-kcm
 polkit-kde-agent
-seatd
 xdg-user-dirs
 xorg-xwayland
 
@@ -67,9 +66,7 @@ mesa
 # Virtual Machine Guest Support
 qemu-guest-agent
 
-# HyperXOS Pure Rust Native Desktop Environment & Tools
-hyperx-de
-hyperx-file-manager
+# HyperXOS Pure Rust Native Installer & System Tools
 hyper-x-installer
 hyper-x-tools
 hyper-x-hw
