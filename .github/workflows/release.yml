@@ -71,7 +71,7 @@ jobs:
               pacman -Sy --noconfirm archlinux-keyring
 
               echo "==> Installing build dependencies for packages and ISO..."
-              pacman -S --noconfirm --needed archiso git rust cargo sudo pacman-contrib libarchive fontconfig freetype2 libxkbcommon polkit gptfdisk dosfstools btrfs-progs arch-install-scripts limine efibootmgr squashfs-tools curl
+              pacman -S --noconfirm --needed archiso git rust cargo sudo pacman-contrib libarchive fontconfig freetype2 libxkbcommon polkit gptfdisk dosfstools btrfs-progs arch-install-scripts limine efibootmgr squashfs-tools curl seatd
 
               echo "==> Setting up unprivileged builder user for makepkg..."
               useradd -m -G wheel builder

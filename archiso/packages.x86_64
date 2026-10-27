@@ -52,6 +52,7 @@ qt6-wayland
 sddm
 sddm-kcm
 polkit-kde-agent
+seatd
 xdg-user-dirs
 xorg-xwayland
 

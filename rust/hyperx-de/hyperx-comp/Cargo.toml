@@ -1,0 +1,27 @@
+[package]
+name = "hyperx-comp"
+version = "0.1.0"
+edition = "2021"
+authors = ["HyperXOS Team <dev@hyperxos.org>"]
+description = "Pure Rust High-Performance Wayland Compositor for HyperXOS Desktop Environment (hyperx-de)"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+smithay = { version = "0.7.0", features = [
+    "backend_winit",
+    "backend_udev",
+    "backend_drm",
+    "backend_libinput",
+    "backend_egl",
+    "renderer_gl",
+    "desktop",
+    "wayland_frontend",
+    "xwayland",
+] }
+calloop = "0.14"
+wayland-server = "0.31"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+clap = { version = "4.5", features = ["derive"] }
+anyhow = "1.0"
+thiserror = "2.0"

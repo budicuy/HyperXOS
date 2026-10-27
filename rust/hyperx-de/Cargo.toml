@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "hyperx-comp",
+    "hyperx-shell",
+    "hyperx-file-manager",
+    "hyperx-launcher",
+    "hyperx-session",
+]
+resolver = "2"

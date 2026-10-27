@@ -92,6 +92,15 @@ enum Commands {
         #[arg(default_value = "live")]
         mode: String,
     },
+    /// Launch or develop HyperX Desktop Environment (hyperx-de / hyperx-comp)
+    De {
+        /// Mode to run: 'dev' / 'winit' (nested window), 'build' (compile release), 'shell', 'launcher', or 'fm'
+        #[arg(default_value = "dev")]
+        mode: String,
+    },
+    /// Launch HyperX File Manager (hyperx-file-manager) directly
+    #[command(name = "file-manager")]
+    FileManager,
     /// Install 'hyperx' CLI binary to /usr/local/bin or ~/.cargo/bin
     InstallCli,
 }
@@ -157,6 +166,20 @@ fn main() {
         Commands::Installer => run_cargo_app("rust/hyper-x-installer", &[]),
         Commands::Hw { action } => run_cargo_app("rust/hyper-x-hw", &[&action]),
         Commands::HyperxVm { mode } => vm::run_vm(&root, &mode),
+        Commands::De { mode } => match mode.as_str() {
+            "build" => {
+                println!("==> [HyperXOS] Compiling all hyperx-de workspace crates in release mode...");
+                let manifest = root.join("rust/hyperx-de/Cargo.toml");
+                let mut cmd = Command::new("cargo");
+                cmd.args(["build", "--release", "--manifest-path", manifest.to_str().unwrap()]);
+                run_stream(&mut cmd, "cargo build hyperx-de")
+            }
+            "shell" => run_cargo_app("rust/hyperx-de/hyperx-shell", &[]),
+            "launcher" => run_cargo_app("rust/hyperx-de/hyperx-launcher", &[]),
+            "fm" | "file-manager" => run_cargo_app("rust/hyperx-de/hyperx-file-manager", &[]),
+            _ => run_cargo_app("rust/hyperx-de/hyperx-comp", &["--winit"]),
+        },
+        Commands::FileManager => run_cargo_app("rust/hyperx-de/hyperx-file-manager", &[]),
         Commands::InstallCli => install_cli_binary(&root),
     };
 
