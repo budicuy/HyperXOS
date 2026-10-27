@@ -20,7 +20,7 @@ OVMF_VARS*.fd
 work/
 *.log
 
-# 4. Mirrored Local Repo inside airootfs (Auto-populated by scripts/build-iso.sh)
+# 4. Mirrored Local Repo inside airootfs (Auto-populated by hyperx build)
 archiso/airootfs/opt/hyperxos-repo/
 
 # 5. Makepkg Temporary Build Directories & Intermediate Artifacts
