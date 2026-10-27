@@ -42,34 +42,50 @@
 
 ---
 
-## 🛠️ Panduan Build & Otomasi (`Makefile`)
+## 🛠️ Panduan Developer Toolchain & Build (`hyperx` / `Makefile`)
 
-HyperXOS menyediakan orkestrasi perintah Makefile yang konsisten:
+HyperXOS menyediakan developer toolchain **100% Pure Rust Native (`hyperx`)** serta wrapper `Makefile` untuk orkestrasi perintah yang konsisten:
 
 ```bash
 # 1. Menampilkan seluruh perintah yang tersedia
-make help
+hyperx help
+# (atau 'make help')
 
 # 2. Memeriksa dependensi host dan konfigurasi /dev/kvm
-make setup
+hyperx setup
+# (atau 'make setup')
 
-# 3. Memvalidasi integritas konfigurasi profiledef, Calamares, dan paket
-make check
+# 3. Memvalidasi integritas konfigurasi profiledef dan paket
+hyperx check
+# (atau 'make check')
 
-# 4. Membangun ISO versi Development (kompresi cepat zstd level 3)
-make build
+# 4. Membangun ISO versi Development (kompresi cepat zstd-1 & build caching)
+hyperx build
+# (atau 'make build')
 
-# 5. Membangun ISO versi Produksi (kompresi ultra zstd level 22 & sanitasi tuntas)
-make build-production
+# 5. Membangun ISO versi Produksi (kompresi ultra zstd-22, initramfs xz-9e, batas ketat <2.0GB)
+hyperx build --prod
+# (atau 'make build-production')
 
-# 6. Menghasilkan checksum SHA256 dan B2SUM untuk ISO
-make checksum
+# 6. Menghasilkan checksum resmi SHA256 dan B2SUM untuk ISO
+hyperx checksum
+# (atau 'make checksum')
 
-# 7. Menjalankan pengujian otomatis QA dan non-interactive smoke test
-make test
+# 7. Menjalankan pengujian otomatis QA dan non-interactive smoke test QEMU
+hyperx test
+# (atau 'make test')
 
 # 8. Membersihkan direktori kerja build sementara
-make clean
+hyperx clean
+# (atau 'make clean' / 'hyperx clean --all')
+
+# 9. Menjalankan modul pendeteksi hardware & GPU secara langsung
+hyperx hw
+# (atau 'make hw')
+
+# 10. Menguji aplikasi GUI HyperXTools dan HyperXInstaller secara langsung
+hyperx tools
+hyperx installer
 ```
 
 ---
@@ -78,14 +94,16 @@ make clean
 
 ```bash
 # Menjalankan ISO secara Live murni tanpa menginstal
-make dev
+hyperx dev
+# (atau 'make dev')
 
 # Menjalankan pengujian instalasi Native Installer ke virtual disk 40 GB (disk otomatis di-reset bersih)
-make install
-# (atau 'make vm-install')
+hyperx install
+# (atau 'make install' / 'hyperx vm-install')
 
 # Menjalankan sistem operasi yang sudah terinstal di dalam virtual disk 40 GB
-make run
+hyperx run
+# (atau 'make run')
 ```
 
 ---
