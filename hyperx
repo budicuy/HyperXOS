@@ -6,8 +6,10 @@ set -e
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 BIN="$SCRIPT_DIR/rust/hyperx-cli/target/release/hyperx"
 
-if [ ! -x "$BIN" ]; then
-    echo "==> [HyperXOS] Mengompilasi toolchain CLI 'hyperx' untuk pertama kali..."
+SRC_DIR="$SCRIPT_DIR/rust/hyperx-cli/src"
+
+if [ ! -x "$BIN" ] || [ -n "$(find "$SRC_DIR" -type f -newer "$BIN" 2>/dev/null)" ]; then
+    echo "==> [HyperXOS] Mengompilasi/memperbarui toolchain CLI 'hyperx'..."
     cargo build --release --manifest-path "$SCRIPT_DIR/rust/hyperx-cli/Cargo.toml"
 fi
 
