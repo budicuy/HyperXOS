@@ -13,12 +13,11 @@ pub const OFFICIAL_PACKAGES: &[&str] = &[
     "hyperxos-hooks-1.0.0-1-any.pkg.tar.zst",
     "hyperxos-keyring-1.0.0-1-any.pkg.tar.zst",
     "hyperxos-mirrorlist-1.0.0-2-any.pkg.tar.zst",
-    "mkinitcpio-openswap-0.1.1-1-any.pkg.tar.zst",
 ];
 
 pub const RELEASE_BASE_URL: &str = "https://github.com/budicuy/HyperXOS/releases/download/packages";
 
-/// Ensure all 9 official HyperXOS packages exist locally in repo/x86_64/
+/// Ensure all 8 official HyperXOS packages exist locally in repo/x86_64/
 pub fn ensure_packages(root: &Path) -> Result<(), String> {
     let repo_dir = root.join("repo/x86_64");
     fs::create_dir_all(&repo_dir).map_err(|e| e.to_string())?;
