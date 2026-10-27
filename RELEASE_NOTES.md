@@ -10,7 +10,7 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
 
 - **Fondasi Arch Linux & Kernel Terbaru:**
   - Mengadopsi arsitektur *rolling-release* dengan repositori resmi Arch Linux dan repositori teroptimasi CachyOS.
-  - Manajemen paket berkecepatan tinggi dengan `pacman` dan AUR helper `paru`.
+  - Manajemen paket berkecepatan tinggi dengan `pacman`.
 
 - **KDE Plasma 6 Wayland Desktop:**
   - Sesi desktop Wayland murni yang responsif dan hemat sumber daya.

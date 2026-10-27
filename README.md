@@ -8,7 +8,7 @@
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **KDE Plasma 6 (Wayland native)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, AUR helper **`paru`** bawaan, serta arsitektur deteksi driver grafis fleksibel (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **KDE Plasma 6 (Wayland native)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis fleksibel (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
 - **Desktop Modern:** KDE Plasma 6 berbasis Wayland dengan tema kustom *HyperXOS Dark*, akselerasi grafis terpadu, dan rendering responsif.
@@ -25,7 +25,6 @@
   - **Intel & AMD:** Mesa + Vulkan native (RADV / ANV).
   - **Laptop Hybrid:** PRIME offloading (`prime-run`) dan dynamic power management.
   - **Mesin Virtual:** Auto-konfigurasi `qemu-guest-agent` dan `spice-vdagent`.
-- **AUR Helper Bawaan:** `paru` terpasang langsung out-of-the-box lengkap dengan `base-devel` dan `linux-headers`.
 - **Audio Modern:** PipeWire dan WirePlumber dengan applet kontrol suara terintegrasi.
 
 ---

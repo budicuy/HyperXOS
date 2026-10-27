@@ -47,7 +47,6 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "hyperxos-hooks",
     "hyperxos-keyring",
     "hyperxos-mirrorlist",
-    "paru",
     "hyper-x-tools",
     "hyper-x-hw",
     // 7. Minimal Core KDE Plasma 6 Desktop

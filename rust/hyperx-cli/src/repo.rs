@@ -4,6 +4,59 @@ use std::process::Command;
 
 use crate::util::run_stream;
 
+pub const OFFICIAL_PACKAGES: &[&str] = &[
+    "hyper-x-hw-1.0.0-1-x86_64.pkg.tar.zst",
+    "hyper-x-installer-1.0.0-1-x86_64.pkg.tar.zst",
+    "hyper-x-tools-2.2.0-1-x86_64.pkg.tar.zst",
+    "hyperxos-branding-1.0.0-3-any.pkg.tar.zst",
+    "hyperxos-default-settings-1.0.0-4-any.pkg.tar.zst",
+    "hyperxos-hooks-1.0.0-1-any.pkg.tar.zst",
+    "hyperxos-keyring-1.0.0-1-any.pkg.tar.zst",
+    "hyperxos-mirrorlist-1.0.0-2-any.pkg.tar.zst",
+    "mkinitcpio-openswap-0.1.1-1-any.pkg.tar.zst",
+];
+
+pub const RELEASE_BASE_URL: &str = "https://github.com/budicuy/HyperXOS/releases/download/packages";
+
+/// Ensure all 9 official HyperXOS packages exist locally in repo/x86_64/
+pub fn ensure_packages(root: &Path) -> Result<(), String> {
+    let repo_dir = root.join("repo/x86_64");
+    fs::create_dir_all(&repo_dir).map_err(|e| e.to_string())?;
+
+    let mut missing = Vec::new();
+    for pkg in OFFICIAL_PACKAGES {
+        let pkg_path = repo_dir.join(pkg);
+        if !pkg_path.exists() {
+            missing.push(*pkg);
+        }
+    }
+
+    if !missing.is_empty() {
+        println!("==> [HyperXOS] Fetching {} official package(s) from GitHub Releases...", missing.len());
+        for pkg in &missing {
+            let pkg_path = repo_dir.join(pkg);
+            let url = format!("{}/{}", RELEASE_BASE_URL, pkg);
+            println!("  -> Downloading {} ...", pkg);
+            let mut curl = Command::new("curl");
+            curl.args([
+                "-L",
+                "--fail",
+                "-o",
+                pkg_path.to_str().unwrap(),
+                &url,
+            ]);
+            let s = curl.status();
+            if s.is_err() || !s.unwrap().success() {
+                let _ = fs::remove_file(&pkg_path);
+                println!("  [!] Warning: Could not download {} from GitHub Releases mirror (will try local fallback).", pkg);
+            }
+        }
+    }
+
+    // Ensure database is updated
+    run_repo(root, "update")
+}
+
 pub fn run_repo(root: &Path, _action: &str) -> Result<(), String> {
     println!("==> [HyperXOS] Updating local pacman repository database...");
     let repo_dir = root.join("repo/x86_64");

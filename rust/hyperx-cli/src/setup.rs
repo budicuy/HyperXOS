@@ -81,6 +81,9 @@ pub fn run_setup(root: &Path) -> Result<(), String> {
         println!("  [✓] Directory ready: {}", d.display());
     }
 
+    // Ensure package repository is initialized
+    let _ = crate::repo::ensure_packages(root);
+
     println!("[✓] HyperXOS host development environment successfully configured!");
     Ok(())
 }

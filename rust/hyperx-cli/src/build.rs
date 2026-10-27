@@ -3,7 +3,6 @@ use std::path::Path;
 use std::process::Command;
 
 use crate::checksum::run_checksum;
-use crate::repo::run_repo;
 use crate::util::{find_latest_iso, run_stream};
 
 pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
@@ -25,9 +24,9 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
 
     fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
 
-    // Step 1: Ensure local repo packages are updated
+    // Step 1: Ensure local repo packages are updated & synced
     println!("==> [1/4] Ensuring HyperXOS custom packages repository is updated...");
-    run_repo(root, "update")?;
+    crate::repo::ensure_packages(root)?;
 
     // Update archiso pacman.conf server path
     let pacman_conf = profile_dir.join("pacman.conf");

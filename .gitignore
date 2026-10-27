@@ -52,3 +52,9 @@ Thumbs.db
 # 8. Hermetic Virtual Machine binaries & local toolchain
 rust/hyperx-vm/.bin/
 .cache/hyperx/
+
+# 9. Local pacman package repository binaries (hosted on GitHub Releases)
+repo/x86_64/*.pkg.tar.*
+repo/x86_64/hyperxos.db*
+repo/x86_64/hyperxos.files*
+
