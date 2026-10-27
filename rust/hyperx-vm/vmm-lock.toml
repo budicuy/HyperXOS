@@ -1,0 +1,18 @@
+[vmm]
+name = "hyperx-vmm-bundle"
+version = "11.1.2"
+target = "x86_64-unknown-linux-gnu"
+relative_bin_path = ".bin/bin/qemu-system-x86_64"
+bin_sha256 = "a2250f5e2b3b07c754473c0817df1cccf6c3c2443fc616dc474c4c311fa6ef1c"
+bundle_archive = "hyperx-vmm-bundle-v11.1.2.tar.zst"
+bundle_sha256 = "3f322d16d78190bada50c75500d7a207860e32aefb2b62c25534c39521db1507"
+
+[features]
+kvm = true
+sdl_opengl = true
+virtio_vga_gl = true
+uefi_ovmf = true
+
+[mirror]
+primary_url = "https://github.com/budicuy/HyperXOS/releases/download/vmm-tools/hyperx-vmm-bundle-v11.1.2.tar.zst"
+fallback_url = "https://archive.archlinux.org/packages/q/qemu-system-x86/qemu-system-x86-11.1.2-1-x86_64.pkg.tar.zst"

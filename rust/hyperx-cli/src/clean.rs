@@ -46,6 +46,8 @@ pub fn run_clean(root: &Path, all: bool) -> Result<(), String> {
         }
 
         let extra_files = [
+            root.join("rust/hyperx-vm/hyperxos-install.qcow2"),
+            root.join("rust/hyperx-vm/OVMF_VARS.4m.fd"),
             root.join("hyperxos-install.qcow2"),
             root.join("hyperxos-test.qcow2"),
             root.join("OVMF_VARS.4m.fd"),

@@ -85,6 +85,13 @@ enum Commands {
         #[arg(default_value = "detect")]
         action: String,
     },
+    /// Run Pure Rust Direct-GPU Virtual Environment Runner (hyperx-vm)
+    #[command(name = "hyperx-vm")]
+    HyperxVm {
+        /// Mode to run: 'dev' / 'live', 'install', 'run', or 'clean'
+        #[arg(default_value = "live")]
+        mode: String,
+    },
     /// Install 'hyperx' CLI binary to /usr/local/bin or ~/.cargo/bin
     InstallCli,
 }
@@ -149,6 +156,7 @@ fn main() {
         Commands::Tools | Commands::Hyperx => run_cargo_app("rust/hyper-x-tools", &[]),
         Commands::Installer => run_cargo_app("rust/hyper-x-installer", &[]),
         Commands::Hw { action } => run_cargo_app("rust/hyper-x-hw", &[&action]),
+        Commands::HyperxVm { mode } => vm::run_vm(&root, &mode),
         Commands::InstallCli => install_cli_binary(&root),
     };
 

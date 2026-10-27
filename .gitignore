@@ -48,3 +48,7 @@ Thumbs.db
 *.swo
 .vscode/
 .idea/
+
+# 8. Hermetic Virtual Machine binaries & local toolchain
+rust/hyperx-vm/.bin/
+.cache/hyperx/

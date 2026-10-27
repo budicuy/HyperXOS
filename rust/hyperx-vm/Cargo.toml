@@ -1,0 +1,26 @@
+[package]
+name = "hyperx-vm"
+version = "1.0.0"
+edition = "2021"
+authors = ["HyperXOS Development Team <dev@hyperxos.org>"]
+description = "Pure Rust Zero-VirtIO Hardware-Accelerated Virtual Environment Runner for HyperXOS Linux"
+license = "GPL-3.0-or-later"
+
+[[bin]]
+name = "hyperx-vm"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+nix = { version = "0.31", features = ["mount", "sched", "fs", "signal", "process", "user"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+sha2 = "0.10"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
