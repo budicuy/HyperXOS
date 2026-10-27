@@ -31,6 +31,5 @@ file_permissions=(
   ["/home/hyperxos/.config/plasma-org.kde.plasma.desktop-appletsrc"]="1000:1000:644"
   ["/home/hyperxos/Desktop/hyper-x-installer.desktop"]="1000:1000:755"
   ["/home/hyperxos/Desktop/hyperxtools.desktop"]="1000:1000:755"
-  ["/usr/share/applications/hyper-x-installer.desktop"]="0:0:755"
   ["/usr/local/bin/launch-installer"]="0:0:755"
 )
