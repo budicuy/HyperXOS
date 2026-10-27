@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=HyperX File Manager
+Comment=macOS Finder-style File Browser with Miller Columns & Quick Look
+Exec=hyperx-file-manager %U
+Icon=system-file-manager
+Terminal=false
+Type=Application
+Categories=System;FileManager;Utility;
+MimeType=inode/directory;
+Keywords=files;finder;miller columns;quick look;browser;

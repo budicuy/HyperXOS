@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=HyperXOS Desktop
+Comment=HyperXOS Pure Rust Wayland Desktop Session (Smithay & Iced)
+Exec=hyperx-session
+Type=Application
+DesktopNames=HyperX;wlroots
+Keywords=wayland;desktop;session;smithay;
