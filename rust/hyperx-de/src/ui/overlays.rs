@@ -7,13 +7,13 @@ use iced::widget::{button, column, container, mouse_area, row, text, text_input}
 use iced::{Alignment, Background, Border, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    active_toggle_button_style, brand_sidebar_header, glass_action_button, glass_card_accent_style,
+    brand_sidebar_header, fluent_acrylic_modal_style, glass_action_button, glass_card_accent_style,
     glass_card_style, glass_input_style, glass_scrollable, glass_window_style, icons, logo_image,
     metric_card, popover_glass_style, primary_button_style, sidebar_container_style,
     sidebar_nav_item, sidebar_section_header, status_pill, svg_icon, terminal_container_style,
     window_header_bar, ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED,
-    FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD, FONT_DISPLAY_EXTRABOLD,
-    TEXT_MAIN, TEXT_MUTED, TEXT_SUB,
+    FLUENT_BORDER, FLUENT_PRIMARY, FLUENT_TEXT_DARK, FLUENT_TEXT_MUTED, FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD,
+    FONT_DISPLAY_BOLD, FONT_DISPLAY_EXTRABOLD, TEXT_MAIN, TEXT_MUTED, TEXT_SUB,
 };
 
 use crate::ui::window_manager::{window_meta, FloatingWindowManager, WindowSnapMode};
@@ -460,83 +460,120 @@ pub fn view_app_switcher<'a>(
     wm: &'a FloatingWindowManager,
     selected_idx: usize,
 ) -> Element<'a, Message> {
-    let all_apps = [
-        DesktopWindowId::Files,
-        DesktopWindowId::Settings,
-        DesktopWindowId::Terminal,
-        DesktopWindowId::Notes,
-    ];
+    let running = wm.running_windows();
+    let target_apps: Vec<DesktopWindowId> = if running.is_empty() {
+        vec![DesktopWindowId::Files, DesktopWindowId::Settings]
+    } else {
+        running
+    };
 
-    let mut cards_row = row![].spacing(14).align_y(Alignment::Center);
-    for (idx, win_id) in all_apps.iter().enumerate() {
-        let (title, sub, ic, accent) = window_meta(*win_id);
-        let st = wm.state(*win_id);
-        let is_selected = idx == (selected_idx % all_apps.len());
+    let total = target_apps.len();
+    let mut cards_row = row![].spacing(12).align_y(Alignment::Center);
 
-        let state_badge = if st.open && !st.minimized {
-            status_pill("Aktif", ACCENT_GREEN, true)
-        } else if st.open && st.minimized {
-            status_pill("Minimized", ACCENT_AMBER, true)
-        } else {
-            status_pill("Siap", accent, false)
-        };
+    for (idx, &win_id) in target_apps.iter().enumerate() {
+        let (title, sub, ic, accent) = window_meta(win_id);
+        let st = wm.state(win_id);
+        let is_selected = idx == (selected_idx % total);
 
         let item_btn = button(
             column![
-                container(svg_icon(ic, 36.0, accent))
-                    .width(Length::Fixed(64.0))
-                    .height(Length::Fixed(64.0))
-                    .center_x(Length::Fixed(64.0))
-                    .center_y(Length::Fixed(64.0))
+                container(svg_icon(ic, 32.0, accent))
+                    .width(Length::Fixed(56.0))
+                    .height(Length::Fixed(56.0))
+                    .center_x(Length::Fixed(56.0))
+                    .center_y(Length::Fixed(56.0))
                     .style(move |_| container::Style {
-                        background: Some(Background::Color(Color { a: 0.16, ..accent })),
+                        background: Some(Background::Color(Color { a: 0.12, ..accent })),
                         border: Border::default()
-                            .rounded(Radius::from(16.0))
-                            .width(1.2)
-                            .color(Color { a: 0.45, ..accent }),
+                            .rounded(Radius::from(10.0))
+                            .width(1.0)
+                            .color(Color { a: 0.35, ..accent }),
                         ..container::Style::default()
                     }),
-                text(title).size(12).font(FONT_DISPLAY_BOLD),
+                text(title)
+                    .size(12)
+                    .font(FONT_DISPLAY_BOLD)
+                    .style(|_| text::Style {
+                        color: Some(FLUENT_TEXT_DARK),
+                    }),
                 text(sub)
-                    .size(9)
+                    .size(10)
                     .font(FONT_BODY_MEDIUM)
                     .style(|_| text::Style {
-                        color: Some(TEXT_MUTED),
+                        color: Some(FLUENT_TEXT_MUTED),
                     }),
-                state_badge,
+                if st.minimized {
+                    status_pill("Terkecilkan", ACCENT_AMBER, false)
+                } else {
+                    status_pill("Aktif", FLUENT_PRIMARY, true)
+                },
             ]
-            .spacing(6)
+            .spacing(5)
             .align_x(Alignment::Center)
             .padding(10),
         )
-        .width(Length::Fixed(164.0))
-        .height(Length::Fixed(158.0))
-        .style(active_toggle_button_style(is_selected, accent))
-        .on_press(Message::SelectAppSwitcherWindow(*win_id));
+        .width(Length::Fixed(150.0))
+        .height(Length::Fixed(148.0))
+        .style(move |_theme, status| {
+            let (bg, border_c, border_w) = if is_selected {
+                (
+                    Color::from_rgba(0.0, 0.47, 0.83, 0.08),
+                    FLUENT_PRIMARY,
+                    2.0,
+                )
+            } else {
+                match status {
+                    button::Status::Hovered => (
+                        Color::from_rgba(0.0, 0.0, 0.0, 0.04),
+                        Color::from_rgba(0.0, 0.0, 0.0, 0.15),
+                        1.0,
+                    ),
+                    _ => (Color::WHITE, FLUENT_BORDER, 1.0),
+                }
+            };
+            button::Style {
+                background: Some(Background::Color(bg)),
+                border: Border::default()
+                    .rounded(Radius::from(8.0))
+                    .width(border_w)
+                    .color(border_c),
+                ..button::Style::default()
+            }
+        })
+        .on_press(Message::SelectAppSwitcherWindow(win_id));
 
         cards_row = cards_row.push(item_btn);
     }
 
+    let card_width = ((target_apps.len() * 162 + 40).max(440)) as f32;
+
     let hud_card = container(
         column![
             row![
-                svg_icon(icons::LAYERS, 16.0, ACCENT_CYAN),
-                text("Pengalih Aplikasi Cepat (Alt + Tab)")
+                svg_icon(icons::LAYERS, 16.0, FLUENT_PRIMARY),
+                text("Pengalih Aplikasi (Alt + Tab)")
                     .size(13)
-                    .font(FONT_DISPLAY_BOLD),
+                    .font(FONT_DISPLAY_BOLD)
+                    .style(|_| text::Style {
+                        color: Some(FLUENT_TEXT_DARK),
+                    }),
                 container("").width(Length::Fill),
-                status_pill("Tekan Enter / Klik untuk Fokus  •  Esc Tutup", ACCENT_CYAN, true),
+                text("Tab: Pilih  •  Enter / Klik: Fokus")
+                    .size(11)
+                    .font(FONT_BODY_MEDIUM)
+                    .style(|_| text::Style {
+                        color: Some(FLUENT_TEXT_MUTED),
+                    }),
             ]
-            .spacing(8)
+            .spacing(12)
             .align_y(Alignment::Center),
             cards_row,
         ]
         .spacing(14)
-        .padding(20),
+        .padding(18),
     )
-    .width(Length::Fixed(745.0))
-    .height(Length::Shrink)
-    .style(popover_glass_style(ACCENT_CYAN));
+    .width(Length::Fixed(card_width))
+    .style(fluent_acrylic_modal_style);
 
     mouse_area(
         container(hud_card)
@@ -545,7 +582,7 @@ pub fn view_app_switcher<'a>(
             .center_x(Length::Fill)
             .center_y(Length::Fill)
             .style(|_| container::Style {
-                background: Some(Background::Color(Color::from_rgba(0.02, 0.03, 0.06, 0.62))),
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.20))),
                 ..container::Style::default()
             }),
     )

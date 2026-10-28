@@ -1,13 +1,14 @@
+use iced::border::Radius;
 use iced::widget::{button, column, container, mouse_area, row, slider, text, text_input};
-use iced::{Alignment, Background, Color, Element, Length};
+use iced::{Alignment, Background, Border, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    active_toggle_button_style, fluent_sidebar_container_style, fluent_sidebar_nav_item,
-    fluent_window_header_bar, fluent_window_style, glass_action_button, glass_card_accent_style,
-    glass_card_style, glass_input_style, glass_scrollable, glass_slider_style, icons, logo_image,
-    metric_card, primary_button_style, status_pill, svg_icon, ACCENT_AMBER, ACCENT_CYAN,
-    ACCENT_GREEN, ACCENT_PURPLE, ACCENT_TEAL, FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD,
-    FONT_DISPLAY_BOLD, TEXT_MUTED, TEXT_SUB,
+    fluent_button_style, fluent_card_style, fluent_input_style, fluent_ribbon_button_style,
+    fluent_sidebar_container_style, fluent_sidebar_nav_item, fluent_slider_style,
+    fluent_toggle_switch, fluent_window_header_bar, fluent_window_style, glass_scrollable, icons,
+    logo_image, status_pill, svg_icon, ACCENT_AMBER, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED,
+    FLUENT_BORDER, FLUENT_PRIMARY, FLUENT_TEXT_DARK, FLUENT_TEXT_MUTED, FONT_BODY_MEDIUM,
+    FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD,
 };
 
 use crate::sys::network::NetworkState;
@@ -38,7 +39,7 @@ impl Default for SettingsViewState {
             active_tab: SettingsTab::Network,
             selected_ssid: None,
             wifi_password_input: String::new(),
-            network_status_msg: "NetworkManager aktif dan siap.".to_string(),
+            network_status_msg: "NetworkManager aktif dan siap digunakan.".to_string(),
             custom_wallpaper_input: String::new(),
         }
     }
@@ -65,22 +66,22 @@ pub fn view_settings<'a>(
     w: Length,
     h: Length,
 ) -> Element<'a, Message> {
-    // 1. Modern Fluent Sidebar
+    // 1. Fluent Sidebar Header & Navigation
     let brand = container(
         row![
-            logo_image(22.0),
+            logo_image(24.0),
             column![
                 text("Pengaturan")
-                    .size(13)
+                    .size(14)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(Color::from_rgb(0.12, 0.14, 0.17)),
+                        color: Some(FLUENT_TEXT_DARK),
                     }),
-                text("HyperX Fluent Control")
+                text("Windows Fluent Design")
                     .size(10)
                     .font(FONT_BODY_MEDIUM)
                     .style(|_| text::Style {
-                        color: Some(Color::from_rgb(0.45, 0.50, 0.58)),
+                        color: Some(FLUENT_TEXT_MUTED),
                     }),
             ]
             .spacing(1),
@@ -103,27 +104,27 @@ pub fn view_settings<'a>(
             .size(10)
             .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
-                color: Some(Color::from_rgb(0.55, 0.58, 0.64)),
+                color: Some(FLUENT_TEXT_MUTED),
             })
     };
 
     let nav_links = column![
-        section_label("KONEKTIVITAS"),
+        section_label("JARINGAN & KONEKSI"),
         fluent_sidebar_nav_item(
             "Wi-Fi & Jaringan",
             icons::WIFI,
             state.active_tab == SettingsTab::Network,
-            Color::from_rgb(0.0, 0.47, 0.83),
+            FLUENT_PRIMARY,
             Message::SelectSettingsTab(SettingsTab::Network),
         ),
         fluent_sidebar_nav_item(
             "Bluetooth",
             icons::BLUETOOTH,
             state.active_tab == SettingsTab::Bluetooth,
-            Color::from_rgb(0.55, 0.36, 0.96),
+            Color::from_rgb(0.35, 0.45, 0.95),
             Message::SelectSettingsTab(SettingsTab::Bluetooth),
         ),
-        section_label("PERANGKAT & MULTIMEDIA"),
+        section_label("PERANGKAT KERAS"),
         fluent_sidebar_nav_item(
             "Suara & Audio",
             icons::VOLUME_HIGH,
@@ -138,9 +139,9 @@ pub fn view_settings<'a>(
             Color::from_rgb(0.06, 0.65, 0.38),
             Message::SelectSettingsTab(SettingsTab::Display),
         ),
-        section_label("DESKTOP & SISTEM"),
+        section_label("PERSONALISASI & SISTEM"),
         fluent_sidebar_nav_item(
-            "Wallpaper & Dock",
+            "Personalisasi & Dock",
             icons::SPARKLES,
             state.active_tab == SettingsTab::Appearance,
             Color::from_rgb(0.55, 0.36, 0.96),
@@ -150,7 +151,7 @@ pub fn view_settings<'a>(
             "Tentang Sistem",
             icons::INFO,
             state.active_tab == SettingsTab::About,
-            Color::from_rgb(0.0, 0.47, 0.83),
+            FLUENT_PRIMARY,
             Message::SelectSettingsTab(SettingsTab::About),
         ),
     ]
@@ -158,24 +159,24 @@ pub fn view_settings<'a>(
 
     let sidebar_footer = container(
         column![
-            text("HyperXOS 2026.10")
+            text("HyperXOS Fluent v2.2")
                 .size(11)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(Color::from_rgb(0.12, 0.14, 0.17)),
+                    color: Some(FLUENT_TEXT_DARK),
                 }),
-            text("Smithay + Iced 0.14 WGPU")
+            text("Smithay Wayland + WGPU")
                 .size(9)
                 .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
-                    color: Some(Color::from_rgb(0.45, 0.50, 0.58)),
+                    color: Some(FLUENT_TEXT_MUTED),
                 }),
         ]
-        .spacing(3),
+        .spacing(2),
     )
-    .padding([10, 12])
+    .padding([8, 10])
     .width(Length::Fill)
-    .style(glass_card_style);
+    .style(fluent_card_style);
 
     let sidebar = container(
         column![
@@ -185,55 +186,25 @@ pub fn view_settings<'a>(
             container("").height(Length::Fill),
             sidebar_footer,
         ]
-        .spacing(12)
-        .padding(14),
+        .spacing(10)
+        .padding(12),
     )
-    .width(Length::Fixed(225.0))
+    .width(Length::Fixed(220.0))
     .height(Length::Fill)
     .style(fluent_sidebar_container_style);
 
     // 2. Right Panel Header
-    let (tab_title, _tab_sub, tab_icon, tab_accent) = match state.active_tab {
-        SettingsTab::Network => (
-            "Wi-Fi & Jaringan (NetworkManager)",
-            "Kelola koneksi nirkabel, alamat IPv4, dan pemindaian SSID",
-            icons::WIFI,
-            ACCENT_CYAN,
-        ),
-        SettingsTab::Bluetooth => (
-            "Perangkat Bluetooth (BlueZ)",
-            "Pasangkan audio nirkabel, kontroler game, dan periferal",
-            icons::BLUETOOTH,
-            ACCENT_PURPLE,
-        ),
-        SettingsTab::Audio => (
-            "Suara & Audio (PipeWire)",
-            "Atur volume master, perangkat output, dan uji kanal audio",
-            icons::VOLUME_HIGH,
-            ACCENT_AMBER,
-        ),
-        SettingsTab::Display => (
-            "Tampilan, Resolusi & Kecerahan",
-            "Konfigurasi resolusi monitor, refresh rate, dan cahaya malam",
-            icons::GPU,
-            ACCENT_GREEN,
-        ),
-        SettingsTab::Appearance => (
-            "Personalisasi Wallpaper & macOS Dock",
-            "Ganti tema latar belakang desktop dan ukuran taskbar secara langsung",
-            icons::SPARKLES,
-            ACCENT_PURPLE,
-        ),
-        SettingsTab::About => (
-            "Tentang HyperXOS Linux",
-            "Informasi perangkat keras, Wayland compositor, dan utilitas sistem",
-            icons::INFO,
-            ACCENT_CYAN,
-        ),
+    let (tab_title, tab_icon, tab_accent) = match state.active_tab {
+        SettingsTab::Network => ("Wi-Fi & Jaringan", icons::WIFI, FLUENT_PRIMARY),
+        SettingsTab::Bluetooth => ("Perangkat Bluetooth", icons::BLUETOOTH, Color::from_rgb(0.35, 0.45, 0.95)),
+        SettingsTab::Audio => ("Suara & Audio (PipeWire)", icons::VOLUME_HIGH, ACCENT_AMBER),
+        SettingsTab::Display => ("Tampilan & Monitor", icons::GPU, ACCENT_GREEN),
+        SettingsTab::Appearance => ("Personalisasi Wallpaper & Dock", icons::SPARKLES, ACCENT_PURPLE),
+        SettingsTab::About => ("Tentang Perangkat & HyperXOS", icons::INFO, FLUENT_PRIMARY),
     };
 
     let top_header = mouse_area(fluent_window_header_bar(
-        "HyperX Settings",
+        "Pengaturan",
         tab_title,
         tab_icon,
         tab_accent,
@@ -247,597 +218,728 @@ pub fn view_settings<'a>(
     // 3. Page Content
     let page_body: Element<'a, Message> = match state.active_tab {
         SettingsTab::Network => {
+            // A. Wi-Fi Status Card
             let status_card = container(
                 row![
-                    svg_icon(
-                        if net.wifi_enabled {
-                            icons::WIFI
-                        } else {
-                            icons::WIFI_OFF
-                        },
+                    container(svg_icon(
+                        if net.wifi_enabled { icons::WIFI } else { icons::WIFI_OFF },
                         24.0,
-                        if net.wifi_enabled {
-                            ACCENT_GREEN
-                        } else {
-                            ACCENT_AMBER
-                        },
-                    ),
+                        if net.wifi_enabled { FLUENT_PRIMARY } else { FLUENT_TEXT_MUTED },
+                    ))
+                    .width(Length::Fixed(44.0))
+                    .height(Length::Fixed(44.0))
+                    .center_x(Length::Fixed(44.0))
+                    .center_y(Length::Fixed(44.0))
+                    .style(move |_| container::Style {
+                        background: Some(Background::Color(Color::from_rgba(0.0, 0.47, 0.83, 0.08))),
+                        border: Border::default().rounded(Radius::from(8.0)),
+                        ..container::Style::default()
+                    }),
                     column![
                         text(if net.wifi_enabled {
-                            format!("Terhubung: {}", net.active_ssid)
+                            if net.active_ssid.is_empty() { "Wi-Fi Aktif (Tidak Terhubung)" } else { &net.active_ssid }
                         } else {
-                            "Radio Wi-Fi Dinonaktifkan".to_string()
+                            "Radio Wi-Fi Mati"
                         })
                         .size(13)
-                        .font(FONT_DISPLAY_BOLD),
-                        text(format!(
-                            "IPv4: {}   •   Gateway: {}   •   {}",
-                            net.ip_address, net.gateway, state.network_status_msg
-                        ))
-                        .size(11)
-                        .font(FONT_BODY_MEDIUM)
-                        .style(|_| text::Style {
-                            color: Some(TEXT_SUB),
-                        }),
+                        .font(FONT_DISPLAY_BOLD)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                        text(format!("IPv4: {}  •  Gateway: {}", net.ip_address, net.gateway))
+                            .size(11)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
                     ]
-                    .spacing(3),
+                    .spacing(2),
                     container("").width(Length::Fill),
                     button(
                         row![
-                            svg_icon(icons::REFRESH, 13.0, ACCENT_CYAN),
-                            text("Pindai Ulang").size(11).font(FONT_BODY_SEMIBOLD),
+                            svg_icon(icons::REFRESH, 13.0, FLUENT_PRIMARY),
+                            text("Pindai Ulang").size(11).font(FONT_BODY_SEMIBOLD).style(|_| text::Style { color: Some(FLUENT_PRIMARY) }),
+                        ]
+                        .spacing(5)
+                        .align_y(Alignment::Center),
+                    )
+                    .padding([6, 12])
+                    .style(fluent_ribbon_button_style)
+                    .on_press(Message::RefreshNetwork),
+                    fluent_toggle_switch(net.wifi_enabled, Message::ToggleWifiRadio),
+                ]
+                .spacing(12)
+                .align_y(Alignment::Center),
+            )
+            .padding(14)
+            .width(Length::Fill)
+            .style(fluent_card_style);
+
+            // B. Password connection card if SSID selected
+            let connect_box: Option<Element<'a, Message>> = state.selected_ssid.as_ref().map(|ssid| {
+                container(
+                    column![
+                        row![
+                            svg_icon(icons::LOCK, 14.0, FLUENT_PRIMARY),
+                            text(format!("Hubungkan ke '{}'", ssid))
+                                .size(12)
+                                .font(FONT_DISPLAY_BOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
                         ]
                         .spacing(6)
                         .align_y(Alignment::Center),
-                    )
-                    .padding([7, 12])
-                    .style(glass_action_button)
-                    .on_press(Message::RefreshNetwork),
-                    button(
-                        text(if net.wifi_enabled {
-                            "Matikan Wi-Fi"
-                        } else {
-                            "Aktifkan Wi-Fi"
-                        })
-                        .size(11)
-                        .font(FONT_DISPLAY_BOLD),
-                    )
-                    .padding([7, 14])
-                    .style(active_toggle_button_style(net.wifi_enabled, ACCENT_GREEN))
-                    .on_press(Message::ToggleWifiRadio),
-                ]
-                .spacing(12)
-                .align_y(Alignment::Center)
-                .padding(14),
-            )
-            .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_CYAN));
+                        row![
+                            text_input("Ketik Kata Sandi Wi-Fi...", &state.wifi_password_input)
+                                .size(12)
+                                .padding([7, 10])
+                                .secure(true)
+                                .style(fluent_input_style)
+                                .on_input(Message::WifiPasswordChanged)
+                                .on_submit(Message::ConnectSelectedWifi),
+                            button(
+                                text("Sambungkan")
+                                    .size(11)
+                                    .font(FONT_BODY_SEMIBOLD)
+                                    .style(|_| text::Style { color: Some(Color::WHITE) }),
+                            )
+                            .padding([7, 14])
+                            .style(fluent_button_style(FLUENT_PRIMARY, true))
+                            .on_press(Message::ConnectSelectedWifi),
+                        ]
+                        .spacing(8)
+                        .align_y(Alignment::Center),
+                    ]
+                    .spacing(8),
+                )
+                .padding(12)
+                .width(Length::Fill)
+                .style(fluent_card_style)
+                .into()
+            });
 
-            let mut ssid_list = column![].spacing(8);
-            for item in &net.networks {
-                let is_sel = state.selected_ssid.as_deref() == Some(item.ssid.as_str());
-                let badge = status_pill(
-                    format!("{}%  •  {}", item.signal, item.security),
-                    if item.is_connected {
-                        ACCENT_GREEN
-                    } else {
-                        ACCENT_CYAN
-                    },
-                    item.is_connected,
-                );
+            // C. SSID List
+            let mut list_col = column![].spacing(6);
+            for ap in &net.networks {
+                let is_active = ap.ssid == net.active_ssid && net.wifi_enabled;
+                let is_selected = state.selected_ssid.as_deref() == Some(&ap.ssid);
 
-                let row_card = container(
+                let ssid_card = button(
                     row![
                         svg_icon(
-                            icons::WIFI,
-                            18.0,
-                            if item.is_connected {
-                                ACCENT_GREEN
-                            } else {
-                                ACCENT_CYAN
-                            }
+                            if !ap.security.is_empty() && !ap.security.eq_ignore_ascii_case("open") { icons::LOCK } else { icons::WIFI },
+                            15.0,
+                            if is_active { FLUENT_PRIMARY } else { FLUENT_TEXT_MUTED },
                         ),
                         column![
-                            text(&item.ssid).size(13).font(FONT_DISPLAY_BOLD),
-                            text(if item.is_connected {
-                                "Jaringan Aktif Saat Ini"
-                            } else {
-                                "Tersedia untuk dihubungkan"
-                            })
-                            .size(10)
-                            .font(FONT_BODY_MEDIUM)
-                            .style(|_| text::Style {
-                                color: Some(TEXT_MUTED),
-                            }),
+                            text(&ap.ssid)
+                                .size(12)
+                                .font(if is_active { FONT_DISPLAY_BOLD } else { FONT_BODY_SEMIBOLD })
+                                .style(move |_| text::Style {
+                                    color: Some(if is_active { FLUENT_PRIMARY } else { FLUENT_TEXT_DARK }),
+                                }),
+                            text(format!("Kekuatan Sinyal: {}%  •  {}", ap.signal, ap.security))
+                                .size(10)
+                                .font(FONT_BODY_MEDIUM)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
                         ]
                         .spacing(2),
                         container("").width(Length::Fill),
-                        badge,
-                        button(
-                            text(if item.is_connected {
-                                "Terhubung"
-                            } else if is_sel {
-                                "Dipilih"
-                            } else {
-                                "Pilih SSID"
-                            })
-                            .size(11)
-                            .font(FONT_BODY_SEMIBOLD),
-                        )
-                        .padding([6, 12])
-                        .style(active_toggle_button_style(
-                            is_sel || item.is_connected,
-                            ACCENT_CYAN,
-                        ))
-                        .on_press(Message::SelectWifiSsid(item.ssid.clone())),
+                        if is_active {
+                            status_pill("Terhubung", FLUENT_PRIMARY, true)
+                        } else if is_selected {
+                            status_pill("Dipilih", ACCENT_AMBER, false)
+                        } else {
+                            status_pill("Pilih", Color::from_rgb(0.55, 0.58, 0.64), false)
+                        },
                     ]
                     .spacing(10)
-                    .align_y(Alignment::Center)
-                    .padding(12),
+                    .align_y(Alignment::Center),
                 )
+                .padding([8, 12])
                 .width(Length::Fill)
-                .style(glass_card_style);
+                .style(move |_theme, status| {
+                    let (bg, border_color) = if is_selected || is_active {
+                        (Color::WHITE, FLUENT_PRIMARY)
+                    } else {
+                        match status {
+                            button::Status::Hovered => (Color::from_rgba(0.97, 0.98, 1.0, 1.0), Color::from_rgba(0.0, 0.0, 0.0, 0.12)),
+                            _ => (Color::WHITE, FLUENT_BORDER),
+                        }
+                    };
+                    button::Style {
+                        background: Some(Background::Color(bg)),
+                        border: Border::default().rounded(Radius::from(6.0)).width(1.0).color(border_color),
+                        ..button::Style::default()
+                    }
+                })
+                .on_press(Message::SelectWifiSsid(ap.ssid.clone()));
 
-                ssid_list = ssid_list.push(row_card);
+                list_col = list_col.push(ssid_card);
             }
 
-            let connect_box: Element<'a, Message> = if let Some(ssid) = &state.selected_ssid {
-                container(
-                    row![
-                        svg_icon(icons::LOCK, 16.0, ACCENT_AMBER),
-                        text(format!("Hubungkan ke '{}':", ssid))
-                            .size(12)
-                            .font(FONT_DISPLAY_BOLD),
-                        text_input("Masukkan kata sandi WPA2/WPA3 (kosongkan jika Open)...", &state.wifi_password_input)
-                            .on_input(Message::WifiPasswordChanged)
-                            .secure(true)
-                            .padding([7, 12])
-                            .size(12)
-                            .width(Length::Fill)
-                            .style(glass_input_style),
-                        button(
-                            row![
-                                svg_icon(icons::CHECK, 13.0, ACCENT_GREEN),
-                                text("Sambungkan").size(11).font(FONT_DISPLAY_BOLD),
-                            ]
-                            .spacing(6)
-                            .align_y(Alignment::Center),
-                        )
-                        .padding([7, 14])
-                        .style(primary_button_style(ACCENT_GREEN))
-                        .on_press(Message::ConnectSelectedWifi),
-                    ]
-                    .spacing(10)
-                    .align_y(Alignment::Center)
-                    .padding(12),
-                )
-                .width(Length::Fill)
-                .style(glass_card_accent_style(ACCENT_AMBER))
-                .into()
-            } else {
-                container("").into()
-            };
+            let mut main_col = column![status_card].spacing(10);
+            if let Some(c) = connect_box {
+                main_col = main_col.push(c);
+            }
+            main_col = main_col.push(
+                text("JARINGAN TERSEDIA")
+                    .size(11)
+                    .font(FONT_DISPLAY_BOLD)
+                    .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+            );
+            main_col = main_col.push(list_col);
 
-            column![status_card, connect_box, ssid_list]
-                .spacing(12)
-                .into()
+            glass_scrollable(main_col.spacing(10).padding([0, 4])).into()
         }
 
         SettingsTab::Bluetooth => {
             let bt_card = container(
                 row![
-                    svg_icon(icons::BLUETOOTH, 24.0, ACCENT_PURPLE),
+                    container(svg_icon(icons::BLUETOOTH, 24.0, Color::from_rgb(0.35, 0.45, 0.95)))
+                        .width(Length::Fixed(44.0))
+                        .height(Length::Fixed(44.0))
+                        .center_x(Length::Fixed(44.0))
+                        .center_y(Length::Fixed(44.0))
+                        .style(|_| container::Style {
+                            background: Some(Background::Color(Color::from_rgba(0.35, 0.45, 0.95, 0.10))),
+                            border: Border::default().rounded(Radius::from(8.0)),
+                            ..container::Style::default()
+                        }),
                     column![
+                        text(if bluetooth_enabled { "Bluetooth Aktif" } else { "Bluetooth Nonaktif" })
+                            .size(13)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
                         text(if bluetooth_enabled {
-                            "Adaptor Bluetooth Aktif (BlueZ)"
+                            "Dapat ditemukan sebagai 'HyperX-PC'. Siap memasangkan perangkat baru."
                         } else {
-                            "Adaptor Bluetooth Nonaktif"
-                        })
-                        .size(13)
-                        .font(FONT_DISPLAY_BOLD),
-                        text("Dapat ditemukan sebagai 'HyperXOS-Desktop'")
-                            .size(11)
-                            .font(FONT_BODY_MEDIUM)
-                            .style(|_| text::Style {
-                                color: Some(TEXT_SUB),
-                            }),
-                    ]
-                    .spacing(3),
-                    container("").width(Length::Fill),
-                    button(
-                        text(if bluetooth_enabled {
-                            "Matikan Bluetooth"
-                        } else {
-                            "Aktifkan Bluetooth"
+                            "Aktifkan Bluetooth untuk menghubungkan headset, keyboard, atau mouse nirkabel."
                         })
                         .size(11)
-                        .font(FONT_DISPLAY_BOLD),
-                    )
-                    .padding([8, 16])
-                    .style(active_toggle_button_style(bluetooth_enabled, ACCENT_PURPLE))
-                    .on_press(Message::ToggleBluetooth),
+                        .font(FONT_BODY_MEDIUM)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    ]
+                    .spacing(2),
+                    container("").width(Length::Fill),
+                    fluent_toggle_switch(bluetooth_enabled, Message::ToggleBluetooth),
                 ]
                 .spacing(12)
-                .align_y(Alignment::Center)
-                .padding(16),
+                .align_y(Alignment::Center),
             )
+            .padding(14)
             .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_PURPLE));
+            .style(fluent_card_style);
 
-            column![bt_card].spacing(12).into()
+            let devices = [
+                ("HyperX Cloud III Wireless Headset", "Audio & Mikrofon Terhubung", true, icons::VOLUME_HIGH),
+                ("Logitech MX Master 3S Mouse", "Perangkat Input • Baterai 85%", true, icons::COMPUTER),
+                ("Xbox Wireless Controller", "Terputus • Klik untuk menghubungkan", false, icons::SPARKLES),
+            ];
+
+            let mut dev_col = column![].spacing(6);
+            for (name, desc, connected, ic) in devices {
+                let dev_row = container(
+                    row![
+                        svg_icon(ic, 18.0, if connected { Color::from_rgb(0.35, 0.45, 0.95) } else { FLUENT_TEXT_MUTED }),
+                        column![
+                            text(name)
+                                .size(12)
+                                .font(FONT_BODY_SEMIBOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                            text(desc)
+                                .size(10)
+                                .font(FONT_BODY_MEDIUM)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                        ]
+                        .spacing(2),
+                        container("").width(Length::Fill),
+                        if connected {
+                            status_pill("Terhubung", ACCENT_GREEN, true)
+                        } else {
+                            status_pill("Pasangkan", FLUENT_TEXT_MUTED, false)
+                        },
+                    ]
+                    .spacing(10)
+                    .align_y(Alignment::Center),
+                )
+                .padding([10, 12])
+                .width(Length::Fill)
+                .style(fluent_card_style);
+
+                dev_col = dev_col.push(dev_row);
+            }
+
+            glass_scrollable(
+                column![
+                    bt_card,
+                    text("PERANGKAT TERSIMPAN & TERHUBUNG")
+                        .size(11)
+                        .font(FONT_DISPLAY_BOLD)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    dev_col,
+                ]
+                .spacing(12)
+                .padding([0, 4]),
+            )
+            .into()
         }
 
         SettingsTab::Audio => {
-            let audio_card = container(
+            let vol_percent = (volume * 100.0).round() as u32;
+
+            let master_card = container(
                 column![
                     row![
                         svg_icon(
-                            if muted {
-                                icons::VOLUME_MUTE
-                            } else {
-                                icons::VOLUME_HIGH
-                            },
+                            if muted || volume < 0.01 { icons::VOLUME_X } else { icons::VOLUME_HIGH },
                             22.0,
-                            ACCENT_CYAN
+                            if muted { ACCENT_RED } else { ACCENT_AMBER },
                         ),
                         column![
-                            text("Perangkat Output: ").size(11).font(FONT_BODY_MEDIUM),
-                            text(output_device).size(13).font(FONT_DISPLAY_BOLD),
+                            text(if muted { "Volume Master (Dibungkam)" } else { "Volume Master" })
+                                .size(13)
+                                .font(FONT_DISPLAY_BOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                            text(format!("Tingkat Volume: {}%  •  PipeWire Audio Server", if muted { 0 } else { vol_percent }))
+                                .size(11)
+                                .font(FONT_BODY_MEDIUM)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
                         ]
                         .spacing(2),
                         container("").width(Length::Fill),
                         button(
-                            text(if muted {
-                                "Suara Dibisukan (Unmute)"
-                            } else {
-                                "Bisukan (Mute)"
-                            })
-                            .size(11)
-                            .font(FONT_DISPLAY_BOLD),
+                            text(if muted { "Bunyikan" } else { "Bungkam" })
+                                .size(11)
+                                .font(FONT_BODY_SEMIBOLD)
+                                .style(move |_| text::Style {
+                                    color: Some(if muted { Color::WHITE } else { FLUENT_TEXT_DARK }),
+                                }),
                         )
-                        .padding([7, 14])
-                        .style(active_toggle_button_style(muted, ACCENT_AMBER))
+                        .padding([6, 12])
+                        .style(move |theme, status| {
+                            if muted {
+                                fluent_button_style(ACCENT_RED, true)(theme, status)
+                            } else {
+                                fluent_ribbon_button_style(theme, status)
+                            }
+                        })
                         .on_press(Message::ToggleMute),
                     ]
                     .spacing(10)
                     .align_y(Alignment::Center),
                     row![
-                        text("Volume Master:")
-                            .size(12)
-                            .font(FONT_BODY_SEMIBOLD)
-                            .width(Length::Fixed(120.0)),
-                        slider(0.0..=100.0, volume, Message::VolumeChanged)
-                            .style(glass_slider_style(ACCENT_CYAN)),
-                        text(format!("{:.0}%", volume))
-                            .size(13)
-                            .font(FONT_DISPLAY_BOLD)
-                            .style(|_| text::Style {
-                                color: Some(ACCENT_CYAN),
-                            }),
+                        svg_icon(icons::VOLUME_X, 14.0, FLUENT_TEXT_MUTED),
+                        slider(0.0..=1.0, volume, Message::VolumeChanged)
+                            .step(0.02_f32)
+                            .style(fluent_slider_style)
+                            .width(Length::Fill),
+                        svg_icon(icons::VOLUME_HIGH, 14.0, FLUENT_TEXT_MUTED),
                     ]
-                    .spacing(12)
+                    .spacing(10)
                     .align_y(Alignment::Center),
                 ]
-                .spacing(14)
-                .padding(16),
+                .spacing(12),
             )
+            .padding(14)
             .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_CYAN));
+            .style(fluent_card_style);
 
-            column![audio_card].spacing(12).into()
+            let dev_card = container(
+                row![
+                    svg_icon(icons::VOLUME_HIGH, 20.0, FLUENT_PRIMARY),
+                    column![
+                        text("Perangkat Keluaran Utama")
+                            .size(12)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                        text(output_device)
+                            .size(11)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    ]
+                    .spacing(2),
+                    container("").width(Length::Fill),
+                    status_pill("Default ALSA/PipeWire", FLUENT_PRIMARY, true),
+                ]
+                .spacing(10)
+                .align_y(Alignment::Center),
+            )
+            .padding([12, 14])
+            .width(Length::Fill)
+            .style(fluent_card_style);
+
+            glass_scrollable(
+                column![
+                    master_card,
+                    text("PERANGKAT AUDIO & KELUARAN")
+                        .size(11)
+                        .font(FONT_DISPLAY_BOLD)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    dev_card,
+                ]
+                .spacing(12)
+                .padding([0, 4]),
+            )
+            .into()
         }
 
         SettingsTab::Display => {
-            let disp_card = container(
+            let bright_percent = (brightness * 100.0).round() as u32;
+
+            let bright_card = container(
                 column![
                     row![
-                        svg_icon(icons::GPU, 22.0, ACCENT_GREEN),
+                        svg_icon(icons::SUN, 22.0, ACCENT_AMBER),
                         column![
-                            text(format!("Resolusi Aktif: {}", resolution))
+                            text("Kecerahan Layar")
                                 .size(13)
-                                .font(FONT_DISPLAY_BOLD),
-                            text(format!("Refresh Rate: {}  •  Akselerasi WGPU Direct-GPU", refresh_rate))
+                                .font(FONT_DISPLAY_BOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                            text(format!("Tingkat Kecerahan: {}%", bright_percent))
                                 .size(11)
                                 .font(FONT_BODY_MEDIUM)
-                                .style(|_| text::Style {
-                                    color: Some(TEXT_SUB),
-                                }),
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
                         ]
                         .spacing(2),
                         container("").width(Length::Fill),
-                        button(
-                            text(if night_light {
-                                "Night Light: Aktif"
-                            } else {
-                                "Night Light: Nonaktif"
-                            })
-                            .size(11)
-                            .font(FONT_DISPLAY_BOLD),
-                        )
-                        .padding([7, 14])
-                        .style(active_toggle_button_style(night_light, ACCENT_AMBER))
-                        .on_press(Message::ToggleNightLight),
+                        text(format!("{}%", bright_percent))
+                            .size(13)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_PRIMARY) }),
                     ]
                     .spacing(10)
                     .align_y(Alignment::Center),
                     row![
-                        svg_icon(icons::SUN_BRIGHTNESS, 16.0, ACCENT_AMBER),
-                        text("Kecerahan Panel:")
-                            .size(12)
-                            .font(FONT_BODY_SEMIBOLD)
-                            .width(Length::Fixed(130.0)),
-                        slider(10.0..=100.0, brightness, Message::BrightnessChanged)
-                            .style(glass_slider_style(ACCENT_AMBER)),
-                        text(format!("{:.0}%", brightness))
-                            .size(13)
-                            .font(FONT_DISPLAY_BOLD)
-                            .style(|_| text::Style {
-                                color: Some(ACCENT_AMBER),
-                            }),
+                        svg_icon(icons::SUN, 13.0, FLUENT_TEXT_MUTED),
+                        slider(0.1..=1.0, brightness, Message::BrightnessChanged)
+                            .step(0.05_f32)
+                            .style(fluent_slider_style)
+                            .width(Length::Fill),
+                        svg_icon(icons::SUN, 18.0, ACCENT_AMBER),
                     ]
-                    .spacing(12)
+                    .spacing(10)
                     .align_y(Alignment::Center),
                 ]
-                .spacing(14)
-                .padding(16),
+                .spacing(12),
             )
+            .padding(14)
             .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_GREEN));
+            .style(fluent_card_style);
 
-            column![disp_card].spacing(12).into()
+            let res_card = container(
+                row![
+                    svg_icon(icons::GPU, 20.0, ACCENT_GREEN),
+                    column![
+                        text("Resolusi & Refresh Rate Layar")
+                            .size(12)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                        text(format!("Monitor Utama: {} @ {}", resolution, refresh_rate))
+                            .size(11)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    ]
+                    .spacing(2),
+                    container("").width(Length::Fill),
+                    status_pill("100% Skala Asli", ACCENT_GREEN, true),
+                ]
+                .spacing(10)
+                .align_y(Alignment::Center),
+            )
+            .padding([12, 14])
+            .width(Length::Fill)
+            .style(fluent_card_style);
+
+            let night_card = container(
+                row![
+                    svg_icon(icons::MOON, 20.0, Color::from_rgb(0.55, 0.36, 0.96)),
+                    column![
+                        text("Cahaya Malam (Night Light)")
+                            .size(12)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                        text("Mengurangi pancaran sinar biru layar untuk kenyamanan mata di malam hari.")
+                            .size(11)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    ]
+                    .spacing(2),
+                    container("").width(Length::Fill),
+                    fluent_toggle_switch(night_light, Message::ToggleNightLight),
+                ]
+                .spacing(10)
+                .align_y(Alignment::Center),
+            )
+            .padding([12, 14])
+            .width(Length::Fill)
+            .style(fluent_card_style);
+
+            glass_scrollable(
+                column![
+                    bright_card,
+                    text("PENGATURAN MONITOR & KENYAMANAN MATA")
+                        .size(11)
+                        .font(FONT_DISPLAY_BOLD)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    res_card,
+                    night_card,
+                ]
+                .spacing(12)
+                .padding([0, 4]),
+            )
+            .into()
         }
 
         SettingsTab::Appearance => {
-            let wp_card = container(
-                column![
-                    row![
-                        svg_icon(icons::SPARKLES, 18.0, ACCENT_PURPLE),
-                        text("Tema Gradasi & Custom Wallpaper Desktop")
-                            .size(13)
-                            .font(FONT_DISPLAY_BOLD),
-                    ]
-                    .spacing(8)
-                    .align_y(Alignment::Center),
-                    row![
-                        button(
-                            text("HyperX Cyber Crimson")
-                                .size(11)
-                                .font(FONT_DISPLAY_BOLD),
-                        )
-                        .width(Length::Fill)
-                        .padding([9, 10])
-                        .style(active_toggle_button_style(
-                            wallpaper_theme == WallpaperTheme::CyberCrimson,
-                            ACCENT_AMBER,
-                        ))
-                        .on_press(Message::SelectWallpaper(WallpaperTheme::CyberCrimson)),
-                        button(
-                            text("macOS Deep Nebula")
-                                .size(11)
-                                .font(FONT_DISPLAY_BOLD),
-                        )
-                        .width(Length::Fill)
-                        .padding([9, 10])
-                        .style(active_toggle_button_style(
-                            wallpaper_theme == WallpaperTheme::DeepNebula,
-                            ACCENT_CYAN,
-                        ))
-                        .on_press(Message::SelectWallpaper(WallpaperTheme::DeepNebula)),
-                        button(
-                            text("Emerald Aurora")
-                                .size(11)
-                                .font(FONT_DISPLAY_BOLD),
-                        )
-                        .width(Length::Fill)
-                        .padding([9, 10])
-                        .style(active_toggle_button_style(
-                            wallpaper_theme == WallpaperTheme::EmeraldAurora,
-                            ACCENT_GREEN,
-                        ))
-                        .on_press(Message::SelectWallpaper(WallpaperTheme::EmeraldAurora)),
-                        button(
-                            text("Custom Image Wallpaper")
-                                .size(11)
-                                .font(FONT_DISPLAY_BOLD),
-                        )
-                        .width(Length::Fill)
-                        .padding([9, 10])
-                        .style(active_toggle_button_style(
-                            wallpaper_theme == WallpaperTheme::CustomImage,
-                            ACCENT_PURPLE,
-                        ))
-                        .on_press(Message::GenerateAndSetSampleCustomWallpaper),
-                    ]
-                    .spacing(8),
-                ]
-                .spacing(12)
-                .padding(14),
-            )
-            .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_PURPLE));
+            let wp_themes = [
+                ("Cyber Crimson", "Gradien gelap aksen merah keunguan", WallpaperTheme::CyberCrimson),
+                ("Deep Nebula", "Gradien biru kosmis ruang angkasa", WallpaperTheme::DeepNebula),
+                ("Emerald Aurora", "Gradien hijau zamrud utara", WallpaperTheme::EmeraldAurora),
+            ];
 
-            let custom_img_card = container(
+            let mut themes_row = row![].spacing(8);
+            for (title, desc, theme) in wp_themes {
+                let is_sel = wallpaper_theme == theme;
+                let btn = button(
+                    column![
+                        text(title)
+                            .size(12)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(move |_| text::Style {
+                                color: Some(if is_sel { FLUENT_PRIMARY } else { FLUENT_TEXT_DARK }),
+                            }),
+                        text(desc)
+                            .size(10)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    ]
+                    .spacing(3),
+                )
+                .padding([10, 12])
+                .width(Length::FillPortion(1))
+                .style(move |_theme, status| {
+                    let border_c = if is_sel {
+                        FLUENT_PRIMARY
+                    } else {
+                        match status {
+                            button::Status::Hovered => Color::from_rgba(0.0, 0.47, 0.83, 0.5),
+                            _ => FLUENT_BORDER,
+                        }
+                    };
+                    button::Style {
+                        background: Some(Background::Color(Color::WHITE)),
+                        border: Border::default().rounded(Radius::from(8.0)).width(if is_sel { 2.0 } else { 1.0 }).color(border_c),
+                        ..button::Style::default()
+                    }
+                })
+                .on_press(Message::SelectWallpaper(theme));
+
+                themes_row = themes_row.push(btn);
+            }
+
+            let custom_wp_card = container(
                 column![
                     row![
-                        svg_icon(icons::IMAGE_ICON, 18.0, ACCENT_CYAN),
-                        column![
-                            text("Pasang Gambar Kustom sebagai Wallpaper (.PNG / .JPG / .WebP)")
-                                .size(12)
-                                .font(FONT_DISPLAY_BOLD),
-                            text("Anda juga dapat mengklik kanan gambar apa pun di HyperX Files -> 'Jadikan Wallpaper Desktop'")
-                                .size(10)
-                                .font(FONT_BODY_MEDIUM)
-                                .style(|_| text::Style {
-                                    color: Some(TEXT_SUB),
-                                }),
-                        ]
-                        .spacing(2),
+                        svg_icon(icons::FOLDER, 16.0, FLUENT_PRIMARY),
+                        text("Wallpaper Kustom dari Berkas Gambar")
+                            .size(12)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
                     ]
-                    .spacing(8)
+                    .spacing(6)
                     .align_y(Alignment::Center),
                     row![
-                        text_input(
-                            "Masukkan path gambar (/home/hyperxos/Pictures/wallpaper.png)...",
-                            &state.custom_wallpaper_input,
-                        )
-                        .on_input(Message::CustomWallpaperInputChanged)
-                        .on_submit(Message::ApplyCustomWallpaperInput)
-                        .padding([7, 12])
-                        .size(11)
-                        .width(Length::Fill)
-                        .style(glass_input_style),
+                        text_input("Jalur berkas gambar PNG/JPG/WebP...", &state.custom_wallpaper_input)
+                            .size(12)
+                            .padding([7, 10])
+                            .style(fluent_input_style)
+                            .on_input(Message::CustomWallpaperInputChanged)
+                            .on_submit(Message::ApplyCustomWallpaperInput),
                         button(
-                            row![
-                                svg_icon(icons::CHECK, 13.0, ACCENT_GREEN),
-                                text("Terapkan Gambar").size(11).font(FONT_DISPLAY_BOLD),
-                            ]
-                            .spacing(5)
-                            .align_y(Alignment::Center),
+                            text("Terapkan")
+                                .size(11)
+                                .font(FONT_BODY_SEMIBOLD)
+                                .style(|_| text::Style { color: Some(Color::WHITE) }),
                         )
-                        .padding([7, 12])
-                        .style(primary_button_style(ACCENT_GREEN))
+                        .padding([7, 14])
+                        .style(fluent_button_style(FLUENT_PRIMARY, true))
                         .on_press(Message::ApplyCustomWallpaperInput),
                         button(
-                            row![
-                                svg_icon(icons::SPARKLES, 13.0, ACCENT_PURPLE),
-                                text("Buat Wallpaper Neon 4K").size(11).font(FONT_DISPLAY_BOLD),
-                            ]
-                            .spacing(5)
-                            .align_y(Alignment::Center),
+                            text("Buat Neon")
+                                .size(11)
+                                .font(FONT_BODY_SEMIBOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_PRIMARY) }),
                         )
                         .padding([7, 12])
-                        .style(primary_button_style(ACCENT_PURPLE))
+                        .style(fluent_ribbon_button_style)
                         .on_press(Message::GenerateAndSetSampleCustomWallpaper),
                     ]
                     .spacing(8)
                     .align_y(Alignment::Center),
                 ]
-                .spacing(10)
-                .padding(14),
+                .spacing(10),
             )
+            .padding(14)
             .width(Length::Fill)
-            .style(glass_card_style);
+            .style(fluent_card_style);
 
-            let dock_card = container(
-                row![
-                    svg_icon(icons::SLIDERS, 18.0, ACCENT_CYAN),
-                    text("Ukuran Ikon macOS Dock:")
-                        .size(12)
+            let dock_size_card = container(
+                column![
+                    row![
+                        svg_icon(icons::LAYERS, 16.0, ACCENT_PURPLE),
+                        column![
+                            text("Ukuran Ikon Taskbar Dock")
+                                .size(12)
+                                .font(FONT_DISPLAY_BOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                            text(format!("Ukuran: {:.0} px", dock_icon_size))
+                                .size(11)
+                                .font(FONT_BODY_MEDIUM)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                        ]
+                        .spacing(2),
+                        container("").width(Length::Fill),
+                        text(format!("{:.0}px", dock_icon_size))
+                            .size(13)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_PRIMARY) }),
+                    ]
+                    .spacing(10)
+                    .align_y(Alignment::Center),
+                    slider(28.0..=48.0, dock_icon_size, Message::DockSizeChanged)
+                        .step(2.0_f32)
+                        .style(fluent_slider_style)
+                        .width(Length::Fill),
+                ]
+                .spacing(10),
+            )
+            .padding(14)
+            .width(Length::Fill)
+            .style(fluent_card_style);
+
+            glass_scrollable(
+                column![
+                    text("PILIHAN TEMA WALLPAPER")
+                        .size(11)
                         .font(FONT_DISPLAY_BOLD)
-                        .width(Length::Fixed(180.0)),
-                    slider(26.0..=48.0, dock_icon_size, Message::DockSizeChanged)
-                        .style(glass_slider_style(ACCENT_CYAN)),
-                    text(format!("{:.0} px", dock_icon_size))
-                        .size(12)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    themes_row,
+                    custom_wp_card,
+                    text("TASKBAR DOCK")
+                        .size(11)
                         .font(FONT_DISPLAY_BOLD)
-                        .style(|_| text::Style {
-                            color: Some(ACCENT_CYAN),
-                        }),
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    dock_size_card,
                 ]
                 .spacing(12)
-                .align_y(Alignment::Center)
-                .padding(14),
+                .padding([0, 4]),
             )
-            .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_CYAN));
-
-            column![wp_card, custom_img_card, dock_card]
-                .spacing(10)
-                .into()
+            .into()
         }
 
         SettingsTab::About => {
-            let hero = container(
+            let info_items: [(&'static str, String, &'static str); 5] = [
+                ("Sistem Operasi", "HyperXOS Linux 2026.10 (Rolling Release)".to_string(), icons::COMPUTER),
+                ("Prosesor (CPU)", cpu_brand.to_string(), icons::CPU),
+                ("Memori (RAM)", format!("{:.2} GB terpakai dari {:.2} GB", ram_used_gb, ram_total_gb), icons::MEMORY),
+                ("Compositor", format!("Smithay Wayland ({})", wayland_socket), icons::GPU),
+                ("Mesin Grafis", "Iced 0.14 WGPU (Direct Rendering / KMS Vulkan)".to_string(), icons::SPARKLES),
+            ];
+
+            let mut info_col = column![].spacing(6);
+            for (label, val, ic) in &info_items {
+                let item_row = container(
+                    row![
+                        svg_icon(ic, 18.0, FLUENT_PRIMARY),
+                        column![
+                            text(*label)
+                                .size(10)
+                                .font(FONT_BODY_MEDIUM)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                            text(val.clone())
+                                .size(12)
+                                .font(FONT_BODY_SEMIBOLD)
+                                .style(|_| text::Style { color: Some(FLUENT_TEXT_DARK) }),
+                        ]
+                        .spacing(2),
+                    ]
+                    .spacing(10)
+                    .align_y(Alignment::Center),
+                )
+                .padding([10, 14])
+                .width(Length::Fill)
+                .style(fluent_card_style);
+
+                info_col = info_col.push(item_row);
+            }
+
+            let usage_card = container(
                 row![
-                    logo_image(54.0),
                     column![
-                        text("HyperXOS Linux — Desktop Environment (hyperx-de)")
-                            .size(16)
-                            .font(FONT_DISPLAY_BOLD),
-                        text(format!(
-                            "Smithay Wayland Compositor ({})  •  Iced 0.14 WGPU Glassmorphism",
-                            wayland_socket
-                        ))
-                        .size(11)
-                        .font(FONT_BODY_SEMIBOLD)
-                        .style(|_| text::Style {
-                            color: Some(ACCENT_CYAN),
-                        }),
-                        text(format!("Prosesor: {}", cpu_brand))
+                        text("Penggunaan CPU Global")
                             .size(11)
                             .font(FONT_BODY_MEDIUM)
-                            .style(|_| text::Style {
-                                color: Some(TEXT_SUB),
-                            }),
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                        text(format!("{:.1}%", cpu_usage))
+                            .size(18)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(FLUENT_PRIMARY) }),
                     ]
-                    .spacing(4),
-                    container("").width(Length::Fill),
-                    button(
-                        row![
-                            svg_icon(icons::ROCKET, 14.0, ACCENT_PURPLE),
-                            text("Buka HyperXTools").size(11).font(FONT_DISPLAY_BOLD),
-                        ]
-                        .spacing(6)
-                        .align_y(Alignment::Center),
-                    )
-                    .padding([8, 14])
-                    .style(primary_button_style(ACCENT_PURPLE))
-                    .on_press(Message::LaunchExternalApp("hyper-x-tools".to_string())),
+                    .width(Length::FillPortion(1)),
+                    column![
+                        text("Penggunaan Memori")
+                            .size(11)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                        text(format!("{:.1}%", (ram_used_gb / ram_total_gb.max(0.1)) * 100.0))
+                            .size(18)
+                            .font(FONT_DISPLAY_BOLD)
+                            .style(|_| text::Style { color: Some(ACCENT_GREEN) }),
+                    ]
+                    .width(Length::FillPortion(1)),
                 ]
-                .spacing(14)
-                .align_y(Alignment::Center)
-                .padding(16),
+                .spacing(16),
             )
+            .padding(14)
             .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_CYAN));
+            .style(fluent_card_style);
 
-            let ram_ratio = if ram_total_gb > 0.0 {
-                (ram_used_gb / ram_total_gb).clamp(0.0, 1.0)
-            } else {
-                0.2
-            };
-
-            let metrics_row = row![
-                metric_card(
-                    "Penggunaan CPU",
-                    icons::CPU,
-                    format!("{:.0}%", cpu_usage),
-                    (cpu_usage / 100.0).clamp(0.0, 1.0),
-                    cpu_brand,
-                    Some("64-bit x86_64"),
-                    ACCENT_CYAN,
-                ),
-                metric_card(
-                    " Penggunaan Memori RAM",
-                    icons::RAM,
-                    format!("{:.1} GB", ram_used_gb),
-                    ram_ratio,
-                    format!("Total Kapasitas: {:.1} GB", ram_total_gb),
-                    Some("ZRAM Aktif"),
-                    ACCENT_TEAL,
-                ),
-            ]
-            .spacing(12);
-
-            column![hero, metrics_row].spacing(12).into()
+            glass_scrollable(
+                column![
+                    usage_card,
+                    text("SPESIFIKASI PERANGKAT & SUBSISTEM")
+                        .size(11)
+                        .font(FONT_DISPLAY_BOLD)
+                        .style(|_| text::Style { color: Some(FLUENT_TEXT_MUTED) }),
+                    info_col,
+                ]
+                .spacing(12)
+                .padding([0, 4]),
+            )
+            .into()
         }
     };
 
-    let scroll_page = glass_scrollable(page_body).height(Length::Fill);
+    // 4. Combine Top Window Header with Left Sidebar & Right Content Panel
+    let right_panel = container(page_body)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .padding(14)
+        .style(|_| container::Style {
+            background: Some(Background::Color(Color::from_rgb(0.97, 0.98, 0.99))),
+            ..container::Style::default()
+        });
 
-    let right_panel = column![
-        top_header,
-        container(scroll_page)
-            .padding(16)
-            .width(Length::Fill)
-            .height(Length::Fill),
-    ]
-    .width(Length::Fill)
-    .height(Length::Fill);
+    let main_body = row![sidebar, right_panel]
+        .width(Length::Fill)
+        .height(Length::Fill);
 
-    container(row![sidebar, right_panel].width(Length::Fill).height(Length::Fill))
-        .width(w)
-        .height(h)
-        .style(fluent_window_style)
-        .into()
+    container(
+        column![
+            top_header,
+            main_body,
+        ]
+        .width(Length::Fill)
+        .height(Length::Fill),
+    )
+    .width(w)
+    .height(h)
+    .style(fluent_window_style)
+    .into()
 }

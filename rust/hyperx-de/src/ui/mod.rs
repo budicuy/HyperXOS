@@ -1,3 +1,4 @@
+pub mod calendar;
 pub mod context_menu;
 pub mod control_center;
 pub mod dock;
@@ -72,20 +73,70 @@ pub enum DesktopIconAction {
 
 pub const DESKTOP_GRID_ORIGIN_X: f32 = 24.0;
 pub const DESKTOP_GRID_ORIGIN_Y: f32 = 24.0;
-pub const DESKTOP_GRID_CELL_WIDTH: f32 = 104.0;
+pub const DESKTOP_GRID_CELL_WIDTH: f32 = 88.0;
 pub const DESKTOP_GRID_CELL_HEIGHT: f32 = 88.0;
 
-pub fn snap_to_desktop_grid(pt: Point) -> Point {
-    let col = ((pt.x - DESKTOP_GRID_ORIGIN_X + (DESKTOP_GRID_CELL_WIDTH / 2.0)) / DESKTOP_GRID_CELL_WIDTH)
-        .floor()
-        .clamp(0.0, 12.0) as usize;
-    let row = ((pt.y - DESKTOP_GRID_ORIGIN_Y + (DESKTOP_GRID_CELL_HEIGHT / 2.0)) / DESKTOP_GRID_CELL_HEIGHT)
-        .floor()
-        .clamp(0.0, 6.0) as usize;
+pub fn compute_grid_point(col: usize, row: usize) -> Point {
     Point::new(
         DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
         DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
     )
+}
+
+pub fn point_to_grid_slot(pt: Point) -> (usize, usize) {
+    let col = ((pt.x - DESKTOP_GRID_ORIGIN_X + (DESKTOP_GRID_CELL_WIDTH / 2.0)) / DESKTOP_GRID_CELL_WIDTH)
+        .floor()
+        .clamp(0.0, 14.0) as usize;
+    let row = ((pt.y - DESKTOP_GRID_ORIGIN_Y + (DESKTOP_GRID_CELL_HEIGHT / 2.0)) / DESKTOP_GRID_CELL_HEIGHT)
+        .floor()
+        .clamp(0.0, 7.0) as usize;
+    (col, row)
+}
+
+pub fn find_free_desktop_slot(
+    target_slot: (usize, usize),
+    moving_icon_idx: usize,
+    icons: &[DesktopShortcutItem],
+) -> (usize, usize) {
+    let is_occupied = |c: usize, r: usize| -> bool {
+        icons.iter().enumerate().any(|(i, item)| {
+            if i == moving_icon_idx {
+                return false;
+            }
+            let (ic, ir) = point_to_grid_slot(item.pos);
+            ic == c && ir == r
+        })
+    };
+
+    if !is_occupied(target_slot.0, target_slot.1) {
+        return target_slot;
+    }
+
+    for dist in 1..15 {
+        for dr in -(dist as isize)..=(dist as isize) {
+            for dc in -(dist as isize)..=(dist as isize) {
+                if dc.abs() != dist as isize && dr.abs() != dist as isize {
+                    continue;
+                }
+                let c = target_slot.0 as isize + dc;
+                let r = target_slot.1 as isize + dr;
+                if c >= 0 && c <= 14 && r >= 0 && r <= 7 {
+                    let (uc, ur) = (c as usize, r as usize);
+                    if !is_occupied(uc, ur) {
+                        return (uc, ur);
+                    }
+                }
+            }
+        }
+    }
+
+    target_slot
+}
+
+#[allow(dead_code)]
+pub fn snap_to_desktop_grid(pt: Point) -> Point {
+    let (col, row) = point_to_grid_slot(pt);
+    compute_grid_point(col, row)
 }
 
 #[derive(Debug, Clone)]
@@ -108,6 +159,8 @@ pub enum Message {
     ToggleWifiModal,
     ToggleControlCenter,
     ToggleNotificationDrawer,
+    ToggleCalendarFlyout,
+    ClearAllNotifications,
     ToggleLauncher,
     ToggleMissionControl,
     ToggleAppSwitcher,
@@ -125,7 +178,6 @@ pub enum Message {
     CloseQuickLook,
     QuickLookOpenInNotes,
     DismissToast,
-    ClearNotifications,
 
     // Context Menus (Right-Click)
     OpenDesktopContextMenu,
@@ -245,15 +297,17 @@ pub struct HyperXDesktop {
     // Draggable Clean Desktop Icons
     pub desktop_icons: Vec<DesktopShortcutItem>,
     pub dragging_icon: Option<(usize, Point)>,
+    pub drag_start_pos: Option<Point>,
     pub last_cursor_pos: Point,
     pub drag_started_at: Option<Instant>,
     pub drag_moved: bool,
     pub created_desktop_folders: usize,
 
-    // Popovers & macOS HUD Overlays
+    // Popovers & Overlays
     pub wifi_modal_open: bool,
     pub control_center_open: bool,
     pub notification_drawer_open: bool,
+    pub calendar_flyout_open: bool,
     pub launcher_open: bool,
     pub launcher_anim: f32,
     pub launcher_search: String,
@@ -440,6 +494,7 @@ impl HyperXDesktop {
             current_day,
             desktop_icons,
             dragging_icon: None,
+            drag_start_pos: None,
             last_cursor_pos: Point::new(340.0, 260.0),
             drag_started_at: None,
             drag_moved: false,
@@ -448,6 +503,7 @@ impl HyperXDesktop {
             control_center_open: false,
             control_center_anim: 0.0,
             notification_drawer_open: false,
+            calendar_flyout_open: false,
             launcher_open: open_launcher,
             launcher_anim: if open_launcher { 1.0 } else { 0.0 },
             launcher_search: String::new(),
@@ -636,6 +692,7 @@ impl HyperXDesktop {
         self.wifi_modal_open = false;
         self.control_center_open = false;
         self.notification_drawer_open = false;
+        self.calendar_flyout_open = false;
         self.context_menu = None;
     }
 
@@ -703,6 +760,10 @@ impl HyperXDesktop {
                 self.launcher_open = false;
                 return Task::none();
             }
+            if self.calendar_flyout_open {
+                self.calendar_flyout_open = false;
+                return Task::none();
+            }
             if self.file_manager.renaming_index.is_some() {
                 self.file_manager.renaming_index = None;
                 return Task::none();
@@ -736,13 +797,13 @@ impl HyperXDesktop {
         }
 
         if self.app_switcher_open && matches!(key.as_ref(), Key::Named(Named::Enter)) {
-            let all_apps = [
-                DesktopWindowId::Files,
-                DesktopWindowId::Settings,
-                DesktopWindowId::Terminal,
-                DesktopWindowId::Notes,
-            ];
-            let target = all_apps[self.app_switcher_index % all_apps.len()];
+            let running = self.wm.running_windows();
+            let target_apps = if running.is_empty() {
+                vec![DesktopWindowId::Files, DesktopWindowId::Settings]
+            } else {
+                running
+            };
+            let target = target_apps[self.app_switcher_index % target_apps.len()];
             return self.update(Message::SelectAppSwitcherWindow(target));
         }
 
@@ -787,6 +848,9 @@ impl HyperXDesktop {
                 }
                 Key::Character("n" | "N") => {
                     return self.update(Message::ToggleNotificationDrawer);
+                }
+                Key::Character("c" | "C") if !has_ctrl => {
+                    return self.update(Message::ToggleCalendarFlyout);
                 }
                 Key::Named(Named::ArrowUp) => {
                     if let Some(win) = self.wm.focused_window() {
@@ -918,15 +982,17 @@ impl HyperXDesktop {
                     return self.update(Message::DesktopCursorMove(position));
                 }
                 Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
+                    let mut tasks = Vec::new();
                     if self.wm.resizing_window.is_some() {
-                        return self.update(Message::EndWindowResize);
+                        tasks.push(self.update(Message::EndWindowResize));
                     }
                     if self.wm.dragging_window.is_some() {
-                        return self.update(Message::EndWindowDrag);
+                        tasks.push(self.update(Message::EndWindowDrag));
                     }
                     if self.dragging_icon.is_some() {
-                        return self.update(Message::DesktopMouseRelease);
+                        tasks.push(self.update(Message::DesktopMouseRelease));
                     }
+                    return Task::batch(tasks);
                 }
                 Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. }) => {
                     return self.handle_keyboard_shortcut(key, modifiers);
@@ -990,10 +1056,11 @@ impl HyperXDesktop {
                 self.context_menu = None;
                 if let Some(item) = self.desktop_icons.get(idx) {
                     let offset = Point::new(
-                        (self.last_cursor_pos.x - item.pos.x).clamp(0.0, 96.0),
-                        (self.last_cursor_pos.y - item.pos.y).clamp(0.0, 96.0),
+                        (self.last_cursor_pos.x - item.pos.x).clamp(0.0, 76.0),
+                        (self.last_cursor_pos.y - item.pos.y).clamp(0.0, 76.0),
                     );
                     self.dragging_icon = Some((idx, offset));
+                    self.drag_start_pos = Some(self.last_cursor_pos);
                     self.drag_started_at = Some(Instant::now());
                     self.drag_moved = false;
                 }
@@ -1044,28 +1111,43 @@ impl HyperXDesktop {
                     return Task::none();
                 }
 
-                // 3. Handle Desktop Icon Dragging
+                // 3. Handle Desktop Icon Dragging (Anti-Lengket dengan 8px threshold)
                 if let Some((idx, offset)) = self.dragging_icon {
-                    if let Some(item) = self.desktop_icons.get_mut(idx) {
-                        let new_x = (pt.x - offset.x).clamp(12.0, 1240.0);
-                        let new_y = (pt.y - offset.y).clamp(12.0, 540.0);
-                        if (new_x - item.pos.x).abs() > 4.0 || (new_y - item.pos.y).abs() > 4.0 {
+                    if let Some(start_pt) = self.drag_start_pos {
+                        let dist = ((pt.x - start_pt.x).powi(2) + (pt.y - start_pt.y).powi(2)).sqrt();
+                        if dist >= 8.0 {
                             self.drag_moved = true;
                         }
-                        item.pos = Point::new(new_x, new_y);
+                    }
+                    if self.drag_moved {
+                        if let Some(item) = self.desktop_icons.get_mut(idx) {
+                            let new_x = (pt.x - offset.x).clamp(12.0, 1260.0);
+                            let new_y = (pt.y - offset.y).clamp(12.0, 560.0);
+                            item.pos = Point::new(new_x, new_y);
+                        }
                     }
                 }
             }
 
             Message::DesktopMouseRelease => {
-                if let Some((idx, _)) = self.dragging_icon.take() {
-                    if !self.drag_moved {
+                let drag_opt = self.dragging_icon.take();
+                let was_moved = self.drag_moved;
+                self.drag_moved = false;
+                self.drag_start_pos = None;
+
+                if let Some((idx, _)) = drag_opt {
+                    if !was_moved {
                         return self.update(Message::DesktopOpenIcon(idx));
-                    } else if let Some(item) = self.desktop_icons.get_mut(idx) {
-                        item.pos = snap_to_desktop_grid(item.pos);
+                    } else {
+                        let target_slot = self.desktop_icons.get(idx).map(|item| point_to_grid_slot(item.pos));
+                        if let Some(target_slot) = target_slot {
+                            let free_slot = find_free_desktop_slot(target_slot, idx, &self.desktop_icons);
+                            if let Some(item) = self.desktop_icons.get_mut(idx) {
+                                item.pos = compute_grid_point(free_slot.0, free_slot.1);
+                            }
+                        }
                     }
                 }
-                self.drag_moved = false;
             }
 
             Message::DesktopCreateNewFolder => {
@@ -1145,6 +1227,7 @@ impl HyperXDesktop {
                 if self.wifi_modal_open {
                     self.control_center_open = false;
                     self.notification_drawer_open = false;
+                    self.calendar_flyout_open = false;
                     self.context_menu = None;
                 }
             }
@@ -1154,6 +1237,7 @@ impl HyperXDesktop {
                 if self.control_center_open {
                     self.wifi_modal_open = false;
                     self.notification_drawer_open = false;
+                    self.calendar_flyout_open = false;
                     self.context_menu = None;
                 }
             }
@@ -1163,9 +1247,25 @@ impl HyperXDesktop {
                 if self.notification_drawer_open {
                     self.wifi_modal_open = false;
                     self.control_center_open = false;
+                    self.calendar_flyout_open = false;
                     self.active_toast = None;
                     self.context_menu = None;
                 }
+            }
+
+            Message::ToggleCalendarFlyout => {
+                self.calendar_flyout_open = !self.calendar_flyout_open;
+                if self.calendar_flyout_open {
+                    self.wifi_modal_open = false;
+                    self.control_center_open = false;
+                    self.notification_drawer_open = false;
+                    self.context_menu = None;
+                }
+            }
+
+            Message::ClearAllNotifications => {
+                self.notifications.clear();
+                self.active_toast = None;
             }
 
             Message::ToggleLauncher => {
@@ -1191,11 +1291,12 @@ impl HyperXDesktop {
             }
 
             Message::ToggleAppSwitcher => {
+                let running_count = self.wm.running_windows().len().max(1);
                 if !self.app_switcher_open {
                     self.app_switcher_open = true;
                     self.app_switcher_index = 0;
                 } else {
-                    self.app_switcher_index = (self.app_switcher_index + 1) % 4;
+                    self.app_switcher_index = (self.app_switcher_index + 1) % running_count;
                 }
                 self.launcher_open = false;
                 self.mission_control_open = false;
@@ -1298,11 +1399,6 @@ impl HyperXDesktop {
             }
 
             Message::DismissToast => {
-                self.active_toast = None;
-            }
-
-            Message::ClearNotifications => {
-                self.notifications.clear();
                 self.active_toast = None;
             }
 
@@ -1846,6 +1942,7 @@ impl HyperXDesktop {
             self.audio.volume,
             self.audio.muted,
             self.notifications.len(),
+            self.calendar_flyout_open,
             self.wifi_modal_open,
             self.control_center_open,
             self.notification_drawer_open,
@@ -1902,6 +1999,22 @@ impl HyperXDesktop {
 
         layers.push(base_layout.into());
 
+        if self.calendar_flyout_open {
+            let cal_overlay = container(
+                row![
+                    container("").width(Length::Fill),
+                    calendar::view_calendar_flyout(
+                        &self.date_header_str,
+                        self.current_day,
+                    ),
+                ]
+                .padding([46, 68]),
+            )
+            .width(Length::Fill)
+            .height(Length::Fill);
+            layers.push(cal_overlay.into());
+        }
+
         if self.wifi_modal_open {
             let wifi_overlay = container(
                 row![
@@ -1922,17 +2035,11 @@ impl HyperXDesktop {
 
         if self.notification_drawer_open {
             let notif_overlay = container(
-                column![
-                    container(notifications::view_notification_drawer(
-                        &self.date_header_str,
-                        self.current_day,
-                        &self.notifications,
-                    ))
-                    .width(Length::Fill)
-                    .center_x(Length::Fill),
-                    container("").height(Length::Fill),
+                row![
+                    container("").width(Length::Fill),
+                    notifications::view_notification_drawer(&self.notifications),
                 ]
-                .padding([42, 0]),
+                .padding([46, 20]),
             )
             .width(Length::Fill)
             .height(Length::Fill);
@@ -2005,9 +2112,8 @@ impl HyperXDesktop {
 
         if self.launcher_anim > 0.005 {
             let t = 1.0 - (1.0 - self.launcher_anim).powi(3);
-            let dy = (1.0 - t) * 40.0;
-            let bg_alpha = 0.40 * t;
-            let bottom_offset = (74.0 - dy).max(10.0);
+            let dy = (1.0 - t) * 35.0;
+            let bottom_offset = (88.0 - dy).max(88.0);
 
             let launcher_card = launcher::view_launcher(
                 &self.launcher_search,
@@ -2028,8 +2134,8 @@ impl HyperXDesktop {
             let launcher_overlay = container(content)
                 .width(Length::Fill)
                 .height(Length::Fill)
-                .style(move |_| container::Style {
-                    background: Some(Background::Color(Color::from_rgba(0.01, 0.02, 0.04, bg_alpha))),
+                .style(|_| container::Style {
+                    background: Some(Background::Color(Color::TRANSPARENT)),
                     ..container::Style::default()
                 });
             layers.push(launcher_overlay.into());
@@ -2256,21 +2362,30 @@ impl HyperXDesktop {
                             color: Some(Color::WHITE),
                         }),
                 ]
-                .spacing(5)
+                .spacing(3)
                 .align_x(Alignment::Center),
             )
-            .width(Length::Fixed(92.0))
-            .height(Length::Fixed(80.0))
-            .padding([4, 4])
+            .width(Length::Fixed(76.0))
+            .height(Length::Fixed(74.0))
+            .padding([3, 2])
             .style(|_theme, status| {
-                let bg = match status {
-                    button::Status::Hovered => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
-                    button::Status::Pressed => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.28))),
-                    _ => None,
+                let (bg, border_color) = match status {
+                    button::Status::Hovered => (
+                        Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.16))),
+                        Color::from_rgba(1.0, 1.0, 1.0, 0.22),
+                    ),
+                    button::Status::Pressed => (
+                        Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.26))),
+                        Color::from_rgba(1.0, 1.0, 1.0, 0.35),
+                    ),
+                    _ => (None, Color::TRANSPARENT),
                 };
                 button::Style {
                     background: bg,
-                    border: Border::default().rounded(Radius::from(10.0)),
+                    border: Border::default()
+                        .rounded(Radius::from(6.0))
+                        .width(1.0)
+                        .color(border_color),
                     ..button::Style::default()
                 }
             })

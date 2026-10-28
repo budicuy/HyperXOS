@@ -239,6 +239,42 @@ impl VmEngine {
         std::thread::sleep(Duration::from_secs(2));
         let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_control_center.png"));
 
+        // 5. Close Action Center, Open Fluent Settings via Super+I
+        send_hmp("sendkey meta_l-a");
+        std::thread::sleep(Duration::from_millis(500));
+        send_hmp("sendkey meta_l-i");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_settings.png"));
+
+        // 6. Close Settings via Alt+F4
+        send_hmp("sendkey alt-f4");
+        std::thread::sleep(Duration::from_millis(500));
+
+        // 7. Open Files via Super+E, then trigger dynamic Alt+Tab App Switcher!
+        send_hmp("sendkey meta_l-e");
+        std::thread::sleep(Duration::from_secs(1));
+        send_hmp("sendkey alt-tab");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_alt_tab.png"));
+        send_hmp("sendkey ret");
+        std::thread::sleep(Duration::from_millis(500));
+        send_hmp("sendkey alt-f4");
+        std::thread::sleep(Duration::from_millis(500));
+
+        // 8. Open Windows 11 Calendar Flyout via Super+C
+        send_hmp("sendkey meta_l-c");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_calendar.png"));
+        send_hmp("sendkey meta_l-c");
+        std::thread::sleep(Duration::from_millis(500));
+
+        // 9. Open Windows 11 Notification Flyout via Super+N
+        send_hmp("sendkey meta_l-n");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_notifications.png"));
+        send_hmp("sendkey meta_l-n");
+        std::thread::sleep(Duration::from_millis(500));
+
         println!("  [✓] [smoke] Installed system smoke test PASSED.");
         Ok(())
     }
