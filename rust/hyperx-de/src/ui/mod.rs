@@ -30,7 +30,7 @@ use sysinfo::System;
 use hyperx_ui_kit::{
     app_icon, fluent_desktop_icon_tile_style, icons, svg_icon,
     ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED, FLUENT_PRIMARY,
-    FONT_BODY_SEMIBOLD, TEXT_MAIN,
+    FONT_BODY_SEMIBOLD,
 };
 
 use crate::compositor::CompositorSnapshot;
@@ -70,6 +70,24 @@ pub enum DesktopIconAction {
     OpenDirectory(PathBuf),
 }
 
+pub const DESKTOP_GRID_ORIGIN_X: f32 = 24.0;
+pub const DESKTOP_GRID_ORIGIN_Y: f32 = 24.0;
+pub const DESKTOP_GRID_CELL_WIDTH: f32 = 104.0;
+pub const DESKTOP_GRID_CELL_HEIGHT: f32 = 88.0;
+
+pub fn snap_to_desktop_grid(pt: Point) -> Point {
+    let col = ((pt.x - DESKTOP_GRID_ORIGIN_X + (DESKTOP_GRID_CELL_WIDTH / 2.0)) / DESKTOP_GRID_CELL_WIDTH)
+        .floor()
+        .clamp(0.0, 12.0) as usize;
+    let row = ((pt.y - DESKTOP_GRID_ORIGIN_Y + (DESKTOP_GRID_CELL_HEIGHT / 2.0)) / DESKTOP_GRID_CELL_HEIGHT)
+        .floor()
+        .clamp(0.0, 6.0) as usize;
+    Point::new(
+        DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
+        DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
+    )
+}
+
 #[derive(Debug, Clone)]
 pub struct DesktopShortcutItem {
     pub title: String,
@@ -83,6 +101,7 @@ pub struct DesktopShortcutItem {
 #[derive(Debug, Clone)]
 pub enum Message {
     Tick,
+    AnimTick,
     RuntimeEvent(Event),
 
     // Popovers & HUD Overlays
@@ -236,7 +255,9 @@ pub struct HyperXDesktop {
     pub control_center_open: bool,
     pub notification_drawer_open: bool,
     pub launcher_open: bool,
+    pub launcher_anim: f32,
     pub launcher_search: String,
+    pub control_center_anim: f32,
     pub mission_control_open: bool,
     pub app_switcher_open: bool,
     pub app_switcher_index: usize,
@@ -336,7 +357,16 @@ impl HyperXDesktop {
             || std::path::Path::new("/usr/local/bin/launch-installer").exists();
 
         let mut desktop_icons = Vec::new();
-        let mut y_offset = 24.0;
+        let mut icon_grid_idx = 0;
+        let mut next_grid_pos = || {
+            let col = icon_grid_idx / 6;
+            let row = icon_grid_idx % 6;
+            icon_grid_idx += 1;
+            Point::new(
+                DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
+                DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
+            )
+        };
 
         if has_installer {
             desktop_icons.push(DesktopShortcutItem {
@@ -345,9 +375,8 @@ impl HyperXDesktop {
                 app_icon_name: "hyper-x-installer".to_string(),
                 svg_color: FLUENT_PRIMARY,
                 action: DesktopIconAction::External("launch-installer".to_string()),
-                pos: Point::new(24.0, y_offset),
+                pos: next_grid_pos(),
             });
-            y_offset += 86.0;
         }
 
         desktop_icons.push(DesktopShortcutItem {
@@ -356,9 +385,8 @@ impl HyperXDesktop {
             app_icon_name: String::new(),
             svg_color: FLUENT_PRIMARY,
             action: DesktopIconAction::Internal(DesktopWindowId::Files),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
-        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "Keranjang Sampah".to_string(),
@@ -366,9 +394,8 @@ impl HyperXDesktop {
             app_icon_name: String::new(),
             svg_color: Color::from_rgb8(100, 116, 139),
             action: DesktopIconAction::Internal(DesktopWindowId::Files),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
-        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "Dokumen".to_string(),
@@ -376,9 +403,8 @@ impl HyperXDesktop {
             app_icon_name: String::new(),
             svg_color: Color::from_rgb8(245, 158, 11),
             action: DesktopIconAction::Internal(DesktopWindowId::Files),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
-        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "Terminal".to_string(),
@@ -386,9 +412,8 @@ impl HyperXDesktop {
             app_icon_name: String::new(),
             svg_color: Color::from_rgb8(16, 185, 129),
             action: DesktopIconAction::Internal(DesktopWindowId::Terminal),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
-        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "Browser".to_string(),
@@ -396,9 +421,8 @@ impl HyperXDesktop {
             app_icon_name: "firefox".to_string(),
             svg_color: Color::from_rgb8(0, 120, 212),
             action: DesktopIconAction::External("firefox".to_string()),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
-        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "HyperXTools".to_string(),
@@ -406,7 +430,7 @@ impl HyperXDesktop {
             app_icon_name: "hyper-x-tools".to_string(),
             svg_color: ACCENT_PURPLE,
             action: DesktopIconAction::External("hyper-x-tools".to_string()),
-            pos: Point::new(24.0, y_offset),
+            pos: next_grid_pos(),
         });
 
         let mut state = Self {
@@ -422,8 +446,10 @@ impl HyperXDesktop {
             created_desktop_folders: 0,
             wifi_modal_open: false,
             control_center_open: false,
+            control_center_anim: 0.0,
             notification_drawer_open: false,
             launcher_open: open_launcher,
+            launcher_anim: if open_launcher { 1.0 } else { 0.0 },
             launcher_search: String::new(),
             mission_control_open: false,
             app_switcher_open: false,
@@ -614,10 +640,21 @@ impl HyperXDesktop {
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
-        Subscription::batch(vec![
+        let is_animating = (self.launcher_open && self.launcher_anim < 1.0)
+            || (!self.launcher_open && self.launcher_anim > 0.0)
+            || (self.control_center_open && self.control_center_anim < 1.0)
+            || (!self.control_center_open && self.control_center_anim > 0.0);
+
+        let mut subs = vec![
             iced::time::every(Duration::from_secs(2)).map(|_| Message::Tick),
             iced::event::listen().map(Message::RuntimeEvent),
-        ])
+        ];
+
+        if is_animating {
+            subs.push(iced::time::every(Duration::from_millis(16)).map(|_| Message::AnimTick));
+        }
+
+        Subscription::batch(subs)
     }
 
     fn handle_keyboard_shortcut(&mut self, key: Key, modifiers: Modifiers) -> Task<Message> {
@@ -861,6 +898,21 @@ impl HyperXDesktop {
                 }
             }
 
+            Message::AnimTick => {
+                let step = 0.14;
+                if self.launcher_open {
+                    self.launcher_anim = (self.launcher_anim + step).min(1.0);
+                } else {
+                    self.launcher_anim = (self.launcher_anim - step).max(0.0);
+                }
+
+                if self.control_center_open {
+                    self.control_center_anim = (self.control_center_anim + step).min(1.0);
+                } else {
+                    self.control_center_anim = (self.control_center_anim - step).max(0.0);
+                }
+            }
+
             Message::RuntimeEvent(ev) => match ev {
                 Event::Mouse(mouse::Event::CursorMoved { position }) => {
                     return self.update(Message::DesktopCursorMove(position));
@@ -871,6 +923,9 @@ impl HyperXDesktop {
                     }
                     if self.wm.dragging_window.is_some() {
                         return self.update(Message::EndWindowDrag);
+                    }
+                    if self.dragging_icon.is_some() {
+                        return self.update(Message::DesktopMouseRelease);
                     }
                 }
                 Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. }) => {
@@ -1006,6 +1061,8 @@ impl HyperXDesktop {
                 if let Some((idx, _)) = self.dragging_icon.take() {
                     if !self.drag_moved {
                         return self.update(Message::DesktopOpenIcon(idx));
+                    } else if let Some(item) = self.desktop_icons.get_mut(idx) {
+                        item.pos = snap_to_desktop_grid(item.pos);
                     }
                 }
                 self.drag_moved = false;
@@ -1024,11 +1081,12 @@ impl HyperXDesktop {
                 };
                 let _ = fs::create_dir_all(&target_dir);
 
-                let row_idx = (self.created_desktop_folders - 1) % 5;
-                let col_idx = 1 + ((self.created_desktop_folders - 1) / 5);
+                let idx = self.desktop_icons.len();
+                let col = idx / 6;
+                let row = idx % 6;
                 let pos = Point::new(
-                    28.0 + (col_idx as f32) * 116.0,
-                    20.0 + (row_idx as f32) * 98.0,
+                    DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
+                    DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
                 );
 
                 self.desktop_icons.push(DesktopShortcutItem {
@@ -1052,11 +1110,14 @@ impl HyperXDesktop {
                 for (i, icon) in self.desktop_icons.iter_mut().enumerate() {
                     let col = i / 6;
                     let row = i % 6;
-                    icon.pos = Point::new(28.0 + (col as f32) * 116.0, 20.0 + (row as f32) * 96.0);
+                    icon.pos = Point::new(
+                        DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
+                        DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
+                    );
                 }
                 self.push_notification(
                     "Desktop HyperXOS",
-                    "Seluruh ikon desktop dirapikan ke susunan Grid.",
+                    "Seluruh ikon desktop dirapikan ke susunan kolom vertikal.",
                     ACCENT_CYAN,
                 );
             }
@@ -1442,7 +1503,10 @@ impl HyperXDesktop {
                     let idx = self.desktop_icons.len();
                     let col = idx / 6;
                     let row = idx % 6;
-                    let pos = Point::new(28.0 + (col as f32) * 116.0, 20.0 + (row as f32) * 96.0);
+                    let pos = Point::new(
+                        DESKTOP_GRID_ORIGIN_X + (col as f32) * DESKTOP_GRID_CELL_WIDTH,
+                        DESKTOP_GRID_ORIGIN_Y + (row as f32) * DESKTOP_GRID_CELL_HEIGHT,
+                    );
                     let svg_icon_data = if app.icon_key == "terminal" {
                         Some(icons::TERMINAL)
                     } else {
@@ -1875,7 +1939,11 @@ impl HyperXDesktop {
             layers.push(notif_overlay.into());
         }
 
-        if self.control_center_open {
+        if self.control_center_anim > 0.005 {
+            let t = 1.0 - (1.0 - self.control_center_anim).powi(3);
+            let dy = (1.0 - t) * 20.0;
+            let top_offset = (52.0 - dy).max(36.0);
+
             let cc_overlay = container(
                 row![
                     container("").width(Length::Fill),
@@ -1893,7 +1961,7 @@ impl HyperXDesktop {
                         self.ram_total_gb,
                     ),
                 ]
-                .padding([42, 14]),
+                .padding([top_offset as u16, 20]),
             )
             .width(Length::Fill)
             .height(Length::Fill);
@@ -1935,20 +2003,35 @@ impl HyperXDesktop {
             ));
         }
 
-        if self.launcher_open {
-            let launcher_overlay = container(launcher::view_launcher(
+        if self.launcher_anim > 0.005 {
+            let t = 1.0 - (1.0 - self.launcher_anim).powi(3);
+            let dy = (1.0 - t) * 40.0;
+            let bg_alpha = 0.40 * t;
+            let bottom_offset = (74.0 - dy).max(10.0);
+
+            let launcher_card = launcher::view_launcher(
                 &self.launcher_search,
                 &self.desktop_apps,
                 &self.pinned_dock_apps,
-            ))
+            );
+
+            let content = column![
+                mouse_area(container("").width(Length::Fill).height(Length::Fill))
+                    .on_press(Message::ToggleLauncher),
+                launcher_card,
+                container("").height(Length::Fixed(bottom_offset)),
+            ]
             .width(Length::Fill)
             .height(Length::Fill)
-            .center_x(Length::Fill)
-            .center_y(Length::Fill)
-            .style(|_| container::Style {
-                background: Some(Background::Color(Color::from_rgba(0.02, 0.03, 0.06, 0.72))),
-                ..container::Style::default()
-            });
+            .align_x(Alignment::Center);
+
+            let launcher_overlay = container(content)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .style(move |_| container::Style {
+                    background: Some(Background::Color(Color::from_rgba(0.01, 0.02, 0.04, bg_alpha))),
+                    ..container::Style::default()
+                });
             layers.push(launcher_overlay.into());
         }
 
@@ -2170,14 +2253,14 @@ impl HyperXDesktop {
                         .size(11)
                         .font(FONT_BODY_SEMIBOLD)
                         .style(|_| text::Style {
-                            color: Some(TEXT_MAIN),
+                            color: Some(Color::WHITE),
                         }),
                 ]
                 .spacing(5)
                 .align_x(Alignment::Center),
             )
-            .width(Length::Fixed(88.0))
-            .height(Length::Fixed(76.0))
+            .width(Length::Fixed(92.0))
+            .height(Length::Fixed(80.0))
             .padding([4, 4])
             .style(|_theme, status| {
                 let bg = match status {

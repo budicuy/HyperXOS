@@ -2,12 +2,12 @@ use iced::widget::{button, column, container, mouse_area, row, slider, text, tex
 use iced::{Alignment, Background, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    active_toggle_button_style, brand_sidebar_header, glass_action_button, glass_card_accent_style,
-    glass_card_style, glass_input_style, glass_scrollable, glass_slider_style, glass_window_style,
-    icons, logo_image, metric_card, primary_button_style, sidebar_container_style,
-    sidebar_nav_item, sidebar_section_header, status_pill, svg_icon, window_header_bar,
-    ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_TEAL, FONT_BODY_MEDIUM,
-    FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD, TEXT_MUTED, TEXT_SUB,
+    active_toggle_button_style, fluent_sidebar_container_style, fluent_sidebar_nav_item,
+    fluent_window_header_bar, fluent_window_style, glass_action_button, glass_card_accent_style,
+    glass_card_style, glass_input_style, glass_scrollable, glass_slider_style, icons, logo_image,
+    metric_card, primary_button_style, status_pill, svg_icon, ACCENT_AMBER, ACCENT_CYAN,
+    ACCENT_GREEN, ACCENT_PURPLE, ACCENT_TEAL, FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD,
+    FONT_DISPLAY_BOLD, TEXT_MUTED, TEXT_SUB,
 };
 
 use crate::sys::network::NetworkState;
@@ -65,70 +65,110 @@ pub fn view_settings<'a>(
     w: Length,
     h: Length,
 ) -> Element<'a, Message> {
-    // 1. Signature Red-Orange Sidebar (matching hyper-x-tools)
-    let brand = brand_sidebar_header("HYPERX SETTINGS", "Pusat Konfigurasi OS");
+    // 1. Modern Fluent Sidebar
+    let brand = container(
+        row![
+            logo_image(22.0),
+            column![
+                text("Pengaturan")
+                    .size(13)
+                    .font(FONT_DISPLAY_BOLD)
+                    .style(|_| text::Style {
+                        color: Some(Color::from_rgb(0.12, 0.14, 0.17)),
+                    }),
+                text("HyperX Fluent Control")
+                    .size(10)
+                    .font(FONT_BODY_MEDIUM)
+                    .style(|_| text::Style {
+                        color: Some(Color::from_rgb(0.45, 0.50, 0.58)),
+                    }),
+            ]
+            .spacing(1),
+        ]
+        .spacing(8)
+        .align_y(Alignment::Center),
+    )
+    .padding([4, 6]);
 
     let sep = container("")
         .width(Length::Fill)
         .height(1)
         .style(|_| container::Style {
-            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.20))),
+            background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08))),
             ..container::Style::default()
         });
 
+    let section_label = |name: &'static str| {
+        text(name)
+            .size(10)
+            .font(FONT_DISPLAY_BOLD)
+            .style(|_| text::Style {
+                color: Some(Color::from_rgb(0.55, 0.58, 0.64)),
+            })
+    };
+
     let nav_links = column![
-        sidebar_section_header("KONEKTIVITAS"),
-        sidebar_nav_item(
+        section_label("KONEKTIVITAS"),
+        fluent_sidebar_nav_item(
             "Wi-Fi & Jaringan",
             icons::WIFI,
             state.active_tab == SettingsTab::Network,
+            Color::from_rgb(0.0, 0.47, 0.83),
             Message::SelectSettingsTab(SettingsTab::Network),
         ),
-        sidebar_nav_item(
+        fluent_sidebar_nav_item(
             "Bluetooth",
             icons::BLUETOOTH,
             state.active_tab == SettingsTab::Bluetooth,
+            Color::from_rgb(0.55, 0.36, 0.96),
             Message::SelectSettingsTab(SettingsTab::Bluetooth),
         ),
-        sidebar_section_header("PERANGKAT & MULTIMEDIA"),
-        sidebar_nav_item(
+        section_label("PERANGKAT & MULTIMEDIA"),
+        fluent_sidebar_nav_item(
             "Suara & Audio",
             icons::VOLUME_HIGH,
             state.active_tab == SettingsTab::Audio,
+            Color::from_rgb(0.96, 0.62, 0.04),
             Message::SelectSettingsTab(SettingsTab::Audio),
         ),
-        sidebar_nav_item(
+        fluent_sidebar_nav_item(
             "Tampilan & Layar",
             icons::GPU,
             state.active_tab == SettingsTab::Display,
+            Color::from_rgb(0.06, 0.65, 0.38),
             Message::SelectSettingsTab(SettingsTab::Display),
         ),
-        sidebar_section_header("DESKTOP & SISTEM"),
-        sidebar_nav_item(
+        section_label("DESKTOP & SISTEM"),
+        fluent_sidebar_nav_item(
             "Wallpaper & Dock",
             icons::SPARKLES,
             state.active_tab == SettingsTab::Appearance,
+            Color::from_rgb(0.55, 0.36, 0.96),
             Message::SelectSettingsTab(SettingsTab::Appearance),
         ),
-        sidebar_nav_item(
+        fluent_sidebar_nav_item(
             "Tentang Sistem",
             icons::INFO,
             state.active_tab == SettingsTab::About,
+            Color::from_rgb(0.0, 0.47, 0.83),
             Message::SelectSettingsTab(SettingsTab::About),
         ),
     ]
-    .spacing(6);
+    .spacing(4);
 
     let sidebar_footer = container(
         column![
             text("HyperXOS 2026.10")
                 .size(11)
-                .font(FONT_DISPLAY_BOLD),
+                .font(FONT_DISPLAY_BOLD)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.12, 0.14, 0.17)),
+                }),
             text("Smithay + Iced 0.14 WGPU")
                 .size(9)
                 .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
-                    color: Some(TEXT_SUB),
+                    color: Some(Color::from_rgb(0.45, 0.50, 0.58)),
                 }),
         ]
         .spacing(3),
@@ -150,10 +190,10 @@ pub fn view_settings<'a>(
     )
     .width(Length::Fixed(225.0))
     .height(Length::Fill)
-    .style(sidebar_container_style);
+    .style(fluent_sidebar_container_style);
 
     // 2. Right Panel Header
-    let (tab_title, tab_sub, tab_icon, tab_accent) = match state.active_tab {
+    let (tab_title, _tab_sub, tab_icon, tab_accent) = match state.active_tab {
         SettingsTab::Network => (
             "Wi-Fi & Jaringan (NetworkManager)",
             "Kelola koneksi nirkabel, alamat IPv4, dan pemindaian SSID",
@@ -192,9 +232,9 @@ pub fn view_settings<'a>(
         ),
     };
 
-    let top_header = mouse_area(window_header_bar(
+    let top_header = mouse_area(fluent_window_header_bar(
+        "HyperX Settings",
         tab_title,
-        tab_sub,
         tab_icon,
         tab_accent,
         Message::MinimizeWindow(DesktopWindowId::Settings),
@@ -798,6 +838,6 @@ pub fn view_settings<'a>(
     container(row![sidebar, right_panel].width(Length::Fill).height(Length::Fill))
         .width(w)
         .height(h)
-        .style(glass_window_style)
+        .style(fluent_window_style)
         .into()
 }

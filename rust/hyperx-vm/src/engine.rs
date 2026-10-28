@@ -232,6 +232,13 @@ impl VmEngine {
         std::thread::sleep(Duration::from_secs(2));
         let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_explorer.png"));
 
+        // 4. Close Explorer, Open Action Center / Quick Settings via Super+A
+        send_hmp("sendkey alt-f4");
+        std::thread::sleep(Duration::from_millis(500));
+        send_hmp("sendkey meta_l-a");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_control_center.png"));
+
         println!("  [✓] [smoke] Installed system smoke test PASSED.");
         Ok(())
     }

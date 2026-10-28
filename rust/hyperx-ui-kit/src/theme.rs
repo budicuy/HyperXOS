@@ -350,6 +350,62 @@ pub fn fluent_sidebar_container_style(_theme: &iced::Theme) -> container::Style 
     }
 }
 
+pub fn fluent_quick_toggle_style(is_active: bool) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
+    move |_theme, status| {
+        if is_active {
+            let bg = match status {
+                button::Status::Hovered => Color::from_rgb8(43, 136, 216),
+                button::Status::Pressed => Color::from_rgb8(16, 110, 190),
+                _ => FLUENT_PRIMARY,
+            };
+            button::Style {
+                background: Some(Background::Color(bg)),
+                text_color: Color::WHITE,
+                border: Border::default().rounded(Radius::from(10.0)),
+                ..button::Style::default()
+            }
+        } else {
+            let bg = match status {
+                button::Status::Hovered => Color::from_rgba(0.0, 0.0, 0.0, 0.06),
+                button::Status::Pressed => Color::from_rgba(0.0, 0.0, 0.0, 0.10),
+                _ => Color::from_rgba(1.0, 1.0, 1.0, 0.85),
+            };
+            button::Style {
+                background: Some(Background::Color(bg)),
+                text_color: FLUENT_TEXT_DARK,
+                border: Border::default()
+                    .rounded(Radius::from(10.0))
+                    .width(1.0)
+                    .color(FLUENT_BORDER_LIGHT),
+                ..button::Style::default()
+            }
+        }
+    }
+}
+
+pub fn fluent_slider_style(_theme: &iced::Theme, status: slider::Status) -> slider::Style {
+    let handle_col = match status {
+        slider::Status::Hovered | slider::Status::Dragged => Color::from_rgb8(43, 136, 216),
+        _ => FLUENT_PRIMARY,
+    };
+    slider::Style {
+        rail: slider::Rail {
+            backgrounds: (
+                Background::Color(FLUENT_PRIMARY),
+                Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.12)),
+            ),
+            width: 4.0,
+            border: Border::default().rounded(Radius::from(2.0)),
+        },
+        handle: slider::Handle {
+            shape: slider::HandleShape::Circle { radius: 8.0 },
+            background: Background::Color(Color::WHITE),
+            border_width: 2.0,
+            border_color: handle_col,
+        },
+    }
+}
+
 pub fn popover_glass_style(accent: Color) -> impl Fn(&iced::Theme) -> container::Style {
     move |_theme| {
         let gradient = Linear::new(Radians(0.785))
