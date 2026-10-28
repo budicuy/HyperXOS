@@ -4,7 +4,7 @@ use std::process::Command;
 use crate::util::run_stream;
 
 pub fn run_vm(root: &Path, mode: &str) -> Result<(), String> {
-    let hyperx_vm_bin = root.join("rust/hyperx-vm/target/release/hyperx-vm");
+    let hyperx_vm_bin = root.join("rust/target/release/hyperx-vm");
 
     if !hyperx_vm_bin.exists() {
         println!("==> [HyperXOS] Compiling 'hyperx-vm' (Pure Rust Virtual Machine Manager)...");
@@ -13,7 +13,9 @@ pub fn run_vm(root: &Path, mode: &str) -> Result<(), String> {
             "build",
             "--release",
             "--manifest-path",
-            root.join("rust/hyperx-vm/Cargo.toml").to_str().unwrap(),
+            root.join("rust/Cargo.toml").to_str().unwrap(),
+            "--bin",
+            "hyperx-vm",
         ]);
         run_stream(&mut build, "cargo build hyperx-vm")?;
     }

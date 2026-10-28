@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=HyperXOS Desktop (Smithay Wayland)
+Comment=Unified HyperXOS Desktop Environment powered by Smithay Wayland Compositor & Iced WGPU
+Exec=/usr/bin/hyperx-de
+Type=Application
+DesktopNames=HyperXOS;hyperx-de
+Keywords=wayland;compositor;desktop;hyperxos;smithay;

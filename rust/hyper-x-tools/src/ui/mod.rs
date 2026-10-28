@@ -1,6 +1,4 @@
-pub mod components;
-pub mod header;
-pub mod icons;
 pub mod pages;
 pub mod sidebar;
-pub mod theme;
+
+pub use hyperx_ui_kit::{components, icons, theme};

@@ -13,16 +13,11 @@ use crate::core::package_manager::{PackageManager, StorePackage};
 use crate::core::snapshot_manager::{SnapshotManager, SnapshotRecord};
 use crate::core::system_monitor::{SystemMetrics, SystemMonitor};
 use crate::core::system_tweaker::SystemTweaker;
-use crate::ui::header::header;
 use crate::ui::sidebar::{sidebar, Page};
-
-fn load_window_icon() -> Option<iced::window::Icon> {
-    let bytes = include_bytes!("../assets/logo.png");
-    let img = image::load_from_memory(bytes).ok()?;
-    let rgba = img.to_rgba8();
-    let (width, height) = rgba.dimensions();
-    iced::window::icon::from_rgba(rgba.into_raw(), width, height).ok()
-}
+use hyperx_ui_kit::{
+    load_window_icon, open_external_url, tools_header, FONT_BODY, FONT_INTER_BYTES,
+    FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
+};
 
 fn main() -> iced::Result {
     let window_settings = window::Settings {
@@ -45,15 +40,15 @@ fn main() -> iced::Result {
         App::view,
     )
     .title("HyperXTools — Control Center & System Dashboard")
-    .font(include_bytes!("../assets/fonts/PlusJakartaSans.ttf").as_slice())
-    .font(include_bytes!("../assets/fonts/Inter.ttf").as_slice())
-    .default_font(crate::ui::theme::FONT_BODY)
+    .font(FONT_PLUS_JAKARTA_BYTES)
+    .font(FONT_INTER_BYTES)
+    .default_font(FONT_BODY)
     .window(window_settings)
     .subscription(App::subscription)
     .theme(|_: &App| iced::Theme::Dark)
     .style(|_: &App, _: &iced::Theme| iced::theme::Style {
         background_color: iced::Color::TRANSPARENT,
-        text_color: crate::ui::theme::TEXT_MAIN,
+        text_color: TEXT_MAIN,
     })
     .run()
 }
@@ -248,9 +243,7 @@ impl App {
                 window::latest().and_then(window::close)
             }
             Message::OpenUrl(url) => {
-                let _ = std::process::Command::new("xdg-open")
-                    .arg(url)
-                    .spawn();
+                open_external_url(url);
                 Task::none()
             }
             Message::HeaderBtnHovered(btn) => {
@@ -505,7 +498,7 @@ impl App {
 
     pub fn view(&self) -> Element<'_, Message> {
         let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
-        let head = header(
+        let head = tools_header(
             self.hovered_header_btn,
             Message::HeaderBtnHovered,
             Message::OpenUrl,

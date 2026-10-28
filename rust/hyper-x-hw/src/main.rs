@@ -32,9 +32,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
-                println!("============================================================");
-                println!("  HyperXOS Hardware & Graphics Diagnostic Engine (Pure Rust)");
-                println!("============================================================");
+                hyperx_ui_kit::print_cli_banner(
+                    "HyperXOS Hardware & Graphics Diagnostic Engine (Pure Rust)",
+                    None,
+                );
                 println!("Virtualization: {}", virt.display_name());
                 println!("Detected Display GPUs: {}", gpu_diag.total_gpus);
                 for card in &gpu_diag.detected_cards {

@@ -6,8 +6,6 @@ use crate::core::partitioner::PartitionLayout;
 
 #[derive(Debug, Clone)]
 pub struct FilesystemContext {
-    pub boot_partition: String,
-    pub root_partition: String,
     pub boot_uuid: String,
     pub root_uuid: String,
 }
@@ -133,8 +131,6 @@ impl FilesystemManager {
         let root_uuid = Self::get_uuid(&layout.root_partition)?;
 
         Ok(FilesystemContext {
-            boot_partition: layout.boot_partition.clone(),
-            root_partition: layout.root_partition.clone(),
             boot_uuid,
             root_uuid,
         })

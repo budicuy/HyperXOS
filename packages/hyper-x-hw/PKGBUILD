@@ -12,12 +12,12 @@ provides=('hw-detect-gpu')
 conflicts=('hw-detect-gpu')
 
 build() {
-    cd "${startdir}/../../rust/hyper-x-hw"
-    cargo build --release --locked
+    cd "${startdir}/../../rust"
+    cargo build --release --bin hyper-x-hw --locked
 }
 
 package() {
-    install -Dm755 "${startdir}/../../rust/hyper-x-hw/target/release/hyper-x-hw" "${pkgdir}/usr/bin/hyper-x-hw"
+    install -Dm755 "${startdir}/../../rust/target/release/hyper-x-hw" "${pkgdir}/usr/bin/hyper-x-hw"
     install -d "${pkgdir}/usr/local/bin"
     ln -sf /usr/bin/hyper-x-hw "${pkgdir}/usr/local/bin/hw-detect-gpu"
 }

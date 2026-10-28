@@ -3,13 +3,10 @@ use std::path::Path;
 use crate::core::kernel_manager::KernelManager;
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub struct SnapshotRecord {
-    pub id: String,
     pub name: String,
     pub date: String,
     pub description: String,
-    pub path: String,
 }
 
 pub struct SnapshotManager;
@@ -42,7 +39,6 @@ impl SnapshotManager {
                     continue;
                 }
 
-                let path_str = entry.path().to_string_lossy().to_string();
                 let date_str = if let Ok(meta) = entry.metadata() {
                     if let Ok(modified) = meta.modified() {
                         let dur = modified
@@ -58,11 +54,9 @@ impl SnapshotManager {
                 };
 
                 list.push(SnapshotRecord {
-                    id: file_name.clone(),
                     name: file_name,
                     date: date_str,
                     description: "Btrfs CoW Subvolume Snapshot".to_string(),
-                    path: path_str,
                 });
             }
         }

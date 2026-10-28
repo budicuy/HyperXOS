@@ -5,6 +5,7 @@ use std::process::Command;
 use crate::util::run_stream;
 
 pub const OFFICIAL_PACKAGES: &[&str] = &[
+    "hyperx-de-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-hw-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-installer-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-tools-2.2.0-1-x86_64.pkg.tar.zst",

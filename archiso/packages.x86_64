@@ -66,7 +66,8 @@ mesa
 # Virtual Machine Guest Support
 qemu-guest-agent
 
-# HyperXOS Pure Rust Native Installer & System Tools
+# HyperXOS Pure Rust Native Installer, Desktop Environment & System Tools
+hyperx-de
 hyper-x-installer
 hyper-x-tools
 hyper-x-hw

@@ -27,16 +27,6 @@ pub fn get_project_root() -> PathBuf {
     PathBuf::from(".")
 }
 
-/// Check if a binary command exists in PATH
-#[allow(dead_code)]
-pub fn command_exists(name: &str) -> bool {
-    Command::new("which")
-        .arg(name)
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
-}
-
 /// Execute a command with streaming stdio
 pub fn run_stream(cmd: &mut Command, desc: &str) -> Result<(), String> {
     cmd.stdout(Stdio::inherit());

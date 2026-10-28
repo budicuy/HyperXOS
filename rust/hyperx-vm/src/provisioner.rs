@@ -13,7 +13,6 @@ pub struct VmmLockManifest {
 
 #[derive(Debug, Deserialize)]
 pub struct VmmInfo {
-    #[allow(dead_code)]
     pub name: String,
     pub version: String,
     pub relative_bin_path: String,
@@ -22,7 +21,6 @@ pub struct VmmInfo {
     pub bundle_sha256: String,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct MirrorInfo {
     pub primary_url: String,
@@ -89,7 +87,10 @@ impl VmmProvisioner {
         }
 
         // 2. Provision hermetic local bundle
-        println!("==> [hyperx-vm] Provisioning 100% self-contained VMM bundle (v{}) ...", manifest.vmm.version);
+        println!(
+            "==> [hyperx-vm] Provisioning 100% self-contained {} bundle (v{}) ...",
+            manifest.vmm.name, manifest.vmm.version
+        );
         fs::create_dir_all(&bin_root).map_err(|e| e.to_string())?;
 
         // 2a. Check if local bundle archive exists in /tmp or cache
@@ -160,7 +161,19 @@ impl VmmProvisioner {
         ]);
 
         let s = curl.status();
-        let download_ok = s.map(|st| st.success()).unwrap_or(false) && downloaded_bundle.exists();
+        let mut download_ok = s.map(|st| st.success()).unwrap_or(false) && downloaded_bundle.exists();
+        if !download_ok {
+            let _ = Command::new("curl")
+                .args([
+                    "-L",
+                    "--fail",
+                    "-o",
+                    downloaded_bundle.to_str().unwrap(),
+                    &manifest.mirror.fallback_url,
+                ])
+                .status();
+            download_ok = downloaded_bundle.exists();
+        }
 
         if download_ok {
             let _ = Self::extract_bundle(&downloaded_bundle, &bin_root);

@@ -96,15 +96,22 @@ enum Commands {
     InstallCli,
 }
 
-fn run_cargo_app(manifest_dir: &str, extra_args: &[&str]) -> Result<(), String> {
+fn run_cargo_app(bin_name: &str, extra_args: &[&str]) -> Result<(), String> {
     let root = get_project_root();
-    let manifest = root.join(manifest_dir).join("Cargo.toml");
+    let manifest = root.join("rust/Cargo.toml");
     if !manifest.exists() {
         return Err(format!("Manifest not found at {}", manifest.display()));
     }
 
     let mut cmd = Command::new("cargo");
-    cmd.args(["run", "--release", "--manifest-path", manifest.to_str().unwrap()]);
+    cmd.args([
+        "run",
+        "--release",
+        "--manifest-path",
+        manifest.to_str().unwrap(),
+        "--bin",
+        bin_name,
+    ]);
     if !extra_args.is_empty() {
         cmd.arg("--");
         for a in extra_args {
@@ -112,16 +119,23 @@ fn run_cargo_app(manifest_dir: &str, extra_args: &[&str]) -> Result<(), String> 
         }
     }
 
-    run_stream(&mut cmd, manifest_dir)
+    run_stream(&mut cmd, bin_name)
 }
 
 fn install_cli_binary(root: &Path) -> Result<(), String> {
     println!("==> [HyperXOS] Installing 'hyperx' CLI binary to system...");
-    let cli_bin = root.join("rust/hyperx-cli/target/release/hyperx");
+    let cli_bin = root.join("rust/target/release/hyperx");
     if !cli_bin.exists() {
         println!("  -> Building release binary...");
         let mut build_cmd = Command::new("cargo");
-        build_cmd.args(["build", "--release", "--manifest-path", root.join("rust/hyperx-cli/Cargo.toml").to_str().unwrap()]);
+        build_cmd.args([
+            "build",
+            "--release",
+            "--manifest-path",
+            root.join("rust/Cargo.toml").to_str().unwrap(),
+            "--bin",
+            "hyperx",
+        ]);
         run_stream(&mut build_cmd, "cargo build hyperx")?;
     }
 
@@ -153,9 +167,9 @@ fn main() {
         Commands::Clean { all } => clean::run_clean(&root, all),
         Commands::Checksum => checksum::run_checksum(&root),
         Commands::Release => release::run_release(&root),
-        Commands::Tools | Commands::Hyperx => run_cargo_app("rust/hyper-x-tools", &[]),
-        Commands::Installer => run_cargo_app("rust/hyper-x-installer", &[]),
-        Commands::Hw { action } => run_cargo_app("rust/hyper-x-hw", &[&action]),
+        Commands::Tools | Commands::Hyperx => run_cargo_app("hyper-x-tools", &[]),
+        Commands::Installer => run_cargo_app("hyper-x-installer", &[]),
+        Commands::Hw { action } => run_cargo_app("hyper-x-hw", &[&action]),
         Commands::HyperxVm { mode } => vm::run_vm(&root, &mode),
         Commands::InstallCli => install_cli_binary(&root),
     };

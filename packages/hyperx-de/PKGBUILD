@@ -1,0 +1,27 @@
+# Maintainer: HyperXOS Development Team <dev@hyperxos.org>
+pkgname=hyperx-de
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Unified HyperXOS Desktop Environment — Smithay Wayland Compositor, macOS Dock, Control Center, Notification Drawer, File Manager & System Settings (Rust + Iced 0.14 + WGPU)"
+arch=('x86_64')
+url="https://github.com/budicuy/HyperXOS"
+license=('GPL-3.0-or-later')
+depends=('fontconfig' 'freetype2' 'libxkbcommon' 'wayland' 'mesa' 'libinput' 'seatd' 'polkit')
+makedepends=('cargo' 'rust')
+provides=('hyperx-de' 'hyperx-files' 'hyperx-settings' 'hyperx-launcher')
+
+build() {
+    cd "${startdir}/../../rust"
+    cargo build --release --bin hyperx-de --locked
+}
+
+package() {
+    install -Dm755 "${startdir}/../../rust/target/release/hyperx-de" "${pkgdir}/usr/bin/hyperx-de"
+    ln -sf hyperx-de "${pkgdir}/usr/bin/hyperx-files"
+    ln -sf hyperx-de "${pkgdir}/usr/bin/hyperx-settings"
+    ln -sf hyperx-de "${pkgdir}/usr/bin/hyperx-launcher"
+
+    install -Dm644 "${startdir}/hyperx-de-session.desktop" "${pkgdir}/usr/share/wayland-sessions/hyperx-de.desktop"
+    install -Dm644 "${startdir}/hyperx-files.desktop" "${pkgdir}/usr/share/applications/hyperx-files.desktop"
+    install -Dm644 "${startdir}/hyperx-settings.desktop" "${pkgdir}/usr/share/applications/hyperx-settings.desktop"
+}

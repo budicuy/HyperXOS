@@ -19,13 +19,10 @@ pub struct LsblkDevice {
 
 #[derive(Debug, Clone)]
 pub struct DiskInfo {
-    pub name: String,
     pub path: String,
     pub model: String,
-    pub size_bytes: u64,
     pub size_gb: f64,
     pub transport: String,
-    pub is_removable: bool,
 }
 
 pub struct DiskManager;
@@ -80,19 +77,11 @@ impl DiskManager {
             let size_gb = (size_bytes as f64) / (1024.0 * 1024.0 * 1024.0);
             let transport = dev.tran.unwrap_or_else(|| "Internal".to_string()).to_uppercase();
 
-            let removable_path = format!("/sys/block/{}/removable", name);
-            let is_removable = fs::read_to_string(removable_path)
-                .map(|v| v.trim() == "1")
-                .unwrap_or(false);
-
             disks.push(DiskInfo {
-                name,
                 path,
                 model,
-                size_bytes,
                 size_gb,
                 transport,
-                is_removable,
             });
         }
 

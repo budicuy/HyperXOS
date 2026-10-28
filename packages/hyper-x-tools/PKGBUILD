@@ -11,12 +11,12 @@ makedepends=('cargo' 'rust')
 provides=('hyperxtools')
 
 build() {
-    cd "${startdir}/../../rust/hyper-x-tools"
-    cargo build --release --locked
+    cd "${startdir}/../../rust"
+    cargo build --release --bin hyper-x-tools --locked
 }
 
 package() {
-    install -Dm755 "${startdir}/../../rust/hyper-x-tools/target/release/hyper-x-tools" "${pkgdir}/usr/bin/hyper-x-tools"
+    install -Dm755 "${startdir}/../../rust/target/release/hyper-x-tools" "${pkgdir}/usr/bin/hyper-x-tools"
     install -d "${pkgdir}/usr/local/bin"
     ln -sf /usr/bin/hyper-x-tools "${pkgdir}/usr/local/bin/hyperxtools"
     install -Dm644 "${startdir}/hyper-x-tools.desktop" "${pkgdir}/usr/share/applications/hyper-x-tools.desktop"

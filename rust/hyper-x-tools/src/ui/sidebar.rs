@@ -1,9 +1,10 @@
-use iced::border::Radius;
-use iced::widget::{button, column, container, mouse_area, row, text};
-use iced::{Alignment, Border, Element, Length};
+use iced::widget::{column, container, mouse_area, text};
+use iced::{Alignment, Element, Length};
 
-use crate::ui::icons::{self, svg_icon};
-use crate::ui::theme::*;
+use hyperx_ui_kit::{
+    brand_sidebar_header, glass_card_style, icons, sidebar_container_style, sidebar_nav_item,
+    sidebar_section_header, FONT_BODY_MEDIUM, FONT_DISPLAY_BOLD,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Page {
@@ -20,45 +21,8 @@ pub fn sidebar<'a, Message: Clone + 'a>(
     on_select: impl Fn(Page) -> Message + 'a,
     on_drag: Message,
 ) -> Element<'a, Message> {
-    // 1. Brand Logo Header with Solid Black Background
-    let logo_img = icons::logo_image(34.0);
-
-    let brand_inner = row![
-        logo_img,
-        column![
-            text("HYPERX TOOLS")
-                .size(13)
-                .font(FONT_DISPLAY_BOLD)
-                .style(|_| text::Style {
-                    color: Some(iced::Color::WHITE),
-                }),
-            text("Pusat Kendali Sistem")
-                .size(10)
-                .font(FONT_BODY_SEMIBOLD)
-                .style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.95, 0.75, 0.60)),
-                }),
-        ]
-        .spacing(1)
-        .align_x(Alignment::Start),
-    ]
-    .spacing(10)
-    .align_y(Alignment::Center);
-
-    let brand = mouse_area(
-        container(brand_inner)
-            .padding([10, 12])
-            .width(Length::Fill)
-            .style(|_| container::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgb(0.05, 0.06, 0.09))),
-                border: Border::default()
-                    .rounded(Radius::from(10.0))
-                    .width(1.0)
-                    .color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.12)),
-                ..container::Style::default()
-            })
-    )
-    .on_press(on_drag);
+    let brand = mouse_area(brand_sidebar_header("HYPERX TOOLS", "Pusat Kendali Sistem"))
+        .on_press(on_drag);
 
     let separator = container("")
         .width(Length::Fill)
@@ -68,65 +32,50 @@ pub fn sidebar<'a, Message: Clone + 'a>(
             ..container::Style::default()
         });
 
-    // Helper to build a styled navigation button with open-source SVG icons
-    let nav_item = |page: Page, label: &'static str, icon_svg: &'static str| -> Element<'a, Message> {
-        let is_active = current_page == page;
-        let active_fg = iced::Color::from_rgb(0.06, 0.07, 0.10); // Font & Icon Hitam saat aktif
-        let inactive_fg = iced::Color::WHITE; // Font & Icon Putih saat tidak aktif
-
-        let (icon_col, text_col, font_weight) = if is_active {
-            (active_fg, active_fg, FONT_DISPLAY_BOLD)
-        } else {
-            (inactive_fg, inactive_fg, FONT_BODY_SEMIBOLD)
-        };
-
-        let content = row![
-            svg_icon(icon_svg, 15.0, icon_col),
-            text(label).size(12).font(font_weight).style(move |_| text::Style {
-                color: Some(text_col),
-            }),
-        ]
-        .spacing(10)
-        .align_y(Alignment::Center);
-
-        button(content)
-            .width(Length::Fill)
-            .padding([9, 12])
-            .style(nav_button_style(is_active))
-            .on_press(on_select(page))
-            .into()
-    };
-
-    let section_header = |name: &'static str| -> Element<'a, Message> {
-        text(name)
-            .size(9)
-            .font(FONT_DISPLAY_BOLD)
-            .style(|_| text::Style {
-                color: Some(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.72)),
-            })
-            .into()
-    };
-
-    // Navigation Groups
     let nav_links = column![
-        // Group: SISTEM
-        section_header("SISTEM"),
-        nav_item(Page::Dashboard, "Dashboard Metrik", icons::DASHBOARD),
-        // Group: PERFORMA & KERNEL
-        section_header("PERFORMA & KERNEL"),
-        nav_item(Page::KernelManager, "Kernel Manager", icons::KERNEL),
-        nav_item(Page::GameTweaks, "Tweak Gaming", icons::GAMING),
-        // Group: CADANGAN & PERAWATAN
-        section_header("CADANGAN & PERAWATAN"),
-        nav_item(Page::Snapshots, "Snapshot & Restore", icons::SNAPSHOT),
-        nav_item(Page::Maintenance, "Perawatan Sistem", icons::MAINTENANCE),
-        // Group: PERANGKAT LUNAK
-        section_header("PERANGKAT LUNAK"),
-        nav_item(Page::PackageStore, "Software Store", icons::STORE),
+        sidebar_section_header("SISTEM"),
+        sidebar_nav_item(
+            "Dashboard Metrik",
+            icons::DASHBOARD,
+            current_page == Page::Dashboard,
+            on_select(Page::Dashboard),
+        ),
+        sidebar_section_header("PERFORMA & KERNEL"),
+        sidebar_nav_item(
+            "Kernel Manager",
+            icons::KERNEL,
+            current_page == Page::KernelManager,
+            on_select(Page::KernelManager),
+        ),
+        sidebar_nav_item(
+            "Tweak Gaming",
+            icons::GAMING,
+            current_page == Page::GameTweaks,
+            on_select(Page::GameTweaks),
+        ),
+        sidebar_section_header("CADANGAN & PERAWATAN"),
+        sidebar_nav_item(
+            "Snapshot & Restore",
+            icons::SNAPSHOT,
+            current_page == Page::Snapshots,
+            on_select(Page::Snapshots),
+        ),
+        sidebar_nav_item(
+            "Perawatan Sistem",
+            icons::MAINTENANCE,
+            current_page == Page::Maintenance,
+            on_select(Page::Maintenance),
+        ),
+        sidebar_section_header("PERANGKAT LUNAK"),
+        sidebar_nav_item(
+            "Software Store",
+            icons::STORE,
+            current_page == Page::PackageStore,
+            on_select(Page::PackageStore),
+        ),
     ]
     .spacing(6);
 
-    // Sidebar Footer
     let footer = container(
         column![
             text("HyperXOS Linux 2026.10")
@@ -154,7 +103,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         brand,
         separator,
         nav_links,
-        container("").height(Length::Fill), // Push footer down
+        container("").height(Length::Fill),
         footer,
     ]
     .spacing(14)

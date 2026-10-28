@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 pub mod preflight;
 pub mod disk;
 pub mod partitioner;

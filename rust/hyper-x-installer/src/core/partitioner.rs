@@ -5,7 +5,6 @@ use crate::core::disk::DiskManager;
 
 #[derive(Debug, Clone)]
 pub struct PartitionLayout {
-    pub disk_path: String,
     pub boot_partition: String,
     pub root_partition: String,
 }
@@ -73,7 +72,6 @@ impl Partitioner {
         let root_partition = DiskManager::get_partition_path(disk_path, 2);
 
         Ok(PartitionLayout {
-            disk_path: disk_path.to_string(),
             boot_partition,
             root_partition,
         })

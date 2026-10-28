@@ -17,12 +17,15 @@ use crate::core::pacstrap::PacstrapInstaller;
 use crate::core::partitioner::Partitioner;
 use crate::core::preflight::PreflightStatus;
 
-use crate::ui::header::header;
 use crate::ui::stepper::{stepper_sidebar, StepId};
 use crate::ui::steps::step7_install::InstallState;
 use crate::ui::steps::{
     step1_welcome, step2_location, step3_keyboard, step4_disk, step5_users, step6_summary,
     step7_install, step8_finished,
+};
+use hyperx_ui_kit::{
+    ensure_display_environment, installer_header, load_window_icon, open_external_url,
+    print_cli_banner, FONT_BODY, FONT_INTER_BYTES, FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
 };
 
 #[derive(Debug, Clone)]
@@ -81,29 +84,15 @@ pub enum Message {
     CompleteAndExit,
 }
 
-fn get_euid() -> u32 {
-    extern "C" {
-        fn geteuid() -> u32;
-    }
-    unsafe { geteuid() }
-}
-
-fn load_window_icon() -> Option<iced::window::Icon> {
-    let bytes = include_bytes!("../assets/logo.png");
-    let img = image::load_from_memory(bytes).ok()?;
-    let rgba = img.to_rgba8();
-    let (width, height) = rgba.dimensions();
-    iced::window::icon::from_rgba(rgba.into_raw(), width, height).ok()
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() > 1 && (args[1] == "--auto-install" || args[1] == "-a") {
         let disk = args.get(2).cloned().unwrap_or_else(|| "/dev/vda".to_string());
-        println!("============================================================");
-        println!("  HyperXOS Installer (Pure Rust) — Headless Automated Mode  ");
-        println!("  Target Disk: {}", disk);
-        println!("============================================================");
+        let sub = format!("Target Disk: {}", disk);
+        print_cli_banner(
+            "HyperXOS Installer (Pure Rust) — Headless Automated Mode",
+            Some(&sub),
+        );
 
         let (tx, rx) = unbounded();
         let handle = thread::spawn(move || {
@@ -136,55 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // Display environment auto-detection & fallback for Wayland & X11
-    let has_wayland = std::env::var("WAYLAND_DISPLAY").is_ok() || std::env::var("WAYLAND_SOCKET").is_ok();
-    let has_x11 = std::env::var("DISPLAY").is_ok();
-
-    if !has_wayland && !has_x11 {
-        let euid = get_euid();
-        let mut resolved = false;
-
-        // 1. Try finding Wayland sockets in current UID runtime dir or live user 1000
-        let runtimes = vec![
-            format!("/run/user/{}", euid),
-            "/run/user/1000".to_string(),
-        ];
-
-        for rdir in &runtimes {
-            if let Ok(entries) = std::fs::read_dir(rdir) {
-                for entry in entries.flatten() {
-                    let name = entry.file_name().to_string_lossy().to_string();
-                    if name.starts_with("wayland-") && !name.ends_with(".lock") {
-                        std::env::set_var("WAYLAND_DISPLAY", &name);
-                        std::env::set_var("XDG_RUNTIME_DIR", rdir);
-                        resolved = true;
-                        break;
-                    }
-                }
-            }
-            if resolved {
-                break;
-            }
-        }
-
-        // 2. If no Wayland socket found, check for X11 socket
-        if !resolved {
-            if std::path::Path::new("/tmp/.X11-unix/X0").exists() {
-                std::env::set_var("DISPLAY", ":0");
-                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
-                resolved = true;
-            } else if std::path::Path::new("/tmp/.X11-unix/X1").exists() {
-                std::env::set_var("DISPLAY", ":1");
-                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
-                resolved = true;
-            }
-        }
-
-        if !resolved {
-            // Default fallback
-            std::env::set_var("DISPLAY", ":0");
-        }
-    }
+    ensure_display_environment();
 
     let window_settings = window::Settings {
         size: Size::new(1060.0, 720.0),
@@ -202,15 +143,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     iced::application(App::default, App::update, App::view)
         .title("HyperXOS Installer (Pure Rust)")
-        .font(include_bytes!("../assets/fonts/PlusJakartaSans.ttf").as_slice())
-        .font(include_bytes!("../assets/fonts/Inter.ttf").as_slice())
-        .default_font(crate::ui::theme::FONT_BODY)
+        .font(FONT_PLUS_JAKARTA_BYTES)
+        .font(FONT_INTER_BYTES)
+        .default_font(FONT_BODY)
         .window(window_settings)
         .subscription(App::subscription)
         .theme(|_: &App| iced::Theme::Dark)
         .style(|_: &App, _: &iced::Theme| iced::theme::Style {
             background_color: iced::Color::TRANSPARENT,
-            text_color: crate::ui::theme::TEXT_MAIN,
+            text_color: TEXT_MAIN,
         })
         .run()?;
 
@@ -285,7 +226,7 @@ impl App {
                 Task::none()
             }
             Message::OpenUrl(url) => {
-                let _ = std::process::Command::new("xdg-open").arg(url).spawn();
+                open_external_url(url);
                 Task::none()
             }
             Message::Minimize => window::latest().and_then(|id| window::minimize(id, true)),
@@ -543,7 +484,7 @@ impl App {
             row![
                 stepper_sidebar(self.step),
                 column![
-                    header(
+                    installer_header(
                         self.hovered_btn,
                         Message::HeaderHover,
                         Message::OpenUrl,
