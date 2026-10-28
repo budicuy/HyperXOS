@@ -98,33 +98,30 @@ Image ISO hasil kompilasi akan otomatis disimpan di dalam direktori `out/` (misa
 ---
 
 ### 5. Langkah 4: Menjalankan Pengujian Virtual Machine (`hyperx-vm`)
-HyperXOS menyediakan tiga alur pengujian virtual machine sejati dengan akselerasi GPU host (NVIDIA/Intel/AMD OpenGL):
+HyperXOS menyediakan alur pengujian virtual machine sejati dengan akselerasi GPU host (NVIDIA/Intel/AMD OpenGL):
 
-#### A. Uji Coba Cepat Live ISO (Live Environment)
-Mem-boot ISO secara langsung ke bootloader Limine UEFI -> systemd -> desktop HyperX-DE:
-```bash
-./hyperx dev
-```
-
-#### B. Uji Coba Instalasi Bersih Interaktif (Clean 40GB Virtual Disk)
+#### A. Uji Coba Instalasi Bersih Interaktif (Clean 40GB Virtual Disk)
 Mereset disk virtual 40GB dan NVRAM, mem-boot Live ISO langsung ke antarmuka GUI installer `hyper-x-installer` untuk pengujian interaktif:
 ```bash
-./hyperx install
+./hyperx vm install
 ```
+*(atau shortcut: `./hyperx install`)*
 
-#### C. Uji Coba Instalasi Otomatis Headless (CI/CD Automated Install Test)
+#### B. Uji Coba Instalasi Otomatis Headless (CI/CD Automated Install Test)
 Menjalankan pengujian instalasi end-to-end tanpa interaksi via QEMU Guest Agent:
 ```bash
-./hyperx install --auto
+./hyperx vm install --auto
 ```
+*(atau shortcut: `./hyperx install --auto`)*
 
-#### D. Uji Coba Booting Sistem Terinstall
+#### C. Uji Coba Booting Sistem Terinstall
 Mem-boot sistem HyperXOS yang sudah terinstal di dalam disk virtual 40GB tanpa menggunakan file ISO:
 ```bash
-./hyperx run
+./hyperx vm run
 ```
+*(atau shortcut: `./hyperx run`)*
 
-#### E. Pengujian Otomatis Non-Interactive (QA Smoke Test)
+#### D. Pengujian Otomatis Non-Interactive (QA Smoke Test)
 Menjalankan pengujian otomatis headless selama 25 detik untuk memvalidasi kernel booting dan konsol:
 ```bash
 ./hyperx test
@@ -184,7 +181,6 @@ Untuk membersihkan berkas build dan mount sementara:
 ### 2. Lingkungan Virtualisasi (`hyperx vm`)
 | Perintah | Deskripsi |
 | :--- | :--- |
-| `./hyperx vm dev` *(atau `./hyperx dev`)* | Menjalankan Live ISO di VM dengan akselerasi direct GPU host |
 | `./hyperx vm install` *(atau `./hyperx install`)* | Menjalankan instalasi manual interaktif pada virtual disk 40 GB |
 | `./hyperx vm install --auto` | Menjalankan pengujian instalasi 100% otomatis via QEMU Guest Agent |
 | `./hyperx vm run` *(atau `./hyperx run`)* | Menjalankan sistem HyperXOS terinstal langsung dari virtual disk 40 GB |

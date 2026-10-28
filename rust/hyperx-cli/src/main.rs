@@ -40,10 +40,10 @@ enum Commands {
     /// Run automated QA testing and 25s non-interactive headless smoke test
     Test,
 
-    /// Run HyperXOS in QEMU virtual machine test harness (dev, install, run, clean)
+    /// Run HyperXOS in QEMU virtual machine test harness (install, run, clean)
     Vm {
         #[command(subcommand)]
-        action: Option<VmAction>,
+        action: VmAction,
     },
 
     /// Manage local pacman repository database (build, sync, check)
@@ -86,10 +86,6 @@ enum Commands {
     // ========================================================================
     // Ergonomic Shortcuts & Legacy Aliases (Hidden to maintain a clean --help)
     // ========================================================================
-
-    /// Shortcut for 'vm dev' (run live ISO in QEMU without formatting virtual disk)
-    #[command(hide = true)]
-    Dev,
 
     /// Shortcut for 'vm install' (run fresh QEMU installation test on 40GB virtual disk)
     #[command(hide = true)]
@@ -161,10 +157,6 @@ enum Commands {
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum VmAction {
-    /// Boot HyperXOS Live ISO in QEMU without formatting virtual disk
-    #[command(alias = "live")]
-    Dev,
-
     /// Run fresh QEMU installation test on 40GB virtual disk
     Install {
         /// Run non-interactive automated installation test via QEMU guest agent
@@ -232,8 +224,7 @@ fn main() {
         // Core commands
         Commands::Build { prod } => build::run_build(&root, prod),
         Commands::Test => qa::run_test(&root),
-        Commands::Vm { action } => match action.unwrap_or(VmAction::Dev) {
-            VmAction::Dev => vm::run_vm(&root, "dev", false),
+        Commands::Vm { action } => match action {
             VmAction::Install { auto } => vm::run_vm(&root, "install", auto),
             VmAction::Run { auto } => vm::run_vm(&root, "run", auto),
             VmAction::Clean => vm::run_vm(&root, "clean", false),
@@ -253,7 +244,6 @@ fn main() {
         Commands::Release { checksum_only } => release::run_release(&root, checksum_only),
 
         // Hidden ergonomic shortcuts & legacy aliases
-        Commands::Dev => vm::run_vm(&root, "dev", false),
         Commands::Install { auto } | Commands::VmInstall { auto } => {
             vm::run_vm(&root, "install", auto)
         }
