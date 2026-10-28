@@ -1,16 +1,16 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use iced::border::Radius;
 use iced::widget::{button, column, container, mouse_area, row, text, text_input};
-use iced::{Alignment, Background, Color, Element, Length};
+use iced::{Alignment, Background, Border, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    active_toggle_button_style, brand_sidebar_header, danger_button_style, glass_action_button,
-    glass_card_accent_style, glass_card_style, glass_input_style, glass_scrollable,
-    glass_window_style, icons, primary_button_style, selection_card_style, sidebar_container_style,
-    sidebar_nav_item, sidebar_section_header, svg_icon, window_header_bar, ACCENT_AMBER,
-    ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED, ACCENT_TEAL, FONT_BODY_MEDIUM,
-    FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD, TEXT_MAIN, TEXT_MUTED, TEXT_SUB,
+    fluent_address_bar_style, fluent_file_item_style, fluent_input_style,
+    fluent_ribbon_button_style, fluent_sidebar_container_style, fluent_sidebar_nav_item,
+    fluent_window_header_bar, fluent_window_style, glass_scrollable, icons, primary_button_style,
+    svg_icon, FLUENT_PRIMARY, FLUENT_TEXT_DARK, FLUENT_TEXT_MUTED, FONT_BODY_MEDIUM,
+    FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD,
 };
 
 use crate::ui::overlays::QuickLookData;
@@ -489,19 +489,23 @@ pub fn is_image_ext(ext: &str) -> bool {
 
 fn file_icon_and_color(item: &FileEntryItem) -> (&'static str, Color) {
     if item.is_dir {
-        (icons::FOLDER, ACCENT_CYAN)
+        (icons::FOLDER, Color::from_rgb(0.96, 0.62, 0.04)) // Windows 11 Fluent Amber Folder
     } else {
         match item.ext.as_str() {
             "rs" | "toml" | "sh" | "py" | "js" | "ts" | "c" | "cpp" | "json" | "yml" | "yaml" => {
-                (icons::FILE_CODE, ACCENT_GREEN)
+                (icons::FILE_CODE, Color::from_rgb(0.06, 0.65, 0.38))
             }
-            "png" | "jpg" | "jpeg" | "svg" | "webp" | "gif" => (icons::IMAGE_ICON, ACCENT_PURPLE),
-            "mp3" | "flac" | "wav" | "ogg" => (icons::MUSIC_ICON, ACCENT_AMBER),
-            "mp4" | "mkv" | "webm" => (icons::VIDEO_ICON, ACCENT_RED),
+            "png" | "jpg" | "jpeg" | "svg" | "webp" | "gif" => {
+                (icons::IMAGE_ICON, Color::from_rgb(0.55, 0.36, 0.96))
+            }
+            "mp3" | "flac" | "wav" | "ogg" => {
+                (icons::MUSIC_ICON, Color::from_rgb(0.92, 0.28, 0.60))
+            }
+            "mp4" | "mkv" | "webm" => (icons::VIDEO_ICON, Color::from_rgb(0.92, 0.26, 0.21)),
             "zst" | "gz" | "xz" | "zip" | "tar" | "iso" | "qcow2" => {
-                (icons::FILE_ARCHIVE, ACCENT_TEAL)
+                (icons::FILE_ARCHIVE, Color::from_rgb(0.08, 0.68, 0.70))
             }
-            _ => (icons::FILE_TEXT, TEXT_SUB),
+            _ => (icons::FILE_TEXT, Color::from_rgb(0.45, 0.50, 0.58)),
         }
     }
 }
@@ -511,120 +515,29 @@ pub fn view_file_manager<'a>(
     w: Length,
     h: Length,
 ) -> Element<'a, Message> {
-    let brand = brand_sidebar_header("HYPERX FILES", "Manajer Berkas Finder");
+    let tab_title = match state.current_place {
+        FilePlace::Home => "Beranda",
+        FilePlace::Desktop => "Desktop",
+        FilePlace::Documents => "Dokumen",
+        FilePlace::Downloads => "Unduhan",
+        FilePlace::Pictures => "Gambar",
+        FilePlace::Music => "Musik",
+        FilePlace::Trash => "Tempat Sampah",
+        FilePlace::Root => "Sistem (Root)",
+    };
 
-    let sep = container("")
-        .width(Length::Fill)
-        .height(1)
-        .style(|_| container::Style {
-            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.20))),
-            ..container::Style::default()
-        });
-
-    let nav_links = column![
-        sidebar_section_header("LOKASI FAVORIT"),
-        sidebar_nav_item(
-            "Beranda (Home)",
-            icons::HOME_ICON,
-            state.current_place == FilePlace::Home,
-            Message::FileSelectPlace(FilePlace::Home),
-        ),
-        sidebar_nav_item(
-            "Desktop",
-            icons::DASHBOARD,
-            state.current_place == FilePlace::Desktop,
-            Message::FileSelectPlace(FilePlace::Desktop),
-        ),
-        sidebar_nav_item(
-            "Dokumen",
-            icons::DOCS,
-            state.current_place == FilePlace::Documents,
-            Message::FileSelectPlace(FilePlace::Documents),
-        ),
-        sidebar_nav_item(
-            "Unduhan",
-            icons::DOWNLOAD,
-            state.current_place == FilePlace::Downloads,
-            Message::FileSelectPlace(FilePlace::Downloads),
-        ),
-        sidebar_nav_item(
-            "Gambar & Screenshot",
-            icons::IMAGE_ICON,
-            state.current_place == FilePlace::Pictures,
-            Message::FileSelectPlace(FilePlace::Pictures),
-        ),
-        sidebar_nav_item(
-            "Musik & Audio",
-            icons::MUSIC_ICON,
-            state.current_place == FilePlace::Music,
-            Message::FileSelectPlace(FilePlace::Music),
-        ),
-        sidebar_section_header("SAMPAH & SISTEM"),
-        sidebar_nav_item(
-            "Tempat Sampah (Trash)",
-            icons::TRASH,
-            state.current_place == FilePlace::Trash,
-            Message::FileSelectPlace(FilePlace::Trash),
-        ),
-        sidebar_nav_item(
-            "Sistem Root (/)",
-            icons::HARD_DRIVE,
-            state.current_place == FilePlace::Root,
-            Message::FileSelectPlace(FilePlace::Root),
-        ),
-    ]
-    .spacing(5);
-
-    let sidebar_footer = container(
-        column![
-            text(format!("Trash: {} item", state.trash_count))
-                .size(11)
-                .font(FONT_DISPLAY_BOLD),
-            text(&state.status_message)
-                .size(9)
-                .font(FONT_BODY_MEDIUM)
-                .style(|_| text::Style {
-                    color: Some(TEXT_SUB),
-                }),
-        ]
-        .spacing(3),
-    )
-    .padding([9, 12])
-    .width(Length::Fill)
-    .style(glass_card_style);
-
-    let sidebar = container(
-        column![
-            brand,
-            sep,
-            nav_links,
-            container("").height(Length::Fill),
-            sidebar_footer,
-        ]
-        .spacing(10)
-        .padding(14),
-    )
-    .width(Length::Fixed(220.0))
-    .height(Length::Fill)
-    .style(sidebar_container_style);
-
-    let path_str = state.current_dir.to_string_lossy().to_string();
-    let top_header = mouse_area(window_header_bar(
-        if state.current_place == FilePlace::Trash {
-            "HyperX Files — Tempat Sampah (macOS Trash)"
-        } else {
-            "HyperX Files — Manajer Berkas Finder"
-        },
-        &path_str,
+    let top_header = mouse_area(fluent_window_header_bar(
+        "HyperX Files",
+        tab_title,
         if state.current_place == FilePlace::Trash {
             icons::TRASH
         } else {
             icons::FOLDER
         },
         if state.current_place == FilePlace::Trash {
-            ACCENT_AMBER
+            Color::from_rgb(0.91, 0.07, 0.14)
         } else {
-            ACCENT_CYAN
+            Color::from_rgb(0.96, 0.62, 0.04)
         },
         Message::MinimizeWindow(DesktopWindowId::Files),
         Message::ToggleMaximizeWindow(DesktopWindowId::Files),
@@ -633,128 +546,403 @@ pub fn view_file_manager<'a>(
     .on_press(Message::StartWindowDrag(DesktopWindowId::Files))
     .on_release(Message::EndWindowDrag);
 
-    // Toolbar adapts if user is in Trash or has a File in Clipboard
-    let mut toolbar = row![
-        button(
-            row![
-                svg_icon(icons::ARROW_UP, 13.0, ACCENT_CYAN),
-                text("Naik").size(11).font(FONT_BODY_SEMIBOLD),
-            ]
-            .spacing(5)
-            .align_y(Alignment::Center),
-        )
-        .padding([6, 9])
-        .style(glass_action_button)
-        .on_press(Message::FileNavigateUp),
-        button(
-            row![
-                svg_icon(icons::REFRESH, 13.0, ACCENT_GREEN),
-                text("Segarkan").size(11).font(FONT_BODY_SEMIBOLD),
-            ]
-            .spacing(5)
-            .align_y(Alignment::Center),
-        )
-        .padding([6, 9])
-        .style(glass_action_button)
-        .on_press(Message::FileRefresh),
-    ]
-    .spacing(6)
-    .align_y(Alignment::Center);
+    // Fluent Command Ribbon Bar
+    let make_ribbon_sep = || {
+        container("")
+            .width(Length::Fixed(1.0))
+            .height(Length::Fixed(16.0))
+            .style(|_| container::Style {
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.10))),
+                ..container::Style::default()
+            })
+    };
 
-    if state.file_clipboard.is_some() {
-        toolbar = toolbar.push(
-            button(
-                row![
-                    svg_icon(icons::PASTE, 13.0, ACCENT_GREEN),
-                    text("Tempel / Paste (Ctrl+V)")
-                        .size(11)
-                        .font(FONT_DISPLAY_BOLD),
-                ]
-                .spacing(5)
-                .align_y(Alignment::Center),
-            )
-            .padding([6, 10])
-            .style(primary_button_style(ACCENT_GREEN))
-            .on_press(Message::FilePasteClipboard),
-        );
+    let new_folder_btn = button(
+        row![
+            svg_icon(icons::FOLDER_PLUS, 14.0, FLUENT_PRIMARY),
+            text("Baru").size(12).font(FONT_BODY_SEMIBOLD).style(|_| text::Style {
+                color: Some(FLUENT_TEXT_DARK),
+            }),
+        ]
+        .spacing(5)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 9])
+    .style(fluent_ribbon_button_style)
+    .on_press(Message::FileCreateFolder);
+
+    let has_selection = state.selected_index.is_some();
+    let sel_idx = state.selected_index.unwrap_or(0);
+
+    let mut cut_btn = button(
+        row![
+            svg_icon(
+                icons::SCISSORS_CUT,
+                14.0,
+                if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED },
+            ),
+            text("Gunting").size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+                color: Some(if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED }),
+            }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style);
+    if has_selection {
+        cut_btn = cut_btn.on_press(Message::FileCutSelected(sel_idx));
     }
 
+    let mut copy_btn = button(
+        row![
+            svg_icon(
+                icons::COPY,
+                14.0,
+                if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED },
+            ),
+            text("Salin").size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+                color: Some(if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED }),
+            }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style);
+    if has_selection {
+        copy_btn = copy_btn.on_press(Message::FileCopySelected(sel_idx));
+    }
+
+    let has_clipboard = state.file_clipboard.is_some();
+    let mut paste_btn = button(
+        row![
+            svg_icon(
+                icons::PASTE,
+                14.0,
+                if has_clipboard { FLUENT_PRIMARY } else { FLUENT_TEXT_MUTED },
+            ),
+            text("Tempel").size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+                color: Some(if has_clipboard { FLUENT_PRIMARY } else { FLUENT_TEXT_MUTED }),
+            }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style);
+    if has_clipboard {
+        paste_btn = paste_btn.on_press(Message::FilePasteClipboard);
+    }
+
+    let mut rename_btn = button(
+        row![
+            svg_icon(
+                icons::EDIT_PEN,
+                14.0,
+                if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED },
+            ),
+            text("Ganti Nama").size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+                color: Some(if has_selection { FLUENT_TEXT_DARK } else { FLUENT_TEXT_MUTED }),
+            }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style);
+    if has_selection {
+        rename_btn = rename_btn.on_press(Message::FileContextStartRename(sel_idx));
+    }
+
+    let mut del_btn = button(
+        row![
+            svg_icon(
+                icons::TRASH,
+                14.0,
+                if has_selection { Color::from_rgb(0.91, 0.07, 0.14) } else { FLUENT_TEXT_MUTED },
+            ),
+            text("Hapus").size(11).font(FONT_BODY_MEDIUM).style(move |_| text::Style {
+                color: Some(if has_selection { Color::from_rgb(0.91, 0.07, 0.14) } else { FLUENT_TEXT_MUTED }),
+            }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style);
+    if has_selection {
+        del_btn = del_btn.on_press(Message::FileDeleteSelected);
+    }
+
+    let view_btn = button(
+        row![
+            svg_icon(
+                if state.grid_mode { icons::GRID_VIEW } else { icons::LIST_VIEW },
+                14.0,
+                FLUENT_PRIMARY,
+            ),
+            text(if state.grid_mode { "Grid" } else { "Daftar" })
+                .size(11)
+                .font(FONT_BODY_MEDIUM)
+                .style(|_| text::Style {
+                    color: Some(FLUENT_TEXT_DARK),
+                }),
+        ]
+        .spacing(4)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 8])
+    .style(fluent_ribbon_button_style)
+    .on_press(Message::FileToggleViewMode);
+
+    let mut ribbon = row![new_folder_btn, make_ribbon_sep(), cut_btn, copy_btn, paste_btn, rename_btn, del_btn]
+        .spacing(3)
+        .align_y(Alignment::Center);
+
     if state.current_place == FilePlace::Trash {
+        ribbon = ribbon.push(make_ribbon_sep());
         if let Some(sel) = state.selected_index {
-            toolbar = toolbar.push(
+            ribbon = ribbon.push(
                 button(
                     row![
-                        svg_icon(icons::ROTATE_CCW, 13.0, ACCENT_GREEN),
-                        text("Pulihkan (Restore)").size(11).font(FONT_DISPLAY_BOLD),
+                        svg_icon(icons::ROTATE_CCW, 13.0, Color::from_rgb(0.06, 0.65, 0.38)),
+                        text("Pulihkan").size(11).font(FONT_BODY_SEMIBOLD),
                     ]
-                    .spacing(5)
+                    .spacing(4)
                     .align_y(Alignment::Center),
                 )
-                .padding([6, 10])
-                .style(primary_button_style(ACCENT_GREEN))
+                .padding([5, 9])
+                .style(fluent_ribbon_button_style)
                 .on_press(Message::FileRestoreFromTrash(sel)),
             );
         }
-        toolbar = toolbar.push(
+        ribbon = ribbon.push(
             button(
                 row![
-                    svg_icon(icons::TRASH, 13.0, ACCENT_RED),
-                    text("Kosongkan Sampah (Empty Trash)")
-                        .size(11)
-                        .font(FONT_DISPLAY_BOLD),
+                    svg_icon(icons::TRASH, 13.0, Color::from_rgb(0.91, 0.07, 0.14)),
+                    text("Kosongkan Sampah").size(11).font(FONT_BODY_SEMIBOLD),
                 ]
-                .spacing(5)
+                .spacing(4)
                 .align_y(Alignment::Center),
             )
-            .padding([6, 12])
-            .style(danger_button_style())
+            .padding([5, 9])
+            .style(fluent_ribbon_button_style)
             .on_press(Message::FileEmptyTrash),
         );
-    } else {
-        toolbar = toolbar
-            .push(
-                button(
-                    text(if state.grid_mode { "Grid" } else { "Daftar" })
-                        .size(11)
-                        .font(FONT_BODY_SEMIBOLD),
-                )
-                .padding([6, 9])
-                .style(active_toggle_button_style(state.grid_mode, ACCENT_CYAN))
-                .on_press(Message::FileToggleViewMode),
-            )
-            .push(
-                text_input("Cari berkas...", &state.search_query)
-                    .on_input(Message::FileSearchChanged)
-                    .padding([6, 10])
-                    .size(11)
-                    .width(Length::Fixed(135.0))
-                    .style(glass_input_style),
-            )
-            .push(
-                text_input("Nama folder baru...", &state.new_folder_name)
-                    .on_input(Message::FileNewFolderNameChanged)
-                    .on_submit(Message::FileCreateFolder)
-                    .padding([6, 10])
-                    .size(11)
-                    .width(Length::Fixed(125.0))
-                    .style(glass_input_style),
-            )
-            .push(
-                button(
-                    row![
-                        svg_icon(icons::FOLDER_PLUS, 13.0, ACCENT_AMBER),
-                        text("Folder Baru").size(11).font(FONT_BODY_SEMIBOLD),
-                    ]
-                    .spacing(5)
-                    .align_y(Alignment::Center),
-                )
-                .padding([6, 10])
-                .style(primary_button_style(ACCENT_AMBER))
-                .on_press(Message::FileCreateFolder),
-            );
     }
 
-    let toolbar = toolbar.padding([6, 14]);
+    ribbon = ribbon.push(make_ribbon_sep()).push(view_btn);
+
+    let command_bar = container(ribbon)
+        .padding([4, 12])
+        .width(Length::Fill)
+        .style(|_| container::Style {
+            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.60))),
+            border: Border {
+                color: Color::from_rgba(0.0, 0.0, 0.0, 0.06),
+                width: 1.0,
+                radius: Radius::default(),
+            },
+            ..container::Style::default()
+        });
+
+    // Breadcrumb Navigation & Search Row
+    let nav_up_btn = button(
+        container(svg_icon(icons::ARROW_UP, 14.0, FLUENT_TEXT_DARK))
+            .width(Length::Fixed(28.0))
+            .height(Length::Fixed(28.0))
+            .center_x(Length::Fixed(28.0))
+            .center_y(Length::Fixed(28.0)),
+    )
+    .padding(0)
+    .style(fluent_ribbon_button_style)
+    .on_press(Message::FileNavigateUp);
+
+    let refresh_btn = button(
+        container(svg_icon(icons::REFRESH, 14.0, FLUENT_TEXT_DARK))
+            .width(Length::Fixed(28.0))
+            .height(Length::Fixed(28.0))
+            .center_x(Length::Fixed(28.0))
+            .center_y(Length::Fixed(28.0)),
+    )
+    .padding(0)
+    .style(fluent_ribbon_button_style)
+    .on_press(Message::FileRefresh);
+
+    let address_breadcrumb = container(
+        row![
+            svg_icon(icons::COMPUTER, 14.0, FLUENT_PRIMARY),
+            text("PC Ini")
+                .size(12)
+                .font(FONT_BODY_MEDIUM)
+                .style(|_| text::Style {
+                    color: Some(Color::from_rgb(0.35, 0.38, 0.44)),
+                }),
+            svg_icon(icons::CHEVRON_RIGHT, 11.0, Color::from_rgb(0.60, 0.63, 0.68)),
+            svg_icon(
+                if state.current_place == FilePlace::Trash {
+                    icons::TRASH
+                } else {
+                    icons::FOLDER
+                },
+                14.0,
+                if state.current_place == FilePlace::Trash {
+                    Color::from_rgb(0.91, 0.07, 0.14)
+                } else {
+                    Color::from_rgb(0.96, 0.62, 0.04)
+                },
+            ),
+            text(tab_title)
+                .size(12)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(FLUENT_TEXT_DARK),
+                }),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([5, 10])
+    .width(Length::Fill)
+    .style(fluent_address_bar_style);
+
+    let search_input = text_input(&format!("Cari di {}...", tab_title), &state.search_query)
+        .on_input(Message::FileSearchChanged)
+        .padding([5, 10])
+        .size(12)
+        .width(Length::Fixed(210.0))
+        .style(fluent_input_style);
+
+    let breadcrumb_row = container(
+        row![nav_up_btn, refresh_btn, address_breadcrumb, search_input]
+            .spacing(8)
+            .align_y(Alignment::Center),
+    )
+    .padding([5, 14])
+    .width(Length::Fill)
+    .style(|_| container::Style {
+        background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.40))),
+        border: Border {
+            color: Color::from_rgba(0.0, 0.0, 0.0, 0.06),
+            width: 1.0,
+            radius: Radius::default(),
+        },
+        ..container::Style::default()
+    });
+
+    let make_subtle_divider = || {
+        container("")
+            .width(Length::Fill)
+            .height(Length::Fixed(1.0))
+            .style(|_| container::Style {
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06))),
+                ..container::Style::default()
+            })
+    };
+
+    let section_label = |name: &'static str| {
+        text(name)
+            .size(10)
+            .font(FONT_DISPLAY_BOLD)
+            .style(|_| text::Style {
+                color: Some(Color::from_rgb(0.55, 0.58, 0.64)),
+            })
+    };
+
+    let sidebar = container(
+        column![
+            section_label("AKSES CEPAT"),
+            fluent_sidebar_nav_item(
+                "Beranda",
+                icons::HOME_ICON,
+                state.current_place == FilePlace::Home,
+                Color::from_rgb(0.0, 0.47, 0.83),
+                Message::FileSelectPlace(FilePlace::Home),
+            ),
+            fluent_sidebar_nav_item(
+                "Desktop",
+                icons::DASHBOARD,
+                state.current_place == FilePlace::Desktop,
+                Color::from_rgb(0.96, 0.62, 0.04),
+                Message::FileSelectPlace(FilePlace::Desktop),
+            ),
+            fluent_sidebar_nav_item(
+                "Dokumen",
+                icons::DOCS,
+                state.current_place == FilePlace::Documents,
+                Color::from_rgb(0.96, 0.62, 0.04),
+                Message::FileSelectPlace(FilePlace::Documents),
+            ),
+            fluent_sidebar_nav_item(
+                "Unduhan",
+                icons::DOWNLOAD,
+                state.current_place == FilePlace::Downloads,
+                Color::from_rgb(0.0, 0.47, 0.83),
+                Message::FileSelectPlace(FilePlace::Downloads),
+            ),
+            fluent_sidebar_nav_item(
+                "Gambar",
+                icons::IMAGE_ICON,
+                state.current_place == FilePlace::Pictures,
+                Color::from_rgb(0.55, 0.36, 0.96),
+                Message::FileSelectPlace(FilePlace::Pictures),
+            ),
+            fluent_sidebar_nav_item(
+                "Musik",
+                icons::MUSIC_ICON,
+                state.current_place == FilePlace::Music,
+                Color::from_rgb(0.92, 0.28, 0.60),
+                Message::FileSelectPlace(FilePlace::Music),
+            ),
+            make_subtle_divider(),
+            section_label("PC INI"),
+            fluent_sidebar_nav_item(
+                "Sistem Root (/)",
+                icons::HARD_DRIVE,
+                state.current_place == FilePlace::Root,
+                Color::from_rgb(0.40, 0.45, 0.52),
+                Message::FileSelectPlace(FilePlace::Root),
+            ),
+            fluent_sidebar_nav_item(
+                "Tempat Sampah",
+                icons::TRASH,
+                state.current_place == FilePlace::Trash,
+                Color::from_rgb(0.91, 0.07, 0.14),
+                Message::FileSelectPlace(FilePlace::Trash),
+            ),
+            container("").height(Length::Fill),
+            container(
+                column![
+                    text(format!("Sampah: {} item", state.trash_count))
+                        .size(11)
+                        .font(FONT_BODY_SEMIBOLD)
+                        .style(|_| text::Style {
+                            color: Some(FLUENT_TEXT_DARK),
+                        }),
+                    text(&state.status_message)
+                        .size(9)
+                        .font(FONT_BODY_MEDIUM)
+                        .style(|_| text::Style {
+                            color: Some(FLUENT_TEXT_MUTED),
+                        }),
+                ]
+                .spacing(2),
+            )
+            .padding([6, 8])
+            .width(Length::Fill)
+            .style(|_| container::Style {
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.03))),
+                border: Border::default().rounded(Radius::from(6.0)),
+                ..container::Style::default()
+            }),
+        ]
+        .spacing(4)
+        .padding(10),
+    )
+    .width(Length::Fixed(190.0))
+    .height(Length::Fill)
+    .style(fluent_sidebar_container_style);
 
     let q = state.search_query.trim().to_lowercase();
     let filtered: Vec<(usize, &FileEntryItem)> = state
@@ -765,43 +953,42 @@ pub fn view_file_manager<'a>(
         .collect();
 
     let files_view: Element<'a, Message> = if state.grid_mode {
-        let mut grid_col = column![].spacing(10);
-        for chunk in filtered.chunks(4) {
-            let mut r = row![].spacing(10);
+        let mut grid_col = column![].spacing(8);
+        for chunk in filtered.chunks(5) {
+            let mut r = row![].spacing(8);
             for (idx, item) in chunk {
                 let is_sel = state.selected_index == Some(*idx);
                 let (ic, col) = file_icon_and_color(item);
                 let sub = if item.is_dir {
-                    "Direktori".to_string()
+                    "Folder file".to_string()
                 } else {
                     format_size(item.size_bytes)
                 };
 
                 let card_btn = button(
                     column![
-                        row![
-                            svg_icon(ic, 24.0, col),
-                            container("").width(Length::Fill),
-                            text(sub)
-                                .size(9)
-                                .font(FONT_BODY_SEMIBOLD)
-                                .style(|_| text::Style {
-                                    color: Some(TEXT_MUTED),
-                                }),
-                        ]
-                        .align_y(Alignment::Center),
+                        container(svg_icon(ic, 38.0, col))
+                            .width(Length::Fill)
+                            .center_x(Length::Fill),
                         text(&item.name)
-                            .size(12)
-                            .font(FONT_DISPLAY_BOLD)
+                            .size(11)
+                            .font(FONT_BODY_SEMIBOLD)
                             .style(|_| text::Style {
-                                color: Some(TEXT_MAIN),
+                                color: Some(FLUENT_TEXT_DARK),
+                            }),
+                        text(sub)
+                            .size(9)
+                            .font(FONT_BODY_MEDIUM)
+                            .style(|_| text::Style {
+                                color: Some(FLUENT_TEXT_MUTED),
                             }),
                     ]
-                    .spacing(8)
-                    .padding(6),
+                    .spacing(3)
+                    .align_x(Alignment::Center),
                 )
                 .width(Length::Fill)
-                .style(active_toggle_button_style(is_sel, col))
+                .padding([8, 6])
+                .style(fluent_file_item_style(is_sel))
                 .on_press(Message::FileEntryClicked(*idx));
 
                 let interactive_card = mouse_area(card_btn)
@@ -809,13 +996,16 @@ pub fn view_file_manager<'a>(
 
                 r = r.push(interactive_card);
             }
+            for _ in chunk.len()..5 {
+                r = r.push(container("").width(Length::Fill));
+            }
             grid_col = grid_col.push(r);
         }
         glass_scrollable(grid_col.padding(14))
             .height(Length::Fill)
             .into()
     } else {
-        let mut list_col = column![].spacing(6);
+        let mut list_col = column![].spacing(4);
         for (idx, item) in filtered {
             let is_sel = state.selected_index == Some(idx);
             let (ic, col) = file_icon_and_color(item);
@@ -828,16 +1018,26 @@ pub fn view_file_manager<'a>(
             let row_btn = button(
                 row![
                     svg_icon(ic, 16.0, col),
-                    text(&item.name).size(12).font(FONT_DISPLAY_BOLD),
+                    text(&item.name)
+                        .size(12)
+                        .font(FONT_BODY_SEMIBOLD)
+                        .style(|_| text::Style {
+                            color: Some(FLUENT_TEXT_DARK),
+                        }),
                     container("").width(Length::Fill),
-                    text(sub).size(11).font(FONT_BODY_MEDIUM),
+                    text(sub)
+                        .size(11)
+                        .font(FONT_BODY_MEDIUM)
+                        .style(|_| text::Style {
+                            color: Some(FLUENT_TEXT_MUTED),
+                        }),
                 ]
                 .spacing(10)
                 .align_y(Alignment::Center)
-                .padding([4, 8]),
+                .padding([5, 10]),
             )
             .width(Length::Fill)
-            .style(active_toggle_button_style(is_sel, col))
+            .style(fluent_file_item_style(is_sel))
             .on_press(Message::FileEntryClicked(idx));
 
             let interactive_row =
@@ -845,7 +1045,7 @@ pub fn view_file_manager<'a>(
 
             list_col = list_col.push(interactive_row);
         }
-        glass_scrollable(list_col.padding(14))
+        glass_scrollable(list_col.padding(12))
             .height(Length::Fill)
             .into()
     };
@@ -854,137 +1054,98 @@ pub fn view_file_manager<'a>(
         Some(
             container(
                 row![
-                    svg_icon(icons::TAG, 15.0, ACCENT_AMBER),
+                    svg_icon(icons::EDIT_PEN, 15.0, FLUENT_PRIMARY),
                     text("Ganti Nama:")
-                        .size(11)
-                        .font(FONT_DISPLAY_BOLD),
+                        .size(12)
+                        .font(FONT_BODY_SEMIBOLD)
+                        .style(|_| text::Style {
+                            color: Some(FLUENT_TEXT_DARK),
+                        }),
                     text_input("Ketik nama baru...", &state.rename_input)
                         .on_input(Message::FileRenameInputChanged)
                         .on_submit(Message::FileCommitRename)
-                        .padding([6, 10])
-                        .size(11)
+                        .padding([5, 10])
+                        .size(12)
                         .width(Length::Fill)
-                        .style(glass_input_style),
-                    button(text("Simpan Nama").size(11).font(FONT_DISPLAY_BOLD))
-                        .padding([6, 12])
-                        .style(primary_button_style(ACCENT_GREEN))
+                        .style(fluent_input_style),
+                    button(text("Simpan").size(11).font(FONT_BODY_SEMIBOLD))
+                        .padding([5, 12])
+                        .style(primary_button_style(FLUENT_PRIMARY))
                         .on_press(Message::FileCommitRename),
-                    button(text("Batal").size(11).font(FONT_BODY_SEMIBOLD))
-                        .padding([6, 10])
-                        .style(glass_action_button)
+                    button(text("Batal").size(11).font(FONT_BODY_MEDIUM))
+                        .padding([5, 10])
+                        .style(fluent_ribbon_button_style)
                         .on_press(Message::FileCancelRename),
                 ]
                 .spacing(8)
                 .align_y(Alignment::Center)
-                .padding([8, 14]),
+                .padding([6, 12]),
             )
             .width(Length::Fill)
-            .style(glass_card_accent_style(ACCENT_AMBER))
+            .style(fluent_address_bar_style)
             .into(),
         )
     } else {
         None
     };
 
-    let inspector_bar: Element<'a, Message> = if let Some(sel_idx) = state.selected_index {
+    let status_footer: Element<'a, Message> = if let Some(sel_idx) = state.selected_index {
         if let Some(item) = state.entries.get(sel_idx) {
             let (ic, col) = file_icon_and_color(item);
             let mut action_row = row![
-                svg_icon(ic, 18.0, col),
-                column![
-                    text(&item.name).size(12).font(FONT_DISPLAY_BOLD),
-                    text(item.path.to_string_lossy().to_string())
-                        .size(9)
-                        .font(FONT_BODY_MEDIUM)
-                        .style(|_| text::Style {
-                            color: Some(TEXT_MUTED),
-                        }),
-                ]
-                .spacing(1),
+                svg_icon(ic, 16.0, col),
+                text(&item.name)
+                    .size(11)
+                    .font(FONT_BODY_SEMIBOLD)
+                    .style(|_| text::Style {
+                        color: Some(FLUENT_TEXT_DARK),
+                    }),
                 container("").width(Length::Fill),
             ]
-            .spacing(7)
+            .spacing(8)
             .align_y(Alignment::Center);
 
             if is_image_ext(&item.ext) {
                 action_row = action_row.push(
                     button(
                         row![
-                            svg_icon(icons::SPARKLES, 12.0, ACCENT_PURPLE),
-                            text("Jadikan Wallpaper").size(10).font(FONT_DISPLAY_BOLD),
+                            svg_icon(icons::SPARKLES, 12.0, Color::from_rgb(0.55, 0.36, 0.96)),
+                            text("Jadikan Wallpaper").size(11).font(FONT_BODY_SEMIBOLD),
                         ]
-                        .spacing(5)
+                        .spacing(4)
                         .align_y(Alignment::Center),
                     )
-                    .padding([5, 10])
-                    .style(primary_button_style(ACCENT_PURPLE))
+                    .padding([4, 8])
+                    .style(fluent_ribbon_button_style)
                     .on_press(Message::SetCustomWallpaperFromFile(item.path.clone())),
                 );
             }
 
-            action_row = action_row
-                .push(
-                    button(
-                        row![
-                            svg_icon(icons::COPY, 12.0, ACCENT_CYAN),
-                            text("Copy (Ctrl+C)").size(10).font(FONT_BODY_SEMIBOLD),
-                        ]
-                        .spacing(4)
-                        .align_y(Alignment::Center),
-                    )
-                    .padding([5, 9])
-                    .style(glass_action_button)
-                    .on_press(Message::FileCopySelected(sel_idx)),
+            action_row = action_row.push(
+                button(
+                    row![
+                        svg_icon(icons::EYE, 12.0, FLUENT_PRIMARY),
+                        text("Quick Look").size(11).font(FONT_BODY_SEMIBOLD),
+                    ]
+                    .spacing(4)
+                    .align_y(Alignment::Center),
                 )
-                .push(
-                    button(
-                        row![
-                            svg_icon(icons::SCISSORS_CUT, 12.0, ACCENT_AMBER),
-                            text("Cut (Ctrl+X)").size(10).font(FONT_BODY_SEMIBOLD),
-                        ]
-                        .spacing(4)
-                        .align_y(Alignment::Center),
-                    )
-                    .padding([5, 9])
-                    .style(glass_action_button)
-                    .on_press(Message::FileCutSelected(sel_idx)),
-                )
-                .push(
-                    button(
-                        row![
-                            svg_icon(icons::EYE, 12.0, ACCENT_PURPLE),
-                            text("Quick Look").size(10).font(FONT_BODY_SEMIBOLD),
-                        ]
-                        .spacing(4)
-                        .align_y(Alignment::Center),
-                    )
-                    .padding([5, 9])
-                    .style(primary_button_style(ACCENT_PURPLE))
-                    .on_press(Message::FileContextQuickLook(sel_idx)),
-                )
-                .push(
-                    button(
-                        row![
-                            svg_icon(icons::TRASH, 12.0, ACCENT_RED),
-                            text(if state.current_place == FilePlace::Trash {
-                                "Hapus Permanen"
-                            } else {
-                                "Ke Sampah"
-                            })
-                            .size(10)
-                            .font(FONT_BODY_SEMIBOLD),
-                        ]
-                        .spacing(4)
-                        .align_y(Alignment::Center),
-                    )
-                    .padding([5, 9])
-                    .style(danger_button_style())
-                    .on_press(Message::FileDeleteSelected),
-                );
+                .padding([4, 8])
+                .style(fluent_ribbon_button_style)
+                .on_press(Message::FileContextQuickLook(sel_idx)),
+            );
 
-            container(action_row.padding([8, 14]))
+            container(action_row.padding([4, 12]))
                 .width(Length::Fill)
-                .style(glass_card_accent_style(col))
+                .style(|_| container::Style {
+                    background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.50))),
+                    border: Border {
+                        color: Color::from_rgba(0.0, 0.0, 0.0, 0.06),
+                        width: 1.0,
+                        radius: Radius::default().bottom_right(12.0),
+                    },
+                    ..container::Style::default()
+                })
                 .into()
         } else {
             container("").into()
@@ -992,40 +1153,63 @@ pub fn view_file_manager<'a>(
     } else {
         container(
             row![
-                svg_icon(icons::INFO, 14.0, ACCENT_CYAN),
-                text("Ctrl+C (Copy), Ctrl+X (Cut), Ctrl+V (Paste), Super+V (Clipboard HUD), Delete (Trash), atau Klik Kanan.")
-                    .size(10)
+                text(format!("{} item", state.entries.len()))
+                    .size(11)
                     .font(FONT_BODY_MEDIUM)
                     .style(|_| text::Style {
-                        color: Some(TEXT_MUTED),
+                        color: Some(FLUENT_TEXT_MUTED),
+                    }),
+                text("|").size(11).style(|_| text::Style {
+                    color: Some(Color::from_rgba(0.0, 0.0, 0.0, 0.15)),
+                }),
+                text(&state.status_message)
+                    .size(11)
+                    .font(FONT_BODY_MEDIUM)
+                    .style(|_| text::Style {
+                        color: Some(FLUENT_TEXT_MUTED),
                     }),
             ]
             .spacing(8)
             .align_y(Alignment::Center)
-            .padding([7, 14]),
+            .padding([4, 12]),
         )
         .width(Length::Fill)
-        .style(selection_card_style(false))
+        .style(|_| container::Style {
+            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.50))),
+            border: Border {
+                color: Color::from_rgba(0.0, 0.0, 0.0, 0.06),
+                width: 1.0,
+                radius: Radius::default().bottom_right(12.0),
+            },
+            ..container::Style::default()
+        })
         .into()
     };
 
-    let mut right_content = column![top_header, toolbar, files_view].spacing(6);
+    let mut right_pane = column![
+        top_header,
+        command_bar,
+        breadcrumb_row,
+        files_view,
+    ]
+    .spacing(0);
+
     if let Some(rb) = rename_bar {
-        right_content = right_content.push(container(rb).padding([0, 14]));
+        right_pane = right_pane.push(container(rb).padding([4, 12]));
     }
-    right_content = right_content.push(container(inspector_bar).padding([0, 14]));
+    right_pane = right_pane.push(status_footer);
 
     container(
         row![
             sidebar,
-            right_content.width(Length::Fill).height(Length::Fill)
+            right_pane.width(Length::Fill).height(Length::Fill)
         ]
         .width(Length::Fill)
         .height(Length::Fill),
     )
     .width(w)
     .height(h)
-    .style(glass_window_style)
+    .style(fluent_window_style)
     .into()
 }
 

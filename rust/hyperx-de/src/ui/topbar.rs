@@ -3,11 +3,12 @@ use iced::widget::{button, column, container, row, text, text_input};
 use iced::{Alignment, Background, Border, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    active_toggle_button_style, glass_action_button, glass_card_accent_style, glass_card_style,
-    glass_input_style, glass_scrollable, icons, popover_glass_style, primary_button_style,
-    status_pill, svg_icon, topbar_glass_style, ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN,
-    ACCENT_PURPLE, ACCENT_RED, ACTIVE_DARK_FG, FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD,
-    FONT_DISPLAY_BOLD, TEXT_MAIN, TEXT_MUTED, TEXT_SUB,
+    active_toggle_button_style, fluent_status_pill_style, glass_action_button,
+    glass_card_accent_style, glass_card_style, glass_input_style, glass_scrollable, icons,
+    popover_glass_style, primary_button_style, status_pill, svg_icon, ACCENT_AMBER, ACCENT_CYAN,
+    ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED, ACTIVE_DARK_FG, FLUENT_PRIMARY, FLUENT_TEXT_DARK,
+    FLUENT_TEXT_MUTED, FONT_BODY_MEDIUM, FONT_BODY_SEMIBOLD, FONT_DISPLAY_BOLD, TEXT_MAIN,
+    TEXT_MUTED, TEXT_SUB,
 };
 
 use crate::sys::network::NetworkState;
@@ -23,71 +24,96 @@ pub fn view_topbar<'a>(
     control_center_open: bool,
     notification_drawer_open: bool,
 ) -> Element<'a, Message> {
-    // 1. Center: Combined Clock + Notification Bell Pill
-    let fg_col = if notification_drawer_open {
-        ACTIVE_DARK_FG
-    } else {
-        TEXT_MAIN
-    };
-    let bell_col = if notification_drawer_open {
-        ACTIVE_DARK_FG
-    } else if unread_notifications > 0 {
-        ACCENT_AMBER
-    } else {
-        ACCENT_PURPLE
+    // 1. Quick Search + Mic Pill
+    let search_pill = button(
+        row![
+            svg_icon(icons::SEARCH, 15.0, FLUENT_TEXT_DARK),
+            svg_icon(icons::MIC, 14.0, FLUENT_TEXT_MUTED),
+        ]
+        .spacing(5)
+        .align_y(Alignment::Center),
+    )
+    .padding([3, 8])
+    .style(|_theme, status| {
+        let bg = match status {
+            button::Status::Hovered | button::Status::Pressed => {
+                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+            }
+            _ => None,
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(9999.0)),
+            ..button::Style::default()
+        }
+    })
+    .on_press(Message::ToggleLauncher);
+
+    // Subtle 1px vertical divider
+    let make_divider = || {
+        container("")
+            .width(Length::Fixed(1.0))
+            .height(Length::Fixed(14.0))
+            .style(|_| container::Style {
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.15))),
+                ..container::Style::default()
+            })
     };
 
-    let mut clock_row = row![
+    // 2. Date & Time Pill with Notification Badge
+    let clock_content = row![
         text(clock_str)
             .size(12)
-            .font(FONT_DISPLAY_BOLD)
-            .style(move |_| text::Style {
-                color: Some(fg_col),
+            .font(FONT_BODY_SEMIBOLD)
+            .style(|_| text::Style {
+                color: Some(FLUENT_TEXT_DARK),
             }),
-        container("")
-            .width(1)
-            .height(12)
-            .style(move |_| container::Style {
-                background: Some(Background::Color(if notification_drawer_open {
-                    Color::from_rgba(0.0, 0.0, 0.0, 0.25)
-                } else {
-                    Color::from_rgba(1.0, 1.0, 1.0, 0.22)
-                })),
-                ..container::Style::default()
-            }),
-        svg_icon(icons::BELL, 13.5, bell_col),
     ]
-    .spacing(8)
+    .spacing(4)
     .align_y(Alignment::Center);
 
+    let mut clock_group = row![clock_content].align_y(Alignment::Center);
     if unread_notifications > 0 {
-        clock_row = clock_row.push(
+        clock_group = clock_group.push(
             container(
                 text(format!("{}", unread_notifications))
-                    .size(10)
+                    .size(9)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACTIVE_DARK_FG),
+                        color: Some(Color::WHITE),
                     }),
             )
-            .padding([1, 6])
+            .padding([1, 5])
             .style(|_| container::Style {
-                background: Some(Background::Color(ACCENT_AMBER)),
+                background: Some(Background::Color(FLUENT_PRIMARY)),
                 border: Border::default().rounded(Radius::from(8.0)),
                 ..container::Style::default()
             }),
         );
     }
 
-    let center_clock_btn = button(clock_row)
-        .padding([5, 14])
-        .style(active_toggle_button_style(
-            notification_drawer_open,
-            ACCENT_PURPLE,
-        ))
+    let clock_btn = button(clock_group)
+        .padding([3, 8])
+        .style(move |_theme, status| {
+            let bg = if notification_drawer_open {
+                Some(Background::Color(Color::from_rgba(0.0, 0.47, 0.83, 0.15)))
+            } else {
+                match status {
+                    button::Status::Hovered | button::Status::Pressed => {
+                        Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+                    }
+                    _ => None,
+                }
+            };
+            button::Style {
+                background: bg,
+                border: Border::default().rounded(Radius::from(9999.0)),
+                ..button::Style::default()
+            }
+        })
         .on_press(Message::ToggleNotificationDrawer);
 
-    // 2. Right: Minimalist Icon-Only Wi-Fi Button + Volume Icon + Control Center Button
+    // 3. System Status Icons: Wi-Fi, Volume, Control / Battery
     let wifi_icon = if wifi_enabled {
         icons::WIFI
     } else {
@@ -95,17 +121,33 @@ pub fn view_topbar<'a>(
     };
     let wifi_btn = button(svg_icon(
         wifi_icon,
-        15.0,
+        14.0,
         if wifi_modal_open {
-            ACTIVE_DARK_FG
+            FLUENT_PRIMARY
         } else if wifi_enabled {
-            ACCENT_CYAN
+            FLUENT_PRIMARY
         } else {
             ACCENT_RED
         },
     ))
-    .padding([5, 9])
-    .style(active_toggle_button_style(wifi_modal_open, ACCENT_CYAN))
+    .padding([3, 6])
+    .style(move |_theme, status| {
+        let bg = if wifi_modal_open {
+            Some(Background::Color(Color::from_rgba(0.0, 0.47, 0.83, 0.15)))
+        } else {
+            match status {
+                button::Status::Hovered | button::Status::Pressed => {
+                    Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+                }
+                _ => None,
+            }
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(9999.0)),
+            ..button::Style::default()
+        }
+    })
     .on_press(Message::ToggleWifiModal);
 
     let vol_icon = if muted || volume <= 0.5 {
@@ -115,52 +157,74 @@ pub fn view_topbar<'a>(
     };
     let vol_btn = button(svg_icon(
         vol_icon,
-        15.0,
-        if muted { ACCENT_RED } else { ACCENT_AMBER },
+        14.0,
+        if muted { ACCENT_RED } else { FLUENT_TEXT_DARK },
     ))
-    .padding([5, 9])
-    .style(glass_action_button)
+    .padding([3, 6])
+    .style(|_theme, status| {
+        let bg = match status {
+            button::Status::Hovered | button::Status::Pressed => {
+                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+            }
+            _ => None,
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(9999.0)),
+            ..button::Style::default()
+        }
+    })
     .on_press(Message::ToggleMute);
 
-    let cc_btn = button(
-        row![
-            svg_icon(
-                icons::SLIDERS,
-                14.0,
-                if control_center_open {
-                    ACTIVE_DARK_FG
-                } else {
-                    ACCENT_CYAN
+    let cc_btn = button(svg_icon(
+        icons::SLIDERS,
+        14.0,
+        if control_center_open { FLUENT_PRIMARY } else { FLUENT_TEXT_DARK },
+    ))
+    .padding([3, 6])
+    .style(move |_theme, status| {
+        let bg = if control_center_open {
+            Some(Background::Color(Color::from_rgba(0.0, 0.47, 0.83, 0.15)))
+        } else {
+            match status {
+                button::Status::Hovered | button::Status::Pressed => {
+                    Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
                 }
-            ),
-            text("Control")
-                .size(11)
-                .font(FONT_DISPLAY_BOLD),
-        ]
-        .spacing(6)
-        .align_y(Alignment::Center),
-    )
-    .padding([5, 11])
-    .style(active_toggle_button_style(control_center_open, ACCENT_CYAN))
+                _ => None,
+            }
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(9999.0)),
+            ..button::Style::default()
+        }
+    })
     .on_press(Message::ToggleControlCenter);
 
-    let right_group = row![wifi_btn, vol_btn, cc_btn]
-        .spacing(6)
-        .align_y(Alignment::Center);
+    let status_island = container(
+        row![
+            search_pill,
+            make_divider(),
+            clock_btn,
+            make_divider(),
+            row![wifi_btn, vol_btn, cc_btn].spacing(1).align_y(Alignment::Center),
+        ]
+        .spacing(7)
+        .align_y(Alignment::Center),
+    )
+    .style(fluent_status_pill_style)
+    .padding([3, 9]);
 
     let bar_row = row![
         container("").width(Length::Fill),
-        center_clock_btn,
-        container(right_group)
-            .width(Length::Fill)
-            .align_x(Alignment::End),
+        status_island,
     ]
     .align_y(Alignment::Center)
-    .padding([5, 14]);
+    .padding([8, 18]);
 
     container(bar_row)
         .width(Length::Fill)
-        .style(topbar_glass_style)
+        .style(|_| container::Style::default())
         .into()
 }
 

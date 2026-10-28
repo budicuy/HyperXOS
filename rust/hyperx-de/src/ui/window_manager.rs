@@ -195,6 +195,7 @@ impl FloatingWindowManager {
             .collect()
     }
 
+    #[allow(dead_code)]
     pub fn running_windows(&self) -> Vec<DesktopWindowId> {
         let all = [
             DesktopWindowId::Files,

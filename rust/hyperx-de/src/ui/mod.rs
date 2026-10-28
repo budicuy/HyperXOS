@@ -28,8 +28,9 @@ use iced::{
 use sysinfo::System;
 
 use hyperx_ui_kit::{
-    app_icon, desktop_icon_button_style, icons, svg_icon, ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN,
-    ACCENT_PURPLE, ACCENT_RED, FONT_BODY_SEMIBOLD, TEXT_MAIN,
+    app_icon, fluent_desktop_icon_tile_style, icons, svg_icon,
+    ACCENT_AMBER, ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED, FLUENT_PRIMARY,
+    FONT_BODY_SEMIBOLD, TEXT_MAIN,
 };
 
 use crate::compositor::CompositorSnapshot;
@@ -170,6 +171,7 @@ pub enum Message {
     FileRefresh,
     FileToggleViewMode,
     FileSearchChanged(String),
+    #[allow(dead_code)]
     FileNewFolderNameChanged(String),
     FileCreateFolder,
     FileEntryClicked(usize),
@@ -334,19 +336,69 @@ impl HyperXDesktop {
             || std::path::Path::new("/usr/local/bin/launch-installer").exists();
 
         let mut desktop_icons = Vec::new();
-        let mut y_offset = 20.0;
+        let mut y_offset = 24.0;
 
         if has_installer {
             desktop_icons.push(DesktopShortcutItem {
                 title: "Install HyperXOS".to_string(),
                 svg_icon_data: None,
                 app_icon_name: "hyper-x-installer".to_string(),
-                svg_color: ACCENT_CYAN,
+                svg_color: FLUENT_PRIMARY,
                 action: DesktopIconAction::External("launch-installer".to_string()),
-                pos: Point::new(28.0, y_offset),
+                pos: Point::new(24.0, y_offset),
             });
-            y_offset += 98.0;
+            y_offset += 86.0;
         }
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "PC Ini".to_string(),
+            svg_icon_data: Some(icons::COMPUTER),
+            app_icon_name: String::new(),
+            svg_color: FLUENT_PRIMARY,
+            action: DesktopIconAction::Internal(DesktopWindowId::Files),
+            pos: Point::new(24.0, y_offset),
+        });
+        y_offset += 86.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Keranjang Sampah".to_string(),
+            svg_icon_data: Some(icons::TRASH),
+            app_icon_name: String::new(),
+            svg_color: Color::from_rgb8(100, 116, 139),
+            action: DesktopIconAction::Internal(DesktopWindowId::Files),
+            pos: Point::new(24.0, y_offset),
+        });
+        y_offset += 86.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Dokumen".to_string(),
+            svg_icon_data: Some(icons::FOLDER),
+            app_icon_name: String::new(),
+            svg_color: Color::from_rgb8(245, 158, 11),
+            action: DesktopIconAction::Internal(DesktopWindowId::Files),
+            pos: Point::new(24.0, y_offset),
+        });
+        y_offset += 86.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Terminal".to_string(),
+            svg_icon_data: Some(icons::TERMINAL),
+            app_icon_name: String::new(),
+            svg_color: Color::from_rgb8(16, 185, 129),
+            action: DesktopIconAction::Internal(DesktopWindowId::Terminal),
+            pos: Point::new(24.0, y_offset),
+        });
+        y_offset += 86.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Browser".to_string(),
+            svg_icon_data: None,
+            app_icon_name: "firefox".to_string(),
+            svg_color: Color::from_rgb8(0, 120, 212),
+            action: DesktopIconAction::External("firefox".to_string()),
+            pos: Point::new(24.0, y_offset),
+        });
+        y_offset += 86.0;
 
         desktop_icons.push(DesktopShortcutItem {
             title: "HyperXTools".to_string(),
@@ -354,47 +406,7 @@ impl HyperXDesktop {
             app_icon_name: "hyper-x-tools".to_string(),
             svg_color: ACCENT_PURPLE,
             action: DesktopIconAction::External("hyper-x-tools".to_string()),
-            pos: Point::new(28.0, y_offset),
-        });
-        y_offset += 98.0;
-
-        desktop_icons.push(DesktopShortcutItem {
-            title: "Firefox".to_string(),
-            svg_icon_data: None,
-            app_icon_name: "firefox".to_string(),
-            svg_color: ACCENT_AMBER,
-            action: DesktopIconAction::External("firefox".to_string()),
-            pos: Point::new(28.0, y_offset),
-        });
-        y_offset += 98.0;
-
-        desktop_icons.push(DesktopShortcutItem {
-            title: "HyperX Files".to_string(),
-            svg_icon_data: Some(icons::FOLDER),
-            app_icon_name: String::new(),
-            svg_color: ACCENT_CYAN,
-            action: DesktopIconAction::Internal(DesktopWindowId::Files),
-            pos: Point::new(28.0, y_offset),
-        });
-        y_offset += 98.0;
-
-        desktop_icons.push(DesktopShortcutItem {
-            title: "Terminal".to_string(),
-            svg_icon_data: Some(icons::TERMINAL),
-            app_icon_name: String::new(),
-            svg_color: ACCENT_GREEN,
-            action: DesktopIconAction::Internal(DesktopWindowId::Terminal),
-            pos: Point::new(28.0, y_offset),
-        });
-        y_offset += 98.0;
-
-        desktop_icons.push(DesktopShortcutItem {
-            title: "Settings".to_string(),
-            svg_icon_data: Some(icons::SETTINGS_GEAR),
-            app_icon_name: String::new(),
-            svg_color: ACCENT_AMBER,
-            action: DesktopIconAction::Internal(DesktopWindowId::Settings),
-            pos: Point::new(28.0, y_offset),
+            pos: Point::new(24.0, y_offset),
         });
 
         let mut state = Self {
@@ -2136,21 +2148,24 @@ impl HyperXDesktop {
         icon_layers.push(wallpaper_click_area.into());
 
         for (idx, item) in self.desktop_icons.iter().enumerate() {
-            let is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
+            let _is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
 
             let icon_graphic: Element<'_, Message> = if let Some(svg_data) = item.svg_icon_data {
-                svg_icon(svg_data, 42.0, item.svg_color).into()
+                svg_icon(svg_data, 26.0, item.svg_color).into()
             } else {
-                app_icon(&item.app_icon_name, 46.0)
+                app_icon(&item.app_icon_name, 28.0)
             };
+
+            let tile_box = container(icon_graphic)
+                .width(Length::Fixed(44.0))
+                .height(Length::Fixed(44.0))
+                .center_x(Length::Fixed(44.0))
+                .center_y(Length::Fixed(44.0))
+                .style(fluent_desktop_icon_tile_style);
 
             let icon_btn = button(
                 column![
-                    container(icon_graphic)
-                        .width(Length::Fixed(50.0))
-                        .height(Length::Fixed(50.0))
-                        .center_x(Length::Fixed(50.0))
-                        .center_y(Length::Fixed(50.0)),
+                    tile_box,
                     text(&item.title)
                         .size(11)
                         .font(FONT_BODY_SEMIBOLD)
@@ -2158,13 +2173,24 @@ impl HyperXDesktop {
                             color: Some(TEXT_MAIN),
                         }),
                 ]
-                .spacing(4)
+                .spacing(5)
                 .align_x(Alignment::Center),
             )
-            .width(Length::Fixed(104.0))
-            .height(Length::Fixed(86.0))
-            .padding([5, 4])
-            .style(desktop_icon_button_style(is_dragging))
+            .width(Length::Fixed(88.0))
+            .height(Length::Fixed(76.0))
+            .padding([4, 4])
+            .style(|_theme, status| {
+                let bg = match status {
+                    button::Status::Hovered => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
+                    button::Status::Pressed => Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.28))),
+                    _ => None,
+                };
+                button::Style {
+                    background: bg,
+                    border: Border::default().rounded(Radius::from(10.0)),
+                    ..button::Style::default()
+                }
+            })
             .on_press(Message::DesktopIconPress(idx));
 
             let interactive_icon = mouse_area(icon_btn)

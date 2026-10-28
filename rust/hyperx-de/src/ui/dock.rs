@@ -3,8 +3,8 @@ use iced::widget::{button, column, container, mouse_area, row, text};
 use iced::{Alignment, Background, Border, Color, Element, Length};
 
 use hyperx_ui_kit::{
-    app_icon, dock_glass_style, dock_item_button_style, icons, svg_icon, ACCENT_AMBER,
-    ACCENT_CYAN, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_RED, FONT_BODY_SEMIBOLD, TEXT_MAIN,
+    app_icon, fluent_dock_item_button_style, fluent_dock_style, icons, svg_icon, ACCENT_AMBER,
+    ACCENT_RED, FLUENT_PRIMARY, FLUENT_TEXT_DARK, FLUENT_TEXT_MUTED, FONT_BODY_SEMIBOLD,
 };
 
 use crate::sys::apps::DesktopAppEntry;
@@ -14,7 +14,7 @@ use crate::ui::{DesktopWindowId, Message};
 pub fn view_dock<'a>(
     wm: &'a FloatingWindowManager,
     launcher_open: bool,
-    mission_control_open: bool,
+    _mission_control_open: bool,
     trash_count: usize,
     dock_icon_size: f32,
     pinned_dock_apps: &'a [DesktopAppEntry],
@@ -26,23 +26,23 @@ pub fn view_dock<'a>(
                           is_running: bool,
                           is_minimized: bool,
                           is_focused: bool,
-                          accent: Color,
+                          _accent: Color,
                           on_press: Message,
                           right_click_msg: Option<Message>|
      -> Element<'a, Message> {
-        let dot_color = if is_focused {
-            accent
+        let (dot_width, dot_color) = if is_focused {
+            (14, FLUENT_PRIMARY)
         } else if is_minimized {
-            ACCENT_AMBER
+            (4, ACCENT_AMBER)
         } else if is_running {
-            Color::WHITE
+            (4, FLUENT_PRIMARY)
         } else {
-            Color::TRANSPARENT
+            (0, Color::TRANSPARENT)
         };
 
         let indicator_dot = container("")
-            .width(if is_focused { 16 } else { 6 })
-            .height(4)
+            .width(dot_width)
+            .height(3)
             .style(move |_| container::Style {
                 background: Some(Background::Color(dot_color)),
                 border: Border::default().rounded(Radius::from(2.0)),
@@ -52,24 +52,24 @@ pub fn view_dock<'a>(
         let btn = button(
             column![
                 container(icon_el)
-                    .width(Length::Fixed(dock_icon_size + 6.0))
-                    .height(Length::Fixed(dock_icon_size + 6.0))
+                    .width(Length::Fixed(dock_icon_size + 4.0))
+                    .height(Length::Fixed(dock_icon_size + 4.0))
                     .center_x(Length::Fill)
                     .center_y(Length::Fill),
                 text(label)
                     .size(10)
                     .font(FONT_BODY_SEMIBOLD)
                     .style(|_| text::Style {
-                        color: Some(TEXT_MAIN),
+                        color: Some(FLUENT_TEXT_DARK),
                     }),
             ]
-            .spacing(3)
+            .spacing(2)
             .align_x(Alignment::Center),
         )
-        .width(Length::Fixed(70.0))
-        .height(Length::Fixed(66.0))
-        .padding([6, 6])
-        .style(dock_item_button_style(is_focused, accent))
+        .width(Length::Fixed(66.0))
+        .height(Length::Fixed(60.0))
+        .padding([4, 4])
+        .style(fluent_dock_item_button_style(is_focused))
         .on_press(on_press);
 
         let wrapped_btn: Element<'a, Message> = if let Some(rc_msg) = right_click_msg {
@@ -79,32 +79,32 @@ pub fn view_dock<'a>(
         };
 
         column![wrapped_btn, indicator_dot]
-            .spacing(4)
+            .spacing(2)
             .align_x(Alignment::Center)
             .into()
     };
 
-    // 1. Launchpad (App Grid)
-    let item_launchpad = make_dock_item(
-        "Launchpad",
-        svg_icon(icons::LAUNCHPAD_GRID, dock_icon_size, ACCENT_PURPLE).into(),
+    // 1. Windows 11 Fluent Start Button (4-square logo)
+    let item_start = make_dock_item(
+        "Mulai",
+        svg_icon(icons::FLUENT_START, dock_icon_size - 4.0, FLUENT_PRIMARY).into(),
         launcher_open,
         false,
         launcher_open,
-        ACCENT_PURPLE,
+        FLUENT_PRIMARY,
         Message::ToggleLauncher,
         None,
     );
 
-    // 2. Mission Control (Spaces / Super+Tab)
-    let item_mission = make_dock_item(
-        "Spaces",
-        svg_icon(icons::LAYERS, dock_icon_size, ACCENT_CYAN).into(),
-        mission_control_open || !wm.running_windows().is_empty(),
+    // 2. Search Button
+    let item_search = make_dock_item(
+        "Cari",
+        svg_icon(icons::SEARCH, dock_icon_size - 4.0, FLUENT_TEXT_DARK).into(),
         false,
-        mission_control_open,
-        ACCENT_CYAN,
-        Message::ToggleMissionControl,
+        false,
+        false,
+        FLUENT_PRIMARY,
+        Message::ToggleLauncher,
         None,
     );
 
@@ -115,70 +115,70 @@ pub fn view_dock<'a>(
         false,
         false,
         false,
-        ACCENT_CYAN,
+        FLUENT_PRIMARY,
         Message::LaunchExternalApp("launch-installer".to_string()),
         None,
     );
 
-    // 4. Firefox Web Browser (Pinned Official App)
-    let item_firefox = make_dock_item(
-        "Firefox",
-        app_icon("firefox", dock_icon_size),
-        false,
-        false,
-        false,
-        ACCENT_AMBER,
-        Message::LaunchExternalApp("firefox".to_string()),
-        None,
-    );
-
-    // 5. HyperX Files (Built-in Seamless File Manager)
+    // 4. File Explorer (Dokumen)
     let files_st = wm.state(DesktopWindowId::Files);
     let item_files = make_dock_item(
         "Files",
-        svg_icon(icons::FOLDER, dock_icon_size, ACCENT_CYAN).into(),
+        svg_icon(icons::FOLDER, dock_icon_size, Color::from_rgb8(245, 158, 11)).into(),
         files_st.open,
         files_st.minimized,
         focused_win == Some(DesktopWindowId::Files),
-        ACCENT_CYAN,
+        FLUENT_PRIMARY,
         Message::DockItemClicked(DesktopWindowId::Files),
         Some(Message::OpenDockContextMenu(DesktopWindowId::Files)),
     );
 
-    // 6. HyperX Terminal & Activity Monitor
+    // 5. Firefox / Web Browser
+    let item_firefox = make_dock_item(
+        "Browser",
+        app_icon("firefox", dock_icon_size),
+        false,
+        false,
+        false,
+        FLUENT_PRIMARY,
+        Message::LaunchExternalApp("firefox".to_string()),
+        None,
+    );
+
+    // 6. HyperX Terminal
     let term_st = wm.state(DesktopWindowId::Terminal);
     let item_terminal = make_dock_item(
         "Terminal",
-        svg_icon(icons::TERMINAL, dock_icon_size, ACCENT_GREEN).into(),
+        svg_icon(icons::TERMINAL, dock_icon_size, Color::from_rgb8(16, 185, 129)).into(),
         term_st.open,
         term_st.minimized,
         focused_win == Some(DesktopWindowId::Terminal),
-        ACCENT_GREEN,
+        FLUENT_PRIMARY,
         Message::DockItemClicked(DesktopWindowId::Terminal),
         Some(Message::OpenDockContextMenu(DesktopWindowId::Terminal)),
     );
 
-    // 7. HyperX Notes & Text Editor
+    // 7. HyperX Notes
     let notes_st = wm.state(DesktopWindowId::Notes);
     let item_notes = make_dock_item(
-        "Notes",
-        svg_icon(icons::EDIT_PEN, dock_icon_size, ACCENT_PURPLE).into(),
+        "Catatan",
+        svg_icon(icons::EDIT_PEN, dock_icon_size, Color::from_rgb8(139, 92, 246)).into(),
         notes_st.open,
         notes_st.minimized,
         focused_win == Some(DesktopWindowId::Notes),
-        ACCENT_PURPLE,
+        FLUENT_PRIMARY,
         Message::DockItemClicked(DesktopWindowId::Notes),
         Some(Message::OpenDockContextMenu(DesktopWindowId::Notes)),
     );
 
     // 8. HyperXTools
     let item_tools = make_dock_item(
-        "HyperXTools",
+        "Tools",
         app_icon("hyper-x-tools", dock_icon_size),
         false,
         false,
         false,
-        ACCENT_PURPLE,
+        FLUENT_PRIMARY,
         Message::LaunchExternalApp("hyper-x-tools".to_string()),
         None,
     );
@@ -186,26 +186,26 @@ pub fn view_dock<'a>(
     // 9. System Settings
     let settings_st = wm.state(DesktopWindowId::Settings);
     let item_settings = make_dock_item(
-        "Settings",
-        svg_icon(icons::SETTINGS_GEAR, dock_icon_size, ACCENT_AMBER).into(),
+        "Pengaturan",
+        svg_icon(icons::SETTINGS_GEAR, dock_icon_size, FLUENT_TEXT_MUTED).into(),
         settings_st.open,
         settings_st.minimized,
         focused_win == Some(DesktopWindowId::Settings),
-        ACCENT_AMBER,
+        FLUENT_PRIMARY,
         Message::DockItemClicked(DesktopWindowId::Settings),
         Some(Message::OpenDockContextMenu(DesktopWindowId::Settings)),
     );
 
-    // 10. macOS Trash Bin at far right of Dock
+    // 10. Trash Bin (Keranjang Sampah)
     let item_trash = make_dock_item(
-        if trash_count > 0 { "Trash •" } else { "Trash" },
+        if trash_count > 0 { "Sampah •" } else { "Sampah" },
         svg_icon(
             icons::TRASH,
             dock_icon_size,
             if trash_count > 0 {
                 ACCENT_RED
             } else {
-                ACCENT_CYAN
+                FLUENT_TEXT_MUTED
             },
         )
         .into(),
@@ -217,30 +217,24 @@ pub fn view_dock<'a>(
         Some(Message::OpenTrashDockContextMenu),
     );
 
-    let sep1 = container("")
-        .width(1)
-        .height(42)
-        .style(|_| container::Style {
-            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
-            ..container::Style::default()
-        });
-
-    let sep2 = container("")
-        .width(1)
-        .height(42)
-        .style(|_| container::Style {
-            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
-            ..container::Style::default()
-        });
+    let make_sep = || {
+        container("")
+            .width(Length::Fixed(1.0))
+            .height(Length::Fixed(24.0))
+            .style(|_| container::Style {
+                background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.15))),
+                ..container::Style::default()
+            })
+    };
 
     let has_installer = std::path::Path::new("/usr/bin/launch-installer").exists()
         || std::path::Path::new("/usr/bin/hyper-x-installer").exists()
         || std::path::Path::new("/usr/local/bin/launch-installer").exists();
 
     let mut dock_row = row![
-        item_launchpad,
-        item_mission,
-        sep1,
+        item_start,
+        item_search,
+        make_sep(),
     ];
 
     if has_installer {
@@ -248,15 +242,15 @@ pub fn view_dock<'a>(
     }
 
     dock_row = dock_row
-        .push(item_firefox)
         .push(item_files)
+        .push(item_firefox)
         .push(item_terminal)
         .push(item_notes)
         .push(item_tools)
         .push(item_settings)
-        .spacing(7)
+        .spacing(4)
         .align_y(Alignment::Center)
-        .padding([8, 14]);
+        .padding([4, 10]);
 
     for (idx, pinned) in pinned_dock_apps.iter().enumerate() {
         let short_label = if pinned.name.chars().count() > 9 {
@@ -270,18 +264,18 @@ pub fn view_dock<'a>(
             false,
             false,
             false,
-            ACCENT_PURPLE,
+            FLUENT_PRIMARY,
             Message::LaunchExternalApp(pinned.exec.clone()),
             Some(Message::OpenPinnedDockContextMenu(idx)),
         );
         dock_row = dock_row.push(pinned_item);
     }
 
-    dock_row = dock_row.push(sep2).push(item_trash);
+    dock_row = dock_row.push(make_sep()).push(item_trash);
 
     container(dock_row)
         .width(Length::Shrink)
         .height(Length::Shrink)
-        .style(dock_glass_style)
+        .style(fluent_dock_style)
         .into()
 }

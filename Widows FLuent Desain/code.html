@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Windows 11 Desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#005faa",
+            "primary-container": "#0078d4",
+            "on-primary": "#ffffff",
+            "surface": "#f9f9f9",
+            "surface-container": "#eeeeee",
+            "on-surface": "#1a1c1c",
+            "on-surface-variant": "#404752"
+          },
+          fontFamily: {
+            sans: ["Segoe UI Variable", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif]
+          }
+        }
+      }
+    };
+</script>
+<style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .acrylic-card {
+      background: rgba(250, 250, 250, 0.88);
+      backdrop-filter: blur(36px);
+      -webkit-backdrop-filter: blur(36px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+    .fluent-window {
+      background: rgba(248, 249, 251, 0.94);
+      backdrop-filter: blur(32px) saturate(160%);
+      -webkit-backdrop-filter: blur(32px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28), 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    .acrylic-dock {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+    .acrylic-pill {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+</style>
+</head>
+<body class="w-screen h-screen m-0 p-0 overflow-hidden relative font-sans text-on-surface bg-slate-900">
+<!-- 1. Background Wallpaper -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none z-0" style="background-image: url('https://lh3.googleusercontent.com/aida/AEtjO1Xljrala1yjfQjsC_70Dz6UwPvXS_kIcbPP6WW38DR4wqHOEX6hWXo7SOOEtPkrNvQ6IZk8f23tueeR-9fvYHHZvKPweAg4_eKcLB6UyJxfTPzFk-ou1fTBDE8pS-24MZbrtp-kP_6KtoZZdCWDrmV5B1yBn48zIyajb2ZYryZLYRdxBuJMnoZxbIbDaUVdFqhXR__oRXx5p38ZfqiDgp-oFV8pE39ssQ42hwe01hk'); background-size: cover; background-position: center center;"></div>
+<!-- 2. Top-Right Floating Status Island (System Tray & Controls) -->
+<header class="fixed top-4 right-6 z-50 acrylic-pill rounded-full flex items-center px-[14px] py-[6px] gap-3 text-[12px] text-[#1c1c1c] font-medium transition-all">
+<!-- Search icon & Mic / Quick Search Pill -->
+<div class="flex items-center gap-1.5 px-1.5 py-0.5 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer text-slate-700">
+<span class="material-symbols-outlined text-[17px]">search</span>
+<span class="material-symbols-outlined text-[16px]">mic</span>
+</div>
+<!-- Subtle Divider -->
+<div class="w-[1px] h-[14px] bg-black/15"></div>
+<!-- Time & Date -->
+<div class="flex items-center gap-1.5 px-1.5 py-0.5 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer text-slate-800">
+<span class="font-semibold tracking-tight">10:42 AM</span>
+<span class="text-slate-500 font-normal">10/24/2024</span>
+</div>
+<!-- Subtle Divider -->
+<div class="w-[1px] h-[14px] bg-black/15"></div>
+<!-- Crisp System Status Icons: Wi-Fi, Volume, Battery -->
+<div class="flex items-center gap-2 px-1 py-0.5 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer text-slate-700">
+<!-- Wi-Fi SVG -->
+<svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+<path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+<path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+<line x1="12" x2="12.01" y1="20" y2="20"></line>
+</svg>
+<!-- Volume SVG -->
+<svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+</svg>
+<!-- Battery SVG -->
+<svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="12" rx="2" ry="2" width="16" x="2" y="6"></rect>
+<line x1="22" x2="22" y1="11" y2="13"></line>
+<rect fill="currentColor" height="6" rx="1" width="9" x="5" y="9"></rect>
+</svg>
+</div>
+</header>
+<!-- 3. Desktop Shortcut Icons (Left Column) -->
+<nav aria-label="Desktop Shortcuts" class="absolute top-6 left-6 z-20 flex flex-col gap-5 w-24">
+<!-- PC Ini -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[#0078d4] text-[26px]">computer</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">PC Ini</span>
+</button>
+<!-- Keranjang Sampah -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-slate-600 text-[26px]">delete</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">Keranjang Sampah</span>
+</button>
+<!-- File Explorer (Dokumen) -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none" onclick="toggleExplorer(true)">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-amber-500 text-[26px]">folder</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">Dokumen</span>
+</button>
+<!-- VS Code -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[#0066b8] text-[26px]">code</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">VS Code</span>
+</button>
+<!-- Microsoft Edge -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[#0078d4] text-[26px]">public</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">Microsoft Edge</span>
+</button>
+<!-- Proyek 2025 -->
+<button class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-white/20 active:bg-white/30 backdrop-blur-xs transition-all cursor-pointer text-center outline-none" onclick="toggleExplorer(true)">
+<div class="w-[44px] h-[44px] rounded-xl flex items-center justify-center bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.14)] border border-white/50 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-amber-500 text-[26px]">folder_zip</span>
+</div>
+<span class="mt-1.5 text-[11px] font-medium text-white tracking-tight" style="text-shadow: rgba(0, 0, 0, 0.65) 0px 1px 3px;">Proyek 2025</span>
+</button>
+</nav>
+<!-- Windows 11 Fluent Design File Explorer Window -->
+<section aria-label="File Explorer" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-[52%] w-[880px] max-w-[94vw] h-[550px] max-h-[82vh] z-30 fluent-window rounded-[12px] flex flex-col overflow-hidden transition-all duration-200 ease-out" id="file-explorer-window">
+<!-- Window Titlebar & Tab Bar -->
+<header class="h-10 px-2.5 pt-1.5 flex items-center justify-between border-b border-black/[0.06] bg-black/[0.015] select-none">
+<!-- Modern Fluent Tabs -->
+<div class="flex items-center gap-1">
+<!-- Active Tab -->
+<div class="flex items-center gap-2 px-3 py-1.5 bg-white/95 rounded-t-lg border-t border-x border-black/10 shadow-xs text-[12px] font-medium text-slate-800">
+<span class="material-symbols-outlined text-amber-500 text-[16px]">folder</span>
+<span class="tracking-tight">Dokumen</span>
+<button class="w-4 h-4 ml-1 rounded hover:bg-black/10 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors" title="Tutup Tab">
+<span class="material-symbols-outlined text-[12px]">close</span>
+</button>
+</div>
+<!-- Add New Tab Button -->
+<button class="w-7 h-7 rounded-md hover:bg-black/5 text-slate-600 flex items-center justify-center transition-colors" title="Tab baru">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+<!-- Window Control Buttons (Minimize, Maximize, Close) -->
+<div class="flex items-center -mr-1">
+<button class="w-10 h-8 rounded hover:bg-black/5 flex items-center justify-center text-slate-700 transition-colors" onclick="toggleExplorer(false)" title="Minimalkan">
+<span class="material-symbols-outlined text-[15px]">remove</span>
+</button>
+<button class="w-10 h-8 rounded hover:bg-black/5 flex items-center justify-center text-slate-700 transition-colors" title="Maksimalkan">
+<span class="material-symbols-outlined text-[13px]">check_box_outline_blank</span>
+</button>
+<button class="w-10 h-8 rounded-tr-lg hover:bg-red-500 hover:text-white flex items-center justify-center text-slate-700 transition-colors" onclick="toggleExplorer(false)" title="Tutup">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</header>
+<!-- Fluent Command Bar / Ribbon Toolbar -->
+<div class="px-3 py-1.5 flex items-center gap-1 border-b border-black/[0.06] bg-white/60 text-[12px] text-slate-700 flex-wrap">
+<!-- New Item Button -->
+<button class="flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-black/5 active:bg-black/10 text-slate-800 font-medium transition-colors">
+<span class="material-symbols-outlined text-blue-600 text-[18px]">add_circle</span>
+<span>Baru</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+</button>
+<div class="w-[1px] h-4 bg-black/10 mx-1"></div>
+<!-- Cut -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Gunting">
+<span class="material-symbols-outlined text-[17px]">content_cut</span>
+</button>
+<!-- Copy -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Salin">
+<span class="material-symbols-outlined text-[17px]">content_copy</span>
+</button>
+<!-- Paste -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-400 cursor-not-allowed transition-colors" title="Tempel">
+<span class="material-symbols-outlined text-[17px]">content_paste</span>
+</button>
+<!-- Rename -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Ganti Nama">
+<span class="material-symbols-outlined text-[17px]">drive_file_rename_outline</span>
+</button>
+<!-- Share -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Bagikan">
+<span class="material-symbols-outlined text-[17px]">share</span>
+</button>
+<!-- Delete -->
+<button class="p-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[17px]">delete</span>
+</button>
+<div class="w-[1px] h-4 bg-black/10 mx-1"></div>
+<!-- Sort -->
+<button class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Urutkan">
+<span class="material-symbols-outlined text-[17px]">sort</span>
+<span class="hidden sm:inline">Urutkan</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400">expand_more</span>
+</button>
+<!-- View -->
+<button class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-black/5 text-slate-700 transition-colors" title="Tampilkan">
+<span class="material-symbols-outlined text-[17px]">grid_view</span>
+<span class="hidden sm:inline">Tampilkan</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400">expand_more</span>
+</button>
+</div>
+<!-- Breadcrumb Navigation & Search Bar -->
+<div class="px-3.5 py-1.5 flex items-center gap-2 border-b border-black/[0.06] bg-white/40 text-[12px]">
+<!-- Nav controls: Back, Forward, Up, Refresh -->
+<div class="flex items-center gap-0.5 text-slate-600">
+<button class="w-7 h-7 rounded hover:bg-black/5 flex items-center justify-center text-slate-400 cursor-not-allowed">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+</button>
+<button class="w-7 h-7 rounded hover:bg-black/5 flex items-center justify-center text-slate-400 cursor-not-allowed">
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+<button class="w-7 h-7 rounded hover:bg-black/5 flex items-center justify-center text-slate-700">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+</button>
+<button class="w-7 h-7 rounded hover:bg-black/5 flex items-center justify-center text-slate-700">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+</button>
+</div>
+<!-- Address Breadcrumb Box -->
+<div class="flex-1 flex items-center gap-1.5 px-3 py-1 bg-white/85 rounded-lg border border-black/10 shadow-2xs hover:border-black/20 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+<span class="material-symbols-outlined text-amber-500 text-[16px]">folder</span>
+<span class="text-slate-600 hover:text-slate-900 cursor-pointer">PC Ini</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400">chevron_right</span>
+<span class="font-medium text-slate-800">Dokumen</span>
+<span class="material-symbols-outlined text-[13px] text-slate-400 ml-auto cursor-pointer hover:text-slate-700">expand_more</span>
+</div>
+<!-- Search Bar in Folder -->
+<div class="w-56 flex items-center gap-1.5 px-3 py-1 bg-white/85 rounded-lg border border-black/10 shadow-2xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+<span class="material-symbols-outlined text-slate-400 text-[16px]">search</span>
+<input class="w-full bg-transparent text-[12px] text-slate-800 placeholder:text-slate-400 outline-none border-none p-0 focus:ring-0" placeholder="Cari di Dokumen" type="text"/>
+</div>
+</div>
+<!-- Main Split Layout (Sidebar + Content Grid) -->
+<div class="flex-1 flex min-h-0 bg-white/70">
+<!-- Left Navigation Sidebar -->
+<aside class="w-48 border-r border-black/[0.06] bg-black/[0.015] p-2 overflow-y-auto text-[12px] flex flex-col gap-0.5">
+<!-- Akses Cepat / Beranda -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-blue-600 text-[17px]">home</span>
+<span class="font-medium truncate">Beranda</span>
+</button>
+<!-- Dokumen (Active selection) -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md bg-[#0078d4]/10 text-[#0078d4] font-semibold transition-colors w-full text-left">
+<span class="material-symbols-outlined text-amber-500 text-[17px]">folder</span>
+<span class="truncate">Dokumen</span>
+</button>
+<!-- Unduhan -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-blue-500 text-[17px]">download</span>
+<span class="truncate">Unduhan</span>
+</button>
+<!-- Gambar -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-indigo-500 text-[17px]">image</span>
+<span class="truncate">Gambar</span>
+</button>
+<!-- Musik -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-pink-500 text-[17px]">music_note</span>
+<span class="truncate">Musik</span>
+</button>
+<!-- Video -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-purple-500 text-[17px]">movie</span>
+<span class="truncate">Video</span>
+</button>
+<div class="h-[1px] bg-black/[0.06] my-1.5"></div>
+<!-- OneDrive -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-sky-500 text-[17px]">cloud</span>
+<span class="truncate">OneDrive</span>
+</button>
+<!-- PC Ini -->
+<div class="pt-1">
+<div class="px-2.5 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">PC Ini</div>
+<button class="flex items-center gap-2.5 px-2.5 py-1 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-slate-500 text-[17px]">hard_drive</span>
+<span class="truncate">Local Disk (C:)</span>
+</button>
+<button class="flex items-center gap-2.5 px-2.5 py-1 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-slate-500 text-[17px]">hard_drive</span>
+<span class="truncate">Data (D:)</span>
+</button>
+</div>
+<div class="h-[1px] bg-black/[0.06] my-1.5"></div>
+<!-- Jaringan -->
+<button class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md hover:bg-black/5 text-slate-700 transition-colors w-full text-left">
+<span class="material-symbols-outlined text-slate-500 text-[17px]">lan</span>
+<span class="truncate">Jaringan</span>
+</button>
+</aside>
+<!-- Folder Contents Area (Grid View) -->
+<main class="flex-1 p-5 overflow-y-auto">
+<div class="text-[12px] font-semibold text-slate-500 mb-3 px-1">Berkas &amp; Folder</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+<!-- Folder 1: Proyek 2025 -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-transparent hover:border-black/10 hover:bg-black/5 active:bg-blue-50/70 cursor-pointer transition-all text-center">
+<div class="w-14 h-14 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[48px]">folder</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-800 leading-tight line-clamp-2">Proyek 2025</span>
+<span class="text-[10px] text-slate-400 mt-0.5">Folder file</span>
+</div>
+<!-- Folder 2: Desain UI -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-transparent hover:border-black/10 hover:bg-black/5 active:bg-blue-50/70 cursor-pointer transition-all text-center">
+<div class="w-14 h-14 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[48px]">folder</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-800 leading-tight line-clamp-2">Desain UI</span>
+<span class="text-[10px] text-slate-400 mt-0.5">Folder file</span>
+</div>
+<!-- Folder 3: Laporan Finansial -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-transparent hover:border-black/10 hover:bg-black/5 active:bg-blue-50/70 cursor-pointer transition-all text-center">
+<div class="w-14 h-14 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[48px]">folder</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-800 leading-tight line-clamp-2">Laporan Finansial</span>
+<span class="text-[10px] text-slate-400 mt-0.5">Folder file</span>
+</div>
+<!-- File 1: Proposal_Q3.docx (Selected item example) -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-blue-400/60 bg-blue-50/60 shadow-2xs cursor-pointer transition-all text-center ring-1 ring-blue-400/50">
+<div class="w-14 h-14 rounded-xl bg-blue-100/90 flex items-center justify-center text-[#185abd] shadow-xs group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[36px]">description</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-900 leading-tight break-all">Proposal_Q3.docx</span>
+<span class="text-[10px] text-blue-600 font-medium mt-0.5">2.4 MB</span>
+</div>
+<!-- File 2: Anggaran_2025.xlsx -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-transparent hover:border-black/10 hover:bg-black/5 active:bg-blue-50/70 cursor-pointer transition-all text-center">
+<div class="w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center text-[#107c41] shadow-xs group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[36px]">table_view</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-800 leading-tight break-all">Anggaran_2025.xlsx</span>
+<span class="text-[10px] text-slate-400 mt-0.5">1.8 MB</span>
+</div>
+<!-- File 3: Brand_Guidelines.pdf -->
+<div class="group flex flex-col items-center p-3 rounded-xl border border-transparent hover:border-black/10 hover:bg-black/5 active:bg-blue-50/70 cursor-pointer transition-all text-center">
+<div class="w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center text-[#d83b01] shadow-xs group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[36px]">picture_as_pdf</span>
+</div>
+<span class="mt-2 text-[12px] font-medium text-slate-800 leading-tight break-all">Brand_Guidelines.pdf</span>
+<span class="text-[10px] text-slate-400 mt-0.5">5.1 MB</span>
+</div>
+</div>
+</main>
+</div>
+<!-- Status Bar -->
+<footer class="h-6 px-4 bg-black/[0.02] border-t border-black/[0.06] flex items-center justify-between text-[11px] text-slate-500">
+<div class="flex items-center gap-3">
+<span>6 item</span>
+<span class="w-[1px] h-3 bg-black/10"></span>
+<span class="text-blue-600 font-medium">1 item dipilih 2.4 MB</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400">
+<span class="material-symbols-outlined text-[14px]">info</span>
+<span class="material-symbols-outlined text-[14px]">view_list</span>
+</div>
+</footer>
+</section>
+<!-- 5. Interactive Start Menu Flyout Modal -->
+<section aria-label="Start Menu" class="fixed bottom-[74px] left-1/2 -translate-x-1/2 w-[580px] max-w-[95vw] max-h-[620px] z-40 acrylic-card rounded-xl flex flex-col overflow-hidden transition-all duration-150 ease-out hidden" id="start-menu-flyout">
+<!-- Search Bar -->
+<div class="p-6 pb-3">
+<div class="relative flex items-center w-full h-10 px-3 bg-white/95 rounded-xl border border-black/5 shadow-xs focus-within:ring-2 focus-within:ring-[#0078d4] transition-all">
+<span class="material-symbols-outlined text-slate-400 text-[20px] mr-2.5">search</span>
+<input class="w-full bg-transparent text-[13px] text-slate-800 placeholder:text-slate-400 outline-none border-none focus:ring-0 p-0" placeholder="Ketik di sini untuk mencari..." type="text"/>
+<button class="p-1 rounded-md hover:bg-slate-100 text-slate-500 transition-colors" title="Dikte">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+</button>
+</div>
+</div>
+<!-- Pinned (Disematkan) Section -->
+<div class="px-6 py-2">
+<div class="flex items-center justify-between mb-3 px-1">
+<span class="text-[13px] font-semibold text-slate-900">Disematkan</span>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-black/5 hover:bg-black/10 text-slate-700 text-[11px] font-medium transition-colors">
+<span class="">Semua aplikasi</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+<!-- 6 Columns App Grid -->
+<div class="grid grid-cols-6 gap-y-3.5 gap-x-2 text-center">
+<!-- Edge -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#0078d4] shadow-xs group-hover:scale-105 transition-transform border border-blue-100">
+<span class="material-symbols-outlined text-[24px]">public</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Edge</span>
+</div>
+<!-- Word -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-[#185abd] shadow-xs group-hover:scale-105 transition-transform border border-blue-200">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Word</span>
+</div>
+<!-- Excel -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-[#107c41] shadow-xs group-hover:scale-105 transition-transform border border-emerald-100">
+<span class="material-symbols-outlined text-[24px]">table_view</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Excel</span>
+</div>
+<!-- PowerPoint -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-[#c43e1c] shadow-xs group-hover:scale-105 transition-transform border border-orange-100">
+<span class="material-symbols-outlined text-[24px]">slideshow</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">PowerPoint</span>
+</div>
+<!-- Mail -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-[#0078d4] shadow-xs group-hover:scale-105 transition-transform border border-sky-100">
+<span class="material-symbols-outlined text-[24px]">mail</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Mail</span>
+</div>
+<!-- Kalender -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[#0078d4] shadow-xs group-hover:scale-105 transition-transform border border-indigo-100">
+<span class="material-symbols-outlined text-[24px]">calendar_month</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Kalender</span>
+</div>
+<!-- Store -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#0078d4] shadow-xs group-hover:scale-105 transition-transform border border-blue-100">
+<span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Store</span>
+</div>
+<!-- Foto -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shadow-xs group-hover:scale-105 transition-transform border border-teal-100">
+<span class="material-symbols-outlined text-[24px]">photo_library</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Foto</span>
+</div>
+<!-- Pengaturan -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shadow-xs group-hover:scale-105 transition-transform border border-slate-200">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Pengaturan</span>
+</div>
+<!-- Kalkulator -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 shadow-xs group-hover:scale-105 transition-transform border border-slate-200">
+<span class="material-symbols-outlined text-[24px]">calculate</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Kalkulator</span>
+</div>
+<!-- Terminal -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform border border-slate-700">
+<span class="material-symbols-outlined text-[22px]">terminal</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Terminal</span>
+</div>
+<!-- Spotify -->
+<div class="flex flex-col items-center group cursor-pointer p-1.5 rounded-xl hover:bg-black/5 transition-all">
+<div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-[#1ed760] shadow-xs group-hover:scale-105 transition-transform border border-emerald-100">
+<span class="material-symbols-outlined text-[24px]">graphic_eq</span>
+</div>
+<span class="mt-1.5 text-[11px] text-slate-700 truncate w-full">Spotify</span>
+</div>
+</div>
+</div>
+<!-- Recommended (Direkomendasikan) Section -->
+<div class="px-6 pt-3 pb-4">
+<div class="flex items-center justify-between mb-2.5 px-1">
+<span class="text-[13px] font-semibold text-slate-900">Direkomendasikan</span>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-black/5 hover:bg-black/10 text-slate-700 text-[11px] font-medium transition-colors">
+<span class="">Lainnya</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<!-- Item 1 -->
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group">
+<div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-[#185abd] group-hover:scale-105 transition-transform border border-blue-100">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[12px] font-medium text-slate-900 truncate">Laporan_Tahunan_2025.docx</span>
+<span class="text-[10px] text-slate-500 flex items-center gap-1">
+<span class="">12 mnt lalu</span>
+<span class="">•</span>
+<span class="font-semibold text-blue-600">BS</span>
+</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group">
+<div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-105 transition-transform border border-purple-100">
+<span class="material-symbols-outlined text-[20px]">draw</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[12px] font-medium text-slate-900 truncate">Desain_Fluent_UI.fig</span>
+<span class="text-[10px] text-slate-500 flex items-center gap-1">
+<span class="">2 jam lalu</span>
+<span class="">•</span>
+<span class="font-semibold text-purple-600">BS</span>
+</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group">
+<div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 group-hover:scale-105 transition-transform border border-orange-100">
+<span class="material-symbols-outlined text-[20px]">slideshow</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[12px] font-medium text-slate-900 truncate">Presentasi_Q2.pptx</span>
+<span class="text-[10px] text-slate-500 flex items-center gap-1">
+<span class="">Kemarin pada 15:40</span>
+<span class="">•</span>
+<span class="font-semibold text-orange-600">BS</span>
+</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group">
+<div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:scale-105 transition-transform border border-emerald-100">
+<span class="material-symbols-outlined text-[20px]">table_chart</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[12px] font-medium text-slate-900 truncate">Sprint_Backlog.xlsx</span>
+<span class="text-[10px] text-slate-500 flex items-center gap-1">
+<span class="">2 hari lalu</span>
+<span class="">•</span>
+<span class="font-semibold text-emerald-600">BS</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+<!-- User Profile & Power Controls Footer Bar -->
+<div class="h-16 px-6 bg-black/[0.03] border-t border-black/[0.06] flex items-center justify-between">
+<!-- Account Info -->
+<div class="flex items-center gap-3 p-1.5 rounded-xl hover:bg-black/5 transition-colors cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-[#0078d4] text-white flex items-center justify-center text-[12px] font-bold shadow-xs">
+        BS
+      </div>
+<div class="flex flex-col">
+<span class="text-[12px] font-semibold text-slate-900 leading-tight">Budi Santoso</span>
+<span class="text-[10px] text-slate-500 leading-tight">Administrator</span>
+</div>
+</div>
+<!-- Power Options -->
+<div class="relative">
+<button class="w-9 h-9 rounded-xl hover:bg-black/5 active:bg-black/10 flex items-center justify-center text-slate-700 transition-all outline-none" id="power-button" onclick="document.getElementById('power-menu').classList.toggle('hidden')" title="Daya">
+<span class="material-symbols-outlined text-[20px]">power_settings_new</span>
+</button>
+<!-- Transient Power Menu Overlay -->
+<div class="hidden absolute right-0 bottom-12 w-44 bg-white/95 backdrop-blur-2xl rounded-xl shadow-xl p-1.5 flex flex-col gap-1 border border-black/10 z-50" id="power-menu">
+<button class="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg hover:bg-black/5 text-left text-slate-800 text-[12px] transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-500">bedtime</span>
+<span class="">Tidur (Sleep)</span>
+</button>
+<button class="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg hover:bg-black/5 text-left text-slate-800 text-[12px] transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-500">power_settings_new</span>
+<span class="">Matikan</span>
+</button>
+<button class="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg hover:bg-black/5 text-left text-slate-800 text-[12px] transition-colors">
+<span class="material-symbols-outlined text-[17px] text-slate-500">restart_alt</span>
+<span class="">Mulai Ulang</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Floating Taskbar Dock (Bottom Center) -->
+<footer class="fixed bottom-[18px] left-1/2 -translate-x-1/2 z-50 px-[10px] py-[6px] acrylic-dock rounded-[14px] flex items-center gap-[6px]">
+<!-- Windows Start Button -->
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/50 active:scale-95 transition-all outline-none" onclick="document.getElementById('start-menu-flyout').classList.toggle('hidden')" title="Mulai">
+<svg class="w-4 h-4" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 3.5H10.5V11H2V3.5Z" fill="#0078D4"></path>
+<path d="M13.5 3.5H22V11H13.5V3.5Z" fill="#0078D4"></path>
+<path d="M2 13H10.5V20.5H2V13Z" fill="#0078D4"></path>
+<path d="M13.5 13H22V20.5H13.5V13Z" fill="#0078D4"></path>
+</svg>
+</button>
+<!-- Search / Copilot -->
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-700 active:scale-95 transition-all outline-none" title="Cari">
+<span class="material-symbols-outlined text-[19px]">search</span>
+</button>
+<!-- Divider Line -->
+<div class="h-4 w-[1px] bg-black/15 mx-0.5"></div>
+<!-- File Explorer (With Active State Indicator) -->
+<button class="relative w-9 h-9 flex items-center justify-center rounded-lg bg-white/50 hover:bg-white/65 text-amber-500 active:scale-95 transition-all outline-none" id="taskbar-folder-btn" onclick="toggleExplorer()" title="File Explorer">
+<span class="material-symbols-outlined text-[20px]">folder</span>
+<span class="absolute bottom-[2px] w-[14px] h-[3px] bg-[#0078d4] rounded-full transition-all" id="folder-active-pill"></span>
+</button>
+<!-- Microsoft Edge -->
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/50 text-[#0078d4] active:scale-95 transition-all outline-none" title="Microsoft Edge">
+<span class="material-symbols-outlined text-[20px]">public</span>
+</button>
+<!-- Terminal / Command Prompt -->
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-800 active:scale-95 transition-all outline-none" title="Terminal">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+</button>
+<!-- Settings -->
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-700 active:scale-95 transition-all outline-none" title="Pengaturan">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+</footer>
+<script>
+  function toggleExplorer(forceOpen) {
+    const explorer = document.getElementById('file-explorer-window');
+    const pill = document.getElementById('folder-active-pill');
+    const taskbarBtn = document.getElementById('taskbar-folder-btn');
+    
+    let isOpening;
+    if (forceOpen === true) {
+      explorer.classList.remove('hidden');
+      isOpening = true;
+    } else if (forceOpen === false) {
+      explorer.classList.add('hidden');
+      isOpening = false;
+    } else {
+      explorer.classList.toggle('hidden');
+      isOpening = !explorer.classList.contains('hidden');
+    }
+
+    if (isOpening) {
+      pill.classList.remove('hidden');
+      taskbarBtn.classList.add('bg-white/50');
+    } else {
+      pill.classList.add('hidden');
+      taskbarBtn.classList.remove('bg-white/50');
+    }
+  }
+</script>
+</body></html>

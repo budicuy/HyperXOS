@@ -49,6 +49,54 @@ pub fn brand_sidebar_header<'a, Message: Clone + 'a>(
         .into()
 }
 
+pub fn fluent_sidebar_nav_item<'a, Message: Clone + 'a>(
+    label: &'static str,
+    icon_svg: &'static str,
+    is_active: bool,
+    icon_color: Color,
+    on_press: Message,
+) -> Element<'a, Message> {
+    let text_col = if is_active {
+        FLUENT_PRIMARY
+    } else {
+        FLUENT_TEXT_DARK
+    };
+
+    let content = row![
+        svg_icon(icon_svg, 16.0, if is_active { FLUENT_PRIMARY } else { icon_color }),
+        text(label)
+            .size(12)
+            .font(if is_active { FONT_BODY_SEMIBOLD } else { FONT_BODY_MEDIUM })
+            .style(move |_| text::Style {
+                color: Some(text_col),
+            }),
+    ]
+    .spacing(10)
+    .align_y(Alignment::Center);
+
+    button(content)
+        .width(Length::Fill)
+        .padding([7, 10])
+        .style(move |_theme, status| {
+            let bg = if is_active {
+                Some(Background::Color(Color::from_rgba(0.0, 0.47, 0.83, 0.12)))
+            } else {
+                match status {
+                    button::Status::Hovered => Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.05))),
+                    button::Status::Pressed => Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.10))),
+                    _ => None,
+                }
+            };
+            button::Style {
+                background: bg,
+                border: Border::default().rounded(Radius::from(6.0)),
+                ..button::Style::default()
+            }
+        })
+        .on_press(on_press)
+        .into()
+}
+
 pub fn sidebar_nav_item<'a, Message: Clone + 'a>(
     label: &'static str,
     icon_svg: &'static str,
@@ -256,6 +304,172 @@ pub fn window_header_bar<'a, Message: Clone + 'a>(
         ..container::Style::default()
     })
     .into()
+}
+
+pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
+    _title: impl Into<String>,
+    tab_name: impl Into<String>,
+    icon_svg: &'static str,
+    accent: Color,
+    on_minimize: Message,
+    on_maximize: Message,
+    on_close: Message,
+) -> Element<'a, Message> {
+    let tab_str = tab_name.into();
+
+    // Modern Fluent Tab (Active Tab)
+    let active_tab = container(
+        row![
+            svg_icon(icon_svg, 14.0, accent),
+            text(tab_str)
+                .size(12)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(|_| text::Style {
+                    color: Some(FLUENT_TEXT_DARK),
+                }),
+            button(svg_icon(icons::CLOSE, 10.0, FLUENT_TEXT_MUTED))
+                .padding([2, 4])
+                .style(|_theme, status| {
+                    let bg = match status {
+                        button::Status::Hovered | button::Status::Pressed => {
+                            Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08)))
+                        }
+                        _ => None,
+                    };
+                    button::Style {
+                        background: bg,
+                        border: Border::default().rounded(Radius::from(4.0)),
+                        ..button::Style::default()
+                    }
+                })
+                .on_press(on_close.clone()),
+        ]
+        .spacing(7)
+        .align_y(Alignment::Center),
+    )
+    .padding([6, 12])
+    .style(|_| container::Style {
+        background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.95))),
+        border: Border::default()
+            .rounded(Radius::default().top(8.0))
+            .width(1.0)
+            .color(Color::from_rgba(0.0, 0.0, 0.0, 0.10)),
+        ..container::Style::default()
+    });
+
+    let add_tab_btn = button(svg_icon(icons::PLUS, 13.0, FLUENT_TEXT_DARK))
+        .padding([6, 8])
+        .style(|_theme, status| {
+            let bg = match status {
+                button::Status::Hovered | button::Status::Pressed => {
+                    Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+                }
+                _ => None,
+            };
+            button::Style {
+                background: bg,
+                border: Border::default().rounded(Radius::from(6.0)),
+                ..button::Style::default()
+            }
+        });
+
+    let left_tabs = row![active_tab, add_tab_btn]
+        .spacing(4)
+        .align_y(Alignment::Center);
+
+    // Fluent Window Controls (Right Cluster: Minimize, Maximize, Close)
+    let btn_min = button(
+        container(svg_icon(icons::MINUS, 12.0, FLUENT_TEXT_DARK))
+            .width(Length::Fixed(40.0))
+            .height(Length::Fixed(32.0))
+            .center_x(Length::Fixed(40.0))
+            .center_y(Length::Fixed(32.0)),
+    )
+    .padding(0)
+    .style(|_theme, status| {
+        let bg = match status {
+            button::Status::Hovered | button::Status::Pressed => {
+                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+            }
+            _ => None,
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(4.0)),
+            ..button::Style::default()
+        }
+    })
+    .on_press(on_minimize);
+
+    let btn_max = button(
+        container(svg_icon(icons::SQUARE, 11.0, FLUENT_TEXT_DARK))
+            .width(Length::Fixed(40.0))
+            .height(Length::Fixed(32.0))
+            .center_x(Length::Fixed(40.0))
+            .center_y(Length::Fixed(32.0)),
+    )
+    .padding(0)
+    .style(|_theme, status| {
+        let bg = match status {
+            button::Status::Hovered | button::Status::Pressed => {
+                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
+            }
+            _ => None,
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::from(4.0)),
+            ..button::Style::default()
+        }
+    })
+    .on_press(on_maximize);
+
+    let btn_close = button(
+        container(svg_icon(icons::CLOSE, 12.0, FLUENT_TEXT_DARK))
+            .width(Length::Fixed(44.0))
+            .height(Length::Fixed(32.0))
+            .center_x(Length::Fixed(44.0))
+            .center_y(Length::Fixed(32.0)),
+    )
+    .padding(0)
+    .style(|_theme, status| {
+        let bg = match status {
+            button::Status::Hovered | button::Status::Pressed => {
+                Some(Background::Color(Color::from_rgb(0.91, 0.07, 0.14)))
+            }
+            _ => None,
+        };
+        button::Style {
+            background: bg,
+            border: Border::default().rounded(Radius::default().top_right(12.0)),
+            ..button::Style::default()
+        }
+    })
+    .on_press(on_close);
+
+    let right_controls = row![btn_min, btn_max, btn_close]
+        .spacing(0)
+        .align_y(Alignment::Center);
+
+    let header_row = row![
+        left_tabs,
+        container("").width(Length::Fill),
+        right_controls,
+    ]
+    .align_y(Alignment::Center)
+    .padding([0, 0]);
+
+    container(header_row)
+        .width(Length::Fill)
+        .height(Length::Fixed(38.0))
+        .style(|_| container::Style {
+            background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.02))),
+            border: Border::default()
+                .width(1.0)
+                .color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)),
+            ..container::Style::default()
+        })
+        .into()
 }
 
 pub fn metric_card<'a, Message: 'a>(

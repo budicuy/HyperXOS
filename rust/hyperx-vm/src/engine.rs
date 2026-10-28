@@ -157,6 +157,30 @@ impl VmEngine {
         println!("  -> [smoke] Waiting for installed system guest agent (max 240s)...");
         let mut qga = QgaClient::wait_ready(Duration::from_secs(240))?;
 
+        // 1. Sync latest hyperx-de package into guest if built in local repo
+        let pkg_path = root.join("repo/x86_64/hyperx-de-1.0.0-1-x86_64.pkg.tar.zst");
+        if pkg_path.exists() {
+            println!("  -> [smoke] Syncing latest hyperx-de package into guest...");
+            let server = Command::new("python3")
+                .args(["-m", "http.server", "8099", "--directory", root.join("repo/x86_64").to_str().unwrap()])
+                .spawn()
+                .ok();
+            std::thread::sleep(Duration::from_millis(600));
+
+            let update_cmd = "curl -sSf http://10.0.2.2:8099/hyperx-de-1.0.0-1-x86_64.pkg.tar.zst -o /tmp/hyperx-de.pkg.tar.zst && \
+                              pacman -U --noconfirm /tmp/hyperx-de.pkg.tar.zst && \
+                              systemctl restart sddm";
+            let (code, out) = qga.exec(update_cmd).unwrap_or((-1, String::new()));
+            if let Some(mut s) = server {
+                let _ = s.kill();
+            }
+            if code == 0 {
+                println!("  [✓] [smoke] Latest hyperx-de package synced and installed in guest.");
+            } else {
+                eprintln!("  [!] [smoke] Guest package sync returned {}: {}", code, out);
+            }
+        }
+
         let start = Instant::now();
         loop {
             let (code, _) = qga.exec("pgrep -f 'hyperx-de --session-ui' >/dev/null")?;
@@ -173,17 +197,41 @@ impl VmEngine {
         }
         println!("  [✓] [smoke] hyperx-de Wayland session is running.");
 
-        std::thread::sleep(Duration::from_secs(4));
-        let (_, b64) = qga.exec(
-            "WAYLAND_DISPLAY=$(ls /run/user/1000 | grep -E '^wayland-[0-9]+$' | head -n1) \
-             XDG_RUNTIME_DIR=/run/user/1000 grim /tmp/smoke.png && base64 -w0 /tmp/smoke.png",
-        )?;
-        let png = crate::qga::base64_decode(b64.trim());
-        if png.len() > 1000 {
-            let out = root.join("out/vm-smoke-installed.png");
-            let _ = std::fs::write(&out, &png);
-            println!("  [✓] [smoke] Desktop screenshot saved: {}", out.display());
-        }
+        let take_screenshot = |qga: &mut QgaClient, out_path: &Path| -> Result<(), String> {
+            let (_, b64) = qga.exec(
+                "WAYLAND_DISPLAY=$(ls /run/user/1000 | grep -E '^wayland-[0-9]+$' | head -n1) \
+                 XDG_RUNTIME_DIR=/run/user/1000 grim /tmp/shot.png && base64 -w0 /tmp/shot.png",
+            )?;
+            let png = crate::qga::base64_decode(b64.trim());
+            if png.len() > 1000 {
+                let _ = std::fs::write(out_path, &png);
+                println!("  [✓] [smoke] Screenshot saved: {}", out_path.display());
+            }
+            Ok(())
+        };
+
+        let send_hmp = |cmd: &str| {
+            if let Ok(mut stream) = std::os::unix::net::UnixStream::connect("/tmp/hmp.sock") {
+                let _ = std::io::Write::write_all(&mut stream, format!("{}\n", cmd).as_bytes());
+            }
+        };
+
+        // 1. Pristine Desktop Screenshot
+        std::thread::sleep(Duration::from_secs(3));
+        let _ = take_screenshot(&mut qga, &root.join("out/vm-smoke-installed.png"));
+
+        // 2. Open Start Menu via Ctrl+Space
+        send_hmp("sendkey ctrl-spc");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_start_menu.png"));
+
+        // 3. Close Start Menu and Open File Explorer via Super+E
+        send_hmp("sendkey ctrl-spc");
+        std::thread::sleep(Duration::from_millis(500));
+        send_hmp("sendkey meta_l-e");
+        std::thread::sleep(Duration::from_secs(2));
+        let _ = take_screenshot(&mut qga, &root.join("out/screenshot_hyperx_fluent_explorer.png"));
+
         println!("  [✓] [smoke] Installed system smoke test PASSED.");
         Ok(())
     }
@@ -223,12 +271,10 @@ impl VmEngine {
             .spawn()
             .map_err(|e| format!("Failed to start VM: {}", e))?;
 
-        if let Err(e) = Self::smoke_test_installed(root) {
-            eprintln!("  [-] [smoke] {}", e);
-        }
-        println!("==> [hyperx-vm] VM window stays open. Close it to exit.");
+        let res = Self::smoke_test_installed(root);
+        let _ = child.kill();
         let _ = child.wait();
-        Ok(())
+        res
     }
 
     /// Build base QEMU/KVM command with UEFI firmware and hardware acceleration
