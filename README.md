@@ -8,12 +8,12 @@
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **HyperX Desktop Environment (`hyperx-de`)** — lingkungan desktop native **100% Pure Rust** berbasis **Smithay Wayland Compositor** dan antarmuka **Iced 0.14 WGPU Glassmorphism**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **HyperX Desktop Environment (`hyperx-de`)** — lingkungan desktop native **100% Pure Rust** bertenaga **Labwc Wayland Compositor** dan antarmuka **Iced 0.14 WGPU Glassmorphism**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
 - **Desktop Modern Pure Rust (`hyperx-de`):**
   - Desktop Environment mandiri yang dibangun sepenuhnya menggunakan bahasa pemrograman Rust.
-  - Compositor Wayland native bertenaga Smithay 0.7 dengan akselerasi perangkat keras Direct WGPU / OpenGL.
+  - Compositor Wayland native bertenaga Labwc (wlroots) dengan akselerasi perangkat keras Direct WGPU / OpenGL dan Server-Side Decorations.
   - Antarmuka visual Glassmorphic modern: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
 - **Pure Rust Native Installer (`hyper-x-installer`):**
   - Dibangun 100% menggunakan Rust murni dengan arsitektur UI Glassmorphic modern (Iced 0.14 + WGPU).
@@ -219,7 +219,7 @@ Untuk membersihkan berkas build dan mount sementara:
 HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
 - **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
 - **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`).
-- **[Smithay](https://smithay.github.io):** Rust framework untuk pembangunan Wayland compositor modern dan aman.
+- **[Labwc](https://github.com/labwc/labwc):** Window-stacking Wayland compositor berbasis wlroots yang ringan, cepat, dan kaya fitur.
 - **[Iced](https://iced.rs):** Cross-platform GUI library berbasis Rust dengan arsitektur reaktif dan akselerasi WGPU.
 - **[Limine Bootloader](https://limine-bootloader.org):** Bootloader modern yang tangguh, ringan, dan cepat.
 

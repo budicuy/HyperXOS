@@ -155,21 +155,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470"
 
 [[package]]
-name = "appendlist"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e149dc73cd30538307e7ffa2acd3d2221148eaeed4871f246657b1c3eaa1cbd2"
-
-[[package]]
-name = "approx"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f2a05fd1bd10b2527e20a2cd32d8873d115b8b39fe219ee25f42a8aca6ba278"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
 name = "arbitrary"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -358,12 +343,6 @@ name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
-
-[[package]]
-name = "atomic_float"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "628d228f918ac3b82fe590352cc719d30664a0c13ca3a60266fe02c7132d480a"
 
 [[package]]
 name = "autocfg"
@@ -625,16 +604,6 @@ name = "cfg_aliases"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527"
-
-[[package]]
-name = "cgmath"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a98d30140e3296250832bbaaff83b27dcd6fa3cc70fb6f1f3e5c9c0023b5317"
-dependencies = [
- "approx",
- "num-traits",
-]
 
 [[package]]
 name = "chrono"
@@ -1021,12 +990,6 @@ name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
-
-[[package]]
-name = "drm-fourcc"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0aafbcdb8afc29c1a7ee5fbe53b5d62f4565b35a042a662ca9fecd0b54dae6f4"
 
 [[package]]
 name = "dtor"
@@ -1645,7 +1608,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "smithay",
  "sysinfo",
  "toml",
 ]
@@ -3766,38 +3728,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0d5d4b1981b8bbbb7aed204cae5726d683d5d6ac7e74ec54122ea28f315e7c8"
 
 [[package]]
-name = "smithay"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "740cea6927892bc182d5bf70c8f79806c8bc9f68f2fb96e55a30be171b63af98"
-dependencies = [
- "appendlist",
- "atomic_float",
- "bitflags 2.13.2",
- "calloop 0.14.5",
- "cgmath",
- "cursor-icon",
- "downcast-rs",
- "drm-fourcc",
- "errno",
- "indexmap",
- "libc",
- "profiling",
- "rand",
- "rustix 1.1.6",
- "sha2",
- "smallvec",
- "tempfile",
- "thiserror 2.0.21",
- "tracing",
- "wayland-protocols",
- "wayland-protocols-misc",
- "wayland-protocols-wlr",
- "wayland-server",
- "xkbcommon",
-]
-
-[[package]]
 name = "smithay-client-toolkit"
 version = "0.19.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4535,7 +4465,6 @@ dependencies = [
  "wayland-backend",
  "wayland-client",
  "wayland-scanner",
- "wayland-server",
 ]
 
 [[package]]
@@ -4562,7 +4491,6 @@ dependencies = [
  "wayland-client",
  "wayland-protocols",
  "wayland-scanner",
- "wayland-server",
 ]
 
 [[package]]
@@ -4589,7 +4517,6 @@ dependencies = [
  "wayland-client",
  "wayland-protocols",
  "wayland-scanner",
- "wayland-server",
 ]
 
 [[package]]
@@ -4601,19 +4528,6 @@ dependencies = [
  "proc-macro2",
  "quick-xml",
  "quote",
-]
-
-[[package]]
-name = "wayland-server"
-version = "0.31.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0dde9c29be0f723a573977de51ee455bf3dfa03652730a74f9dd3b337e374d75"
-dependencies = [
- "bitflags 2.13.2",
- "downcast-rs",
- "rustix 1.1.6",
- "wayland-backend",
- "wayland-scanner",
 ]
 
 [[package]]
@@ -5281,17 +5195,6 @@ name = "xcursor"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "163b33ed8786455e2fa5d72f554057ce3f3182425434f756cd39c99839d88e23"
-
-[[package]]
-name = "xkbcommon"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d66ca9352cbd4eecbbc40871d8a11b4ac8107cfc528a6e14d7c19c69d0e1ac9"
-dependencies = [
- "libc",
- "memmap2",
- "xkeysym",
-]
 
 [[package]]
 name = "xkbcommon-dl"

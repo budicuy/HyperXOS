@@ -13,7 +13,6 @@ pub mod window_manager;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use chrono::{Datelike, Local};
@@ -34,7 +33,6 @@ use hyperx_ui_kit::{
     FONT_BODY_SEMIBOLD,
 };
 
-use crate::compositor::CompositorSnapshot;
 use crate::sys::{
     apps::{scan_desktop_apps, spawn_external_command, DesktopAppEntry},
     audio::AudioState,
@@ -298,7 +296,6 @@ pub enum Message {
 }
 
 pub struct HyperXDesktop {
-    pub compositor_snapshot: Arc<Mutex<CompositorSnapshot>>,
     pub clock_str: String,
     pub date_header_str: String,
     pub current_day: u32,
@@ -375,7 +372,6 @@ pub struct HyperXDesktop {
 
 impl HyperXDesktop {
     pub fn new(
-        compositor_snapshot: Arc<Mutex<CompositorSnapshot>>,
         initial_window: Option<DesktopWindowId>,
         open_launcher: bool,
     ) -> (Self, Task<Message>) {
@@ -413,11 +409,8 @@ impl HyperXDesktop {
             wm.open_or_focus(win_id);
         }
 
-        let wayland_socket = compositor_snapshot
-            .lock()
-            .ok()
-            .map(|s| s.socket_name.clone())
-            .unwrap_or_else(|| "wayland-hyperx-0".to_string());
+        let wayland_socket = std::env::var("WAYLAND_DISPLAY")
+            .unwrap_or_else(|_| "wayland-1".to_string());
 
         let has_installer = std::path::Path::new("/usr/bin/launch-installer").exists()
             || std::path::Path::new("/usr/bin/hyper-x-installer").exists()
@@ -516,7 +509,6 @@ impl HyperXDesktop {
         dock_app_order.push(DockAppKey::Settings);
 
         let mut state = Self {
-            compositor_snapshot,
             clock_str,
             date_header_str,
             current_day,
@@ -541,7 +533,7 @@ impl HyperXDesktop {
             app_switcher_index: 0,
             clipboard_hud_open: false,
             clipboard_history: vec![
-                "HyperXOS Desktop v2.1 — Smithay Wayland + Iced 0.14 WGPU".to_string(),
+                "HyperXOS Desktop v2.2 — Labwc Wayland + Iced 0.14 WGPU".to_string(),
                 "/home/hyperxos/Pictures/Screenshots".to_string(),
                 "sudo pacman -Syu".to_string(),
             ],
@@ -1010,8 +1002,8 @@ impl HyperXDesktop {
                 self.ram_used_gb = (self.sys.used_memory() as f32) / (1024.0 * 1024.0 * 1024.0);
                 self.ram_total_gb =
                     ((self.sys.total_memory() as f32) / (1024.0 * 1024.0 * 1024.0)).max(1.0);
-                if let Ok(snap) = self.compositor_snapshot.lock() {
-                    self.wayland_socket = snap.socket_name.clone();
+                if let Ok(sock) = std::env::var("WAYLAND_DISPLAY") {
+                    self.wayland_socket = sock;
                 }
             }
 

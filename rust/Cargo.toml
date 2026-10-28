@@ -46,10 +46,6 @@ iced = { version = "0.14", features = [
     "canvas",
 ] }
 image = { version = "0.25", default-features = false, features = ["png"] }
-smithay = { version = "0.7.0", default-features = false, features = [
-    "desktop",
-    "wayland_frontend",
-] }
 sysinfo = "0.33"
 chrono = "0.4"
 crossbeam-channel = "0.5"

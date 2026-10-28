@@ -2,11 +2,11 @@
 pkgname=hyperx-de
 pkgver=1.0.0
 pkgrel=1
-pkgdesc="Unified HyperXOS Desktop Environment — Smithay Wayland Compositor, macOS Dock, Control Center, Notification Drawer, File Manager & System Settings (Rust + Iced 0.14 + WGPU)"
+pkgdesc="Unified HyperXOS Desktop Environment — Labwc Wayland Compositor, Fluent Floating Dock, Control Center, Notification Drawer, File Manager & System Settings (Rust + Iced 0.14 + WGPU)"
 arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
-depends=('fontconfig' 'freetype2' 'libxkbcommon' 'wayland' 'mesa' 'libinput' 'seatd' 'polkit')
+depends=('fontconfig' 'freetype2' 'libxkbcommon' 'wayland' 'mesa' 'libinput' 'seatd' 'polkit' 'labwc')
 makedepends=('cargo' 'rust')
 provides=('hyperx-de' 'hyperx-files' 'hyperx-settings' 'hyperx-launcher')
 options=('!strip' '!debug')

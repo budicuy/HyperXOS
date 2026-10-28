@@ -144,7 +144,7 @@ jobs:
           echo "- **BLAKE2b (ISO):** \`${B2SUM_VAL}\`" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
           echo "### 📦 Paket Resmi Termasuk (Included Packages in this Release):" >> RELEASE_NOTES.md
-          echo "- \`hyperx-de\`: Unified HyperXOS Desktop Environment (Smithay Wayland Compositor + Iced 0.14 WGPU)" >> RELEASE_NOTES.md
+          echo "- \`hyperx-de\`: Unified HyperXOS Desktop Environment (Labwc Wayland Compositor + Iced 0.14 WGPU Desktop Shell)" >> RELEASE_NOTES.md
           echo "- \`hyper-x-hw\`: Pure Rust Multi-Tier Hardware & GPU Auto-Detection Engine" >> RELEASE_NOTES.md
           echo "- \`hyper-x-installer\`: Pure Rust Native System Installer (Iced 0.14 + WGPU)" >> RELEASE_NOTES.md
           echo "- \`hyper-x-tools\`: Modern Glassmorphism System Dashboard & Tweaker" >> RELEASE_NOTES.md

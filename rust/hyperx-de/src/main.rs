@@ -1,4 +1,3 @@
-mod compositor;
 mod sys;
 mod ui;
 
@@ -15,16 +14,8 @@ fn main() -> iced::Result {
     let args: Vec<String> = std::env::args().collect();
 
     if args.iter().any(|a| a == "--check" || a == "--version") {
-        let snap = compositor::spawn_smithay_server();
-        std::thread::sleep(std::time::Duration::from_millis(60));
-        let sock = snap
-            .lock()
-            .ok()
-            .map(|s| s.socket_name.clone())
-            .unwrap_or_else(|| "wayland-hyperx-0".to_string());
         println!(
-            "HyperXOS Desktop Environment (hyperx-de) v1.0.0 — Smithay 0.7.0 ({}) + Iced 0.14 WGPU OK",
-            sock
+            "HyperXOS Desktop Environment (hyperx-de) v2.2.0 — Labwc Wayland Compositor + Iced 0.14 WGPU OK"
         );
         return Ok(());
     }
@@ -89,9 +80,6 @@ fn main() -> iced::Result {
         open_launcher = true;
     }
 
-    // Start the embedded Smithay Wayland Compositor server thread
-    let compositor_snapshot = compositor::spawn_smithay_server();
-
     let window_settings = window::Settings {
         size: Size::new(1366.0, 768.0),
         min_size: Some(Size::new(1024.0, 640.0)),
@@ -109,7 +97,7 @@ fn main() -> iced::Result {
     iced::application(
         move || {
             let (mut st, task) =
-                HyperXDesktop::new(compositor_snapshot.clone(), initial_window, open_launcher);
+                HyperXDesktop::new(initial_window, open_launcher);
             if open_wifi_modal {
                 st.wifi_modal_open = true;
             }
@@ -168,7 +156,7 @@ fn main() -> iced::Result {
         HyperXDesktop::update,
         HyperXDesktop::view,
     )
-    .title("HyperXOS Desktop Environment — Smithay Wayland & WGPU Shell")
+    .title("HyperXOS Desktop Environment — Labwc Wayland & WGPU Shell")
     .font(FONT_PLUS_JAKARTA_BYTES)
     .font(FONT_INTER_BYTES)
     .default_font(FONT_BODY_MEDIUM)

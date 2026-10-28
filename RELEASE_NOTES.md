@@ -2,7 +2,7 @@
 
 Selamat datang di rilis resmi pertama **HyperXOS** (`2026.10.26`).
 
-HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **HyperX Desktop Environment (`hyperx-de` - Pure Rust + Smithay Wayland + Iced WGPU)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
+HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **HyperX Desktop Environment (`hyperx-de` - Pure Rust + Labwc Wayland + Iced WGPU)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
 
 ---
 
@@ -13,7 +13,7 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
   - Manajemen paket berkecepatan tinggi dengan `pacman`.
 
 - **HyperX Desktop Environment (`hyperx-de`):**
-  - Sesi desktop Wayland murni yang responsif dan hemat sumber daya bertenaga Smithay 0.7 dan Iced 0.14 WGPU.
+  - Sesi desktop Wayland murni yang responsif dan hemat sumber daya bertenaga Labwc Wayland Compositor dan Iced 0.14 WGPU Desktop Shell.
   - Antarmuka visual Glassmorphic terpadu: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
   - Integrasi wallpaper dinamis, manajemen audio PipeWire, dan tray sistem real-time.
 

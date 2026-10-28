@@ -28,9 +28,10 @@
   <windowRules>
     <!-- HyperX-DE Desktop canvas should stay at the bottom layer and skip window switcher -->
     <windowRule identifier="hyperx-de">
-      <action name="ToggleAlwaysOnBottom" />
+      <serverDecoration>no</serverDecoration>
       <skipTaskbar>yes</skipTaskbar>
       <skipWindowSwitcher>yes</skipWindowSwitcher>
+      <action name="ToggleAlwaysOnBottom" />
     </windowRule>
   </windowRules>
 

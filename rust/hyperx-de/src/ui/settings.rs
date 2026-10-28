@@ -165,7 +165,7 @@ pub fn view_settings<'a>(
                 .style(|_| text::Style {
                     color: Some(FLUENT_TEXT_DARK),
                 }),
-            text("Smithay Wayland + WGPU")
+            text("Labwc Wayland + Iced WGPU")
                 .size(9)
                 .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
@@ -838,7 +838,7 @@ pub fn view_settings<'a>(
                 ("Sistem Operasi", "HyperXOS Linux 2026.10 (Rolling Release)".to_string(), icons::COMPUTER),
                 ("Prosesor (CPU)", cpu_brand.to_string(), icons::CPU),
                 ("Memori (RAM)", format!("{:.2} GB terpakai dari {:.2} GB", ram_used_gb, ram_total_gb), icons::MEMORY),
-                ("Compositor", format!("Smithay Wayland ({})", wayland_socket), icons::GPU),
+                ("Compositor", format!("Labwc Wayland ({})", wayland_socket), icons::GPU),
                 ("Mesin Grafis", "Iced 0.14 WGPU (Direct Rendering / KMS Vulkan)".to_string(), icons::SPARKLES),
             ];
 

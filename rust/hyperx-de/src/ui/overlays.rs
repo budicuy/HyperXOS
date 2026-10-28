@@ -31,7 +31,7 @@ impl Default for TerminalAppState {
         Self {
             command_input: String::new(),
             output_lines: vec![
-                "HyperXOS Interactive Shell v2.0 (Smithay Wayland + WGPU)".to_string(),
+                "HyperXOS Interactive Shell v2.2 (Labwc Wayland + WGPU)".to_string(),
                 "Ketik perintah Linux (contoh: uname -a, ls -la, df -h, free -h) atau gunakan tombol cepat di atas.".to_string(),
                 "------------------------------------------------------------------------".to_string(),
             ],
