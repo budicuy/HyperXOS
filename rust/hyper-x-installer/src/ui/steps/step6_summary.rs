@@ -37,7 +37,7 @@ pub fn view<'a, Message: Clone + 'a>(
             summary_item("BOOT PARTITION", "4096 MiB (4 GB) FAT32 mounted at /boot".to_string(), ACCENT_GREEN),
             summary_item("ROOT PARTITION", "Btrfs with @ (root) and @home (home) subvolumes".to_string(), ACCENT_GREEN),
             summary_item("BOOTLOADER", "Limine (UEFI NVRAM Registered)".to_string(), ACCENT_AMBER),
-            summary_item("DESKTOP ENVIRONMENT", "HyperX Desktop Environment (Labwc Wayland + WGPU)".to_string(), ACCENT_PURPLE),
+            summary_item("DESKTOP ENVIRONMENT", "HyperX Windows 11 Desktop (Hyprland + Waybar)".to_string(), ACCENT_PURPLE),
             summary_item("REGION & KEYBOARD", format!("{}, {} (Keymap: {})", cfg.timezone, cfg.locale, cfg.keymap), TEXT_MAIN),
             summary_item("USER & HOSTNAME", format!("{} on {}", cfg.username, cfg.hostname), TEXT_MAIN),
         ]

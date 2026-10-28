@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=HyperX Settings
-Comment=Pusat Konfigurasi Sistem, Wi-Fi, Audio, dan Tampilan HyperXOS
-Exec=/usr/bin/hyperx-settings
-Icon=hyper-x-tools
-Terminal=false
-Type=Application
-Categories=Settings;System;HardwareSettings;
-Keywords=settings;wifi;network;audio;display;wallpaper;hyperxos;

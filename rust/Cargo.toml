@@ -12,10 +12,6 @@ name = "hyperx_ui_kit"
 path = "hyperx-ui-kit/src/lib.rs"
 
 [[bin]]
-name = "hyperx-de"
-path = "hyperx-de/src/main.rs"
-
-[[bin]]
 name = "hyper-x-tools"
 path = "hyper-x-tools/src/main.rs"
 

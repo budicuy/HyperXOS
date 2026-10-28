@@ -1,8 +1,8 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
-pkgrel=5
-pkgdesc="Default shell, user skeleton, and Labwc window manager configuration for HyperXOS"
+pkgrel=6
+pkgdesc="Default shell, user skeleton, Hyprland, Waybar, and Windows 11 Fluent desktop configurations for HyperXOS"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
@@ -16,8 +16,13 @@ package() {
         install -Dm755 profile.d/hyperxos.sh "${pkgdir}/etc/profile.d/hyperxos.sh"
     fi
 
-    if [ -d etc/xdg/labwc ]; then
-        install -d "${pkgdir}/etc/xdg/labwc"
-        cp -af etc/xdg/labwc/. "${pkgdir}/etc/xdg/labwc/"
+    if [ -d etc/skel ]; then
+        install -d "${pkgdir}/etc/skel"
+        cp -af etc/skel/. "${pkgdir}/etc/skel/"
+    fi
+
+    if [ -d etc/xdg ]; then
+        install -d "${pkgdir}/etc/xdg"
+        cp -af etc/xdg/. "${pkgdir}/etc/xdg/"
     fi
 }

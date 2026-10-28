@@ -138,14 +138,14 @@ DisplayServer=wayland
 GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
 [Wayland]
-CompositorCommand=labwc
+CompositorCommand=Hyprland
 "#;
         let _ = fs::write("/mnt/etc/sddm.conf.d/10-wayland.conf", sddm_cfg);
 
         let autologin_cfg = format!(
             r#"[Autologin]
 User={}
-Session=hyperx-de
+Session=hyprland
 Relogin=true
 "#,
             cfg.username

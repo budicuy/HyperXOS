@@ -8,13 +8,15 @@
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **HyperX Desktop Environment (`hyperx-de`)** — lingkungan desktop native **100% Pure Rust** bertenaga **Labwc Wayland Compositor** dan antarmuka **Iced 0.14 WGPU Glassmorphism**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **Windows 11 Fluent Suite (Hyprland + Waybar + Wofi + SwayNC)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
-- **Desktop Modern Pure Rust (`hyperx-de`):**
-  - Desktop Environment mandiri yang dibangun sepenuhnya menggunakan bahasa pemrograman Rust.
-  - Compositor Wayland native bertenaga Labwc (wlroots) dengan akselerasi perangkat keras Direct WGPU / OpenGL dan Server-Side Decorations.
-  - Antarmuka visual Glassmorphic modern: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
+- **Desktop Modern Windows 11 Fluent Suite (Hyprland):**
+  - Compositor Wayland modern bertenaga **Hyprland** dengan efek kaca Dual-Kawase Blur, sudut membulat, bayangan halus, dan animasi transisi cepat.
+  - Floating Centered Taskbar & System Tray bertenaga **Waybar**.
+  - Start Menu & Pencarian bergaya Windows 11 bertenaga **Wofi**.
+  - Action Center & Notification Hub bertenaga **SwayNC**.
+  - Shortcut Windows 11 native: `Win` (Start Menu), `Win + E` (Explorer), `Win + V` (Clipboard History), `Win + Shift + S` (Snipping Tool), `Win + L` (Lock Screen), `Alt + F4`, dan snapping jendela.
 - **Pure Rust Native Installer (`hyper-x-installer`):**
   - Dibangun 100% menggunakan Rust murni dengan arsitektur UI Glassmorphic modern (Iced 0.14 + WGPU).
   - Skema partisi otomatis: Partisi boot ESP FAT32 sebesar 4096 MiB (4 GB) di `/boot` dan partisi root **Btrfs** dengan subvolume terpisah (`@`, `@home`, `@snapshots`, `@var`, `@opt`) dengan kompresi `zstd:1`.
@@ -219,7 +221,8 @@ Untuk membersihkan berkas build dan mount sementara:
 HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
 - **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
 - **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`).
-- **[Labwc](https://github.com/labwc/labwc):** Window-stacking Wayland compositor berbasis wlroots yang ringan, cepat, dan kaya fitur.
+- **[Hyprland](https://hyprland.org):** Wayland compositor dinamis modern dengan akselerasi GPU, animasi halus, dan efek kaca kustom.
+- **[Waybar](https://github.com/Alexays/Waybar):** Highly customizable Wayland bar untuk taskbar dan system tray.
 - **[Iced](https://iced.rs):** Cross-platform GUI library berbasis Rust dengan arsitektur reaktif dan akselerasi WGPU.
 - **[Limine Bootloader](https://limine-bootloader.org):** Bootloader modern yang tangguh, ringan, dan cepat.
 

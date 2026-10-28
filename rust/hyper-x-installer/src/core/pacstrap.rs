@@ -28,14 +28,25 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "networkmanager",
     "wireless-regdb",
     "curl",
-    // 4. Audio & Wayland Display Core
+    // 4. Audio, Hyprland Wayland Display & Windows 11 Shell Core
     "pipewire",
     "pipewire-pulse",
     "pipewire-alsa",
     "wireplumber",
     "mesa",
-    "labwc",
-    "layer-shell-qt",
+    "hyprland",
+    "xdg-desktop-portal-hyprland",
+    "waybar",
+    "wofi",
+    "swaync",
+    "hyprpaper",
+    "hyprlock",
+    "cliphist",
+    "slurp",
+    "swappy",
+    "thunar",
+    "papirus-icon-theme",
+    "ttf-jetbrains-mono-nerd",
     "foot",
     "grim",
     "wl-clipboard",
@@ -48,7 +59,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     // 5. Bootloader (Default Limine)
     "limine",
     "efibootmgr",
-    // 6. HyperXOS Pure Rust Desktop Environment, Branding, Keyrings & Tools
+    // 6. HyperXOS Branding, Default Settings, Keyrings & Tools
     "archlinux-keyring",
     "cachyos-keyring",
     "hyperxos-branding",
@@ -56,7 +67,6 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "hyperxos-hooks",
     "hyperxos-keyring",
     "hyperxos-mirrorlist",
-    "hyperx-de",
     "hyper-x-tools",
     "hyper-x-hw",
 ];

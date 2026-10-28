@@ -152,38 +152,14 @@ impl VmEngine {
         }
     }
 
-    /// Smoke-test the booted installed system: hyperx-de session alive + screenshot.
+    /// Smoke-test the booted installed system: Hyprland session alive + screenshot.
     fn smoke_test_installed(root: &Path) -> Result<(), String> {
         println!("  -> [smoke] Waiting for installed system guest agent (max 240s)...");
         let mut qga = QgaClient::wait_ready(Duration::from_secs(240))?;
 
-        // 1. Sync latest hyperx-de package into guest if built in local repo
-        let pkg_path = root.join("repo/x86_64/hyperx-de-1.0.0-1-x86_64.pkg.tar.zst");
-        if pkg_path.exists() {
-            println!("  -> [smoke] Syncing latest hyperx-de package into guest...");
-            let server = Command::new("python3")
-                .args(["-m", "http.server", "8099", "--directory", root.join("repo/x86_64").to_str().unwrap()])
-                .spawn()
-                .ok();
-            std::thread::sleep(Duration::from_millis(600));
-
-            let update_cmd = "curl -sSf http://10.0.2.2:8099/hyperx-de-1.0.0-1-x86_64.pkg.tar.zst -o /tmp/hyperx-de.pkg.tar.zst && \
-                              pacman -U --noconfirm /tmp/hyperx-de.pkg.tar.zst && \
-                              systemctl restart sddm";
-            let (code, out) = qga.exec(update_cmd).unwrap_or((-1, String::new()));
-            if let Some(mut s) = server {
-                let _ = s.kill();
-            }
-            if code == 0 {
-                println!("  [✓] [smoke] Latest hyperx-de package synced and installed in guest.");
-            } else {
-                eprintln!("  [!] [smoke] Guest package sync returned {}: {}", code, out);
-            }
-        }
-
         let start = Instant::now();
         loop {
-            let (code, _) = qga.exec("pgrep -f 'hyperx-de --session-ui' >/dev/null")?;
+            let (code, _) = qga.exec("pgrep -x Hyprland >/dev/null || pgrep -x hyprland >/dev/null")?;
             if code == 0 {
                 break;
             }
@@ -191,11 +167,11 @@ impl VmEngine {
                 let (_, log) = qga
                     .exec("journalctl -b -u sddm -n 30 --no-pager")
                     .unwrap_or_default();
-                return Err(format!("hyperx-de session did not start. SDDM log:\n{}", log));
+                return Err(format!("Hyprland session did not start. SDDM log:\n{}", log));
             }
             std::thread::sleep(Duration::from_secs(2));
         }
-        println!("  [✓] [smoke] hyperx-de Wayland session is running.");
+        println!("  [✓] [smoke] Hyprland Wayland session is running.");
 
         let take_screenshot = |qga: &mut QgaClient, out_path: &Path| -> Result<(), String> {
             let (_, b64) = qga.exec(

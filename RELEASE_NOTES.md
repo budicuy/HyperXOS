@@ -2,7 +2,7 @@
 
 Selamat datang di rilis resmi pertama **HyperXOS** (`2026.10.26`).
 
-HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **HyperX Desktop Environment (`hyperx-de` - Pure Rust + Labwc Wayland + Iced WGPU)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
+HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **Windows 11 Fluent Suite (Hyprland + Waybar + Wofi + SwayNC)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
 
 ---
 
@@ -12,10 +12,12 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
   - Mengadopsi arsitektur *rolling-release* dengan repositori resmi Arch Linux dan repositori teroptimasi CachyOS.
   - Manajemen paket berkecepatan tinggi dengan `pacman`.
 
-- **HyperX Desktop Environment (`hyperx-de`):**
-  - Sesi desktop Wayland murni yang responsif dan hemat sumber daya bertenaga Labwc Wayland Compositor dan Iced 0.14 WGPU Desktop Shell.
-  - Antarmuka visual Glassmorphic terpadu: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
-  - Integrasi wallpaper dinamis, manajemen audio PipeWire, dan tray sistem real-time.
+- **HyperX Windows 11 Fluent Desktop (Hyprland):**
+  - Sesi desktop Wayland bertenaga Hyprland dengan efek kaca Dual-Kawase Blur, sudut membulat, bayangan halus, dan animasi cepat.
+  - Floating Centered Taskbar & System Tray bertenaga Waybar.
+  - Start Menu & App Search bertenaga Wofi.
+  - Action Center & Notification Hub bertenaga SwayNC.
+  - Shortcut Windows 11 native: `Win` (Start Menu), `Win + E` (Explorer), `Win + V` (Clipboard), `Win + Shift + S` (Snipping Tool), `Win + L` (Lock Screen), `Alt + F4`, dan window snapping.
 
 - **Peramban Web Firefox Terintegrasi:**
   - Mozilla Firefox langsung tersedia di media Live USB dan secara otomatis terpasang pada instalasi target.

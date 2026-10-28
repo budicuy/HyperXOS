@@ -87,7 +87,7 @@ pub fn run_check(root: &Path) -> Result<(), String> {
         let vital = [
             "linux",
             "base",
-            "hyperx-de",
+            "hyprland",
             "sddm",
             "hyper-x-installer",
             "hyper-x-tools",
@@ -104,7 +104,6 @@ pub fn run_check(root: &Path) -> Result<(), String> {
 
     // 5. Package PKGBUILDs
     let pkgbuilds = [
-        "packages/hyperx-de/PKGBUILD",
         "packages/hyper-x-installer/PKGBUILD",
         "packages/hyper-x-hw/PKGBUILD",
         "packages/hyper-x-tools/PKGBUILD",

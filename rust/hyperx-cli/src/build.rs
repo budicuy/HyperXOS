@@ -114,7 +114,7 @@ pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String>
             // Inject freshly built dev binaries directly into cached airootfs/usr/bin/
             let debug_dir = root.join("rust/target/debug");
             let usr_bin = airootfs_work.join("usr/bin");
-            for bin_name in ["hyperx-de", "hyper-x-tools", "hyper-x-installer", "hyper-x-hw"] {
+            for bin_name in ["hyper-x-tools", "hyper-x-installer", "hyper-x-hw"] {
                 let src_bin = debug_dir.join(bin_name);
                 let dst_bin = usr_bin.join(bin_name);
                 if src_bin.exists() {

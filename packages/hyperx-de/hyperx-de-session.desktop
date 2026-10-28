@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=HyperXOS Desktop
-Comment=Unified HyperXOS Desktop Environment powered by Labwc Wayland Compositor & Iced WGPU
-Exec=/usr/bin/hyperx-de
-Type=Application
-DesktopNames=HyperXOS;hyperx-de
-Keywords=wayland;compositor;desktop;hyperxos;labwc;

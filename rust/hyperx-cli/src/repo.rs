@@ -28,7 +28,6 @@ pub fn run_repo_action(root: &Path, action: &RepoAction) -> Result<(), String> {
 }
 
 pub const OFFICIAL_PACKAGES: &[&str] = &[
-    "hyperx-de-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-hw-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-installer-1.0.0-1-x86_64.pkg.tar.zst",
     "hyper-x-tools-2.2.0-1-x86_64.pkg.tar.zst",
@@ -48,7 +47,6 @@ pub const BASE_PKG_DIRS: &[&str] = &[
 ];
 
 pub const RUST_PKG_DIRS: &[&str] = &[
-    "hyperx-de",
     "hyper-x-tools",
     "hyper-x-installer",
     "hyper-x-hw",
@@ -123,8 +121,6 @@ pub fn build_and_sync_rust_packages(root: &Path, prod: bool) -> Result<(), Strin
         manifest.to_str().unwrap(),
         "--locked",
         "--bin",
-        "hyperx-de",
-        "--bin",
         "hyper-x-tools",
         "--bin",
         "hyper-x-installer",
@@ -135,7 +131,7 @@ pub fn build_and_sync_rust_packages(root: &Path, prod: bool) -> Result<(), Strin
 
     // Guard: production packages must never contain unstripped debug binaries.
     if prod {
-        for bin in ["hyperx-de", "hyper-x-tools", "hyper-x-installer", "hyper-x-hw"] {
+        for bin in ["hyper-x-tools", "hyper-x-installer", "hyper-x-hw"] {
             let path = root.join("rust/target/release").join(bin);
             let info = Command::new("file")
                 .arg(&path)

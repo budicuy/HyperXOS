@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=HyperX Files
-Comment=Manajer Berkas Finder untuk HyperXOS Desktop Environment
-Exec=/usr/bin/hyperx-files
-Icon=hyper-x-tools
-Terminal=false
-Type=Application
-Categories=System;FileTools;FileManager;
-Keywords=files;folder;manager;finder;hyperxos;
