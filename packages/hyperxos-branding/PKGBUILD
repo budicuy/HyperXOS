@@ -2,7 +2,7 @@
 pkgname=hyperxos-branding
 pkgver=1.0.0
 pkgrel=3
-pkgdesc="Visual branding, wallpapers, and color schemes for HyperXOS"
+pkgdesc="Visual branding, default wallpapers, and OS identity for HyperXOS"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
@@ -10,34 +10,16 @@ depends=()
 
 package() {
     cd "${startdir}"
-    
-    # 1. Wallpapers
+
+    # 1. Default System Wallpaper
     install -Dm644 assets/hyperxos-default-wallpaper.png "${pkgdir}/usr/share/wallpapers/hyperxos-default.png"
-    install -Dm644 assets/hyperxos-default-wallpaper.png "${pkgdir}/usr/share/wallpapers/HyperXOS/contents/images/3840x2160.png"
-    
-    cat << 'EOF' > "${pkgdir}/usr/share/wallpapers/HyperXOS/metadata.json"
-{
-    "KPlugin": {
-        "Authors": [
-            {
-                "Name": "HyperXOS Design Team"
-            }
-        ],
-        "Id": "HyperXOS",
-        "Name": "HyperXOS Default"
-    }
-}
-EOF
 
-    # 2. KDE Color Scheme
-    install -Dm644 assets/HyperXOSDark.colors "${pkgdir}/usr/share/color-schemes/HyperXOSDark.colors"
-
-    # 3. OS Identification
+    # 2. OS Identification
     install -Dm644 assets/os-release "${pkgdir}/etc/os-release"
     install -Dm644 assets/os-release "${pkgdir}/etc/hyperxos-release"
 
-    # 4. Icon/Pixmaps (Orange HyperXOS Logo)
-    local logo_src="${startdir}/../hyper-x-installer/logo.png"
+    # 3. Icon/Pixmaps (Unified HyperXOS Logo from hyperx-ui-kit)
+    local logo_src="${startdir}/../../rust/hyperx-ui-kit/assets/logo.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/hyperxos.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/hyperxos.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyperxos.png"

@@ -84,7 +84,15 @@ pub fn run_check(root: &Path) -> Result<(), String> {
         );
 
         // Verify vital packages are included
-        let vital = ["linux", "base", "plasma-desktop", "sddm", "hyper-x-installer", "hyper-x-tools", "hyper-x-hw"];
+        let vital = [
+            "linux",
+            "base",
+            "hyperx-de",
+            "sddm",
+            "hyper-x-installer",
+            "hyper-x-tools",
+            "hyper-x-hw",
+        ];
         for v in vital {
             if !active_pkgs.contains(&v) {
                 return Err(format!("Vital package '{}' is missing from packages.x86_64!", v));
@@ -96,6 +104,7 @@ pub fn run_check(root: &Path) -> Result<(), String> {
 
     // 5. Package PKGBUILDs
     let pkgbuilds = [
+        "packages/hyperx-de/PKGBUILD",
         "packages/hyper-x-installer/PKGBUILD",
         "packages/hyper-x-hw/PKGBUILD",
         "packages/hyper-x-tools/PKGBUILD",

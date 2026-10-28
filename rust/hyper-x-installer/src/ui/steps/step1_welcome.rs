@@ -62,7 +62,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let ram_row = check_row(
         "System Memory (RAM)",
         format!(
-            "{:.1} GB detected (Minimum 3.5 GB required for online KDE Plasma 6 installation)",
+            "{:.1} GB detected (Minimum 3.5 GB required for HyperXOS installation)",
             preflight.total_ram_gb
         ),
         preflight.has_min_ram,
@@ -143,7 +143,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN)
                 }),
-            text("Pure Rust Native Installer with Limine Bootloader & KDE Plasma 6 Wayland")
+            text("Pure Rust Native Installer with Limine Bootloader & HyperX Desktop Environment")
                 .size(13)
                 .font(FONT_BODY)
                 .style(|_| text::Style {

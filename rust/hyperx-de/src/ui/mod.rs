@@ -329,56 +329,73 @@ impl HyperXDesktop {
             .map(|s| s.socket_name.clone())
             .unwrap_or_else(|| "wayland-hyperx-0".to_string());
 
-        let desktop_icons = vec![
-            DesktopShortcutItem {
+        let has_installer = std::path::Path::new("/usr/bin/launch-installer").exists()
+            || std::path::Path::new("/usr/bin/hyper-x-installer").exists()
+            || std::path::Path::new("/usr/local/bin/launch-installer").exists();
+
+        let mut desktop_icons = Vec::new();
+        let mut y_offset = 20.0;
+
+        if has_installer {
+            desktop_icons.push(DesktopShortcutItem {
                 title: "Install HyperXOS".to_string(),
                 svg_icon_data: None,
                 app_icon_name: "hyper-x-installer".to_string(),
                 svg_color: ACCENT_CYAN,
                 action: DesktopIconAction::External("launch-installer".to_string()),
-                pos: Point::new(28.0, 20.0),
-            },
-            DesktopShortcutItem {
-                title: "HyperXTools".to_string(),
-                svg_icon_data: None,
-                app_icon_name: "hyper-x-tools".to_string(),
-                svg_color: ACCENT_PURPLE,
-                action: DesktopIconAction::External("hyper-x-tools".to_string()),
-                pos: Point::new(28.0, 118.0),
-            },
-            DesktopShortcutItem {
-                title: "Firefox".to_string(),
-                svg_icon_data: None,
-                app_icon_name: "firefox".to_string(),
-                svg_color: ACCENT_AMBER,
-                action: DesktopIconAction::External("firefox".to_string()),
-                pos: Point::new(28.0, 216.0),
-            },
-            DesktopShortcutItem {
-                title: "HyperX Files".to_string(),
-                svg_icon_data: Some(icons::FOLDER),
-                app_icon_name: String::new(),
-                svg_color: ACCENT_CYAN,
-                action: DesktopIconAction::Internal(DesktopWindowId::Files),
-                pos: Point::new(28.0, 314.0),
-            },
-            DesktopShortcutItem {
-                title: "Terminal".to_string(),
-                svg_icon_data: Some(icons::TERMINAL),
-                app_icon_name: String::new(),
-                svg_color: ACCENT_GREEN,
-                action: DesktopIconAction::Internal(DesktopWindowId::Terminal),
-                pos: Point::new(28.0, 412.0),
-            },
-            DesktopShortcutItem {
-                title: "Settings".to_string(),
-                svg_icon_data: Some(icons::SETTINGS_GEAR),
-                app_icon_name: String::new(),
-                svg_color: ACCENT_AMBER,
-                action: DesktopIconAction::Internal(DesktopWindowId::Settings),
-                pos: Point::new(28.0, 510.0),
-            },
-        ];
+                pos: Point::new(28.0, y_offset),
+            });
+            y_offset += 98.0;
+        }
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "HyperXTools".to_string(),
+            svg_icon_data: None,
+            app_icon_name: "hyper-x-tools".to_string(),
+            svg_color: ACCENT_PURPLE,
+            action: DesktopIconAction::External("hyper-x-tools".to_string()),
+            pos: Point::new(28.0, y_offset),
+        });
+        y_offset += 98.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Firefox".to_string(),
+            svg_icon_data: None,
+            app_icon_name: "firefox".to_string(),
+            svg_color: ACCENT_AMBER,
+            action: DesktopIconAction::External("firefox".to_string()),
+            pos: Point::new(28.0, y_offset),
+        });
+        y_offset += 98.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "HyperX Files".to_string(),
+            svg_icon_data: Some(icons::FOLDER),
+            app_icon_name: String::new(),
+            svg_color: ACCENT_CYAN,
+            action: DesktopIconAction::Internal(DesktopWindowId::Files),
+            pos: Point::new(28.0, y_offset),
+        });
+        y_offset += 98.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Terminal".to_string(),
+            svg_icon_data: Some(icons::TERMINAL),
+            app_icon_name: String::new(),
+            svg_color: ACCENT_GREEN,
+            action: DesktopIconAction::Internal(DesktopWindowId::Terminal),
+            pos: Point::new(28.0, y_offset),
+        });
+        y_offset += 98.0;
+
+        desktop_icons.push(DesktopShortcutItem {
+            title: "Settings".to_string(),
+            svg_icon_data: Some(icons::SETTINGS_GEAR),
+            app_icon_name: String::new(),
+            svg_color: ACCENT_AMBER,
+            action: DesktopIconAction::Internal(DesktopWindowId::Settings),
+            pos: Point::new(28.0, y_offset),
+        });
 
         let mut state = Self {
             compositor_snapshot,
@@ -506,7 +523,7 @@ impl HyperXDesktop {
             let fy = y as f32 / h as f32;
             for x in 0..w {
                 let fx = x as f32 / w as f32;
-                let wave1 = ((fx * 6.28 + fy * 3.14).sin() * 0.5 + 0.5).powf(2.0);
+                let wave1 = ((fx * std::f32::consts::TAU + fy * std::f32::consts::PI).sin() * 0.5 + 0.5).powf(2.0);
                 let wave2 = ((fx * 4.5 - fy * 5.0).cos() * 0.5 + 0.5).powf(2.2);
                 let r = ((18.0 + 135.0 * wave1 * (1.0 - fy * 0.4)) as u8).clamp(10, 210);
                 let g = ((22.0 + 95.0 * wave2 + 45.0 * (1.0 - fy)) as u8).clamp(12, 195);

@@ -44,26 +44,18 @@ fn main() -> iced::Result {
             .unwrap_or_else(|_| std::path::PathBuf::from("/usr/bin/hyperx-de"));
         let self_str = self_exe.to_string_lossy().to_string();
 
-        // Try cage first, then kwin_wayland (fullscreen Wayland DRM host)
-        if Command::new("cage")
+        // Launch via cage (lightweight DRM Wayland kiosk host).
+        // Hardware cursor planes render flipped/offset on virtio-gpu (QEMU virgl),
+        // so force software cursor in cage.
+        let status = Command::new("cage")
+            .env("WLR_NO_HARDWARE_CURSORS", "1")
             .args(["-s", "--", &self_str, "--session-ui"])
-            .status()
-            .is_ok()
-        {
-            return Ok(());
-        }
-        if Command::new("kwin_wayland")
-            .args([
-                "--drm",
-                "--no-lockscreen",
-                "--no-global-shortcuts",
-                "--exit-with-session",
-                &format!("{} --session-ui {}", self_str, args[1..].join(" ")),
-            ])
-            .status()
-            .is_ok()
-        {
-            return Ok(());
+            .status();
+
+        if let Ok(s) = status {
+            if s.success() {
+                return Ok(());
+            }
         }
     }
 

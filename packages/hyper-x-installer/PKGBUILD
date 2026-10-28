@@ -9,17 +9,34 @@ license=('GPL-3.0-or-later')
 depends=('fontconfig' 'freetype2' 'libxkbcommon' 'polkit' 'gptfdisk' 'dosfstools' 'btrfs-progs' 'arch-install-scripts' 'limine' 'efibootmgr')
 makedepends=('cargo' 'rust')
 provides=('hyperxos-installer')
+options=('!strip' '!debug')
 
 build() {
     cd "${startdir}/../../rust"
-    cargo build --release --bin hyper-x-installer --locked
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        if [ ! -f "target/debug/hyper-x-installer" ]; then
+            cargo build --bin hyper-x-installer --locked
+        fi
+    else
+        if [ ! -f "target/release/hyper-x-installer" ]; then
+            cargo build --release --bin hyper-x-installer --locked
+        fi
+    fi
 }
 
 package() {
-    install -Dm755 "${startdir}/../../rust/target/release/hyper-x-installer" "${pkgdir}/usr/bin/hyper-x-installer"
+    local target_dir="release"
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        target_dir="debug"
+    fi
+
+    install -Dm755 "${startdir}/../../rust/target/${target_dir}/hyper-x-installer" "${pkgdir}/usr/bin/hyper-x-installer"
     install -Dm755 "${startdir}/hyper-x-installer-launcher" "${pkgdir}/usr/bin/hyper-x-installer-launcher"
     ln -sf hyper-x-installer-launcher "${pkgdir}/usr/bin/launch-installer"
+    install -d "${pkgdir}/usr/local/bin"
+    ln -sf /usr/bin/hyper-x-installer-launcher "${pkgdir}/usr/local/bin/launch-installer"
     install -Dm644 "${startdir}/hyper-x-installer.desktop" "${pkgdir}/usr/share/applications/hyper-x-installer.desktop"
-    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-installer.png"
-    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/pixmaps/hyper-x-installer.png"
+    local logo_src="${startdir}/../../rust/hyperx-ui-kit/assets/logo.png"
+    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-installer.png"
+    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/hyper-x-installer.png"
 }

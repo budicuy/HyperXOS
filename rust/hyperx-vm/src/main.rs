@@ -2,6 +2,7 @@ mod config;
 mod display;
 mod engine;
 mod provisioner;
+mod qga;
 mod storage;
 mod util;
 
@@ -32,6 +33,10 @@ struct Cli {
     /// Number of virtual CPU cores
     #[arg(long, default_value_t = 4)]
     cores: u32,
+
+    /// Run automated non-interactive install/smoke test via QEMU guest agent
+    #[arg(long, global = true)]
+    auto: bool,
 }
 
 #[derive(Subcommand)]
@@ -90,8 +95,8 @@ fn main() {
 
     let res = match cli.command {
         Commands::Live | Commands::Dev => VmEngine::run_live(&root, &config),
-        Commands::Install => VmEngine::run_install(&root, &config),
-        Commands::Run => VmEngine::run_installed(&root, &config),
+        Commands::Install => VmEngine::run_install(&root, &config, cli.auto),
+        Commands::Run => VmEngine::run_installed(&root, &config, cli.auto),
         Commands::Check => run_check(&root, &config),
         Commands::Provision => VmmProvisioner::ensure_vmm(&root).map(|bin| {
             println!("[✓] Hermetic VMM binary is up-to-date and ready at: {}", bin.display());

@@ -2,7 +2,7 @@
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
 pkgrel=4
-pkgdesc="Default desktop and user skeleton settings for HyperXOS"
+pkgdesc="Default shell and user skeleton settings for HyperXOS"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
@@ -11,7 +11,6 @@ depends=()
 package() {
     cd "${startdir}"
     install -d "${pkgdir}/etc/skel"
-    cp -a skel/. "${pkgdir}/etc/skel/"
 
     if [ -f profile.d/hyperxos.sh ]; then
         install -Dm755 profile.d/hyperxos.sh "${pkgdir}/etc/profile.d/hyperxos.sh"

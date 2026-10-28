@@ -26,10 +26,6 @@ file_permissions=(
   ["/root/.automated_script.sh"]="0:0:755"
   ["/root/.gnupg"]="0:0:700"
   ["/home/hyperxos"]="1000:1000:750"
-  ["/home/hyperxos/.config"]="1000:1000:750"
-  ["/home/hyperxos/.config/kdeglobals"]="1000:1000:644"
-  ["/home/hyperxos/.config/plasma-org.kde.plasma.desktop-appletsrc"]="1000:1000:644"
   ["/home/hyperxos/Desktop/hyper-x-installer.desktop"]="1000:1000:755"
   ["/home/hyperxos/Desktop/hyperxtools.desktop"]="1000:1000:755"
-  ["/usr/local/bin/launch-installer"]="0:0:755"
 )

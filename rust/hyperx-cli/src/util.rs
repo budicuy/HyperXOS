@@ -83,6 +83,6 @@ pub fn find_latest_iso(root: &Path) -> Option<PathBuf> {
         }
     }
 
-    isos.sort_by(|a, b| b.1.cmp(&a.1));
+    isos.sort_by_key(|a| std::cmp::Reverse(a.1));
     isos.first().map(|(p, _)| p.clone())
 }

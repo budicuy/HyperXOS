@@ -1,5 +1,8 @@
 use std::path::Path;
 use std::process::Command;
+use std::time::{Duration, Instant};
+
+use crate::qga::{QgaClient, QGA_SOCKET};
 
 use crate::config::VmConfig;
 use crate::display::DisplayManager;
@@ -42,7 +45,7 @@ impl VmEngine {
     }
 
     /// Run installation test on clean 40GB virtual disk
-    pub fn run_install(root: &Path, config: &VmConfig) -> Result<(), String> {
+    pub fn run_install(root: &Path, config: &VmConfig, auto: bool) -> Result<(), String> {
         let iso = StorageManager::find_latest_iso(root).ok_or_else(|| {
             "No HyperXOS ISO found in out/. Please build one first using './hyperx build'.".to_string()
         })?;
@@ -67,12 +70,126 @@ impl VmEngine {
             "-boot", "d",
         ]);
 
-        println!("==> [hyperx-vm] Starting virtual machine (Installer Mode)...");
-        run_stream(&mut cmd, "hyperx-vm install")
+        if !auto {
+            println!("==> [hyperx-vm] Starting virtual machine (Manual Installer Mode)...");
+            return run_stream(&mut cmd, "hyperx-vm install");
+        }
+
+        println!("==> [hyperx-vm] Starting virtual machine (Automated Install Test)...");
+        let _ = std::fs::remove_file(QGA_SOCKET);
+        let mut child = cmd
+            .spawn()
+            .map_err(|e| format!("Failed to start VM: {}", e))?;
+
+        let result = Self::drive_auto_install();
+        if result.is_err() {
+            let _ = child.kill();
+        }
+        let _ = child.wait();
+        result?;
+
+        println!("==> [hyperx-vm] Automated install PASSED. Booting installed system...");
+        Self::run_installed(root, config, true)
+    }
+
+    /// Drive `hyper-x-installer --auto-install /dev/vda` inside the live ISO via QEMU Guest Agent.
+    fn drive_auto_install() -> Result<(), String> {
+        println!("  -> Waiting for Live ISO guest agent (max 300s)...");
+        let mut qga = QgaClient::wait_ready(Duration::from_secs(300))?;
+        println!("  [✓] Guest agent connected.");
+
+        // Let systemd finish starting core services (pacman-init, network)
+        let _ = qga.exec("systemctl is-system-running --wait >/dev/null 2>&1; true");
+
+        println!("  -> Launching: hyper-x-installer --auto-install /dev/vda");
+        qga.spawn(
+            "rm -f /tmp/autoinstall.log /tmp/autoinstall.exit; \
+             /usr/bin/hyper-x-installer --auto-install /dev/vda > /tmp/autoinstall.log 2>&1; \
+             echo $? > /tmp/autoinstall.exit",
+        )?;
+
+        let start = Instant::now();
+        let mut offset: usize = 0;
+        loop {
+            std::thread::sleep(Duration::from_secs(3));
+            // Stream new log bytes
+            if let Ok((_, chunk)) =
+                qga.exec(&format!("tail -c +{} /tmp/autoinstall.log 2>/dev/null", offset + 1))
+            {
+                if !chunk.is_empty() {
+                    offset += chunk.len();
+                    for line in chunk.lines() {
+                        let l = line.trim();
+                        if l.starts_with("[STAGE") || l.starts_with("[✓]") || l.starts_with("[-]") {
+                            println!("  {}", l);
+                        }
+                    }
+                }
+            }
+            if let Ok((0, code)) = qga.exec("cat /tmp/autoinstall.exit 2>/dev/null") {
+                let code = code.trim();
+                if !code.is_empty() {
+                    if code == "0" {
+                        println!(
+                            "  [✓] Installation finished in {}s. Powering off live VM...",
+                            start.elapsed().as_secs()
+                        );
+                        let _ = qga.spawn("sleep 1; systemctl poweroff");
+                        return Ok(());
+                    }
+                    let (_, tail) = qga
+                        .exec("tail -n 25 /tmp/autoinstall.log")
+                        .unwrap_or_default();
+                    return Err(format!(
+                        "Automated install failed (exit {}). Last log:\n{}",
+                        code, tail
+                    ));
+                }
+            }
+            if start.elapsed() > Duration::from_secs(2400) {
+                return Err("Automated install timed out after 40 minutes".to_string());
+            }
+        }
+    }
+
+    /// Smoke-test the booted installed system: hyperx-de session alive + screenshot.
+    fn smoke_test_installed(root: &Path) -> Result<(), String> {
+        println!("  -> [smoke] Waiting for installed system guest agent (max 240s)...");
+        let mut qga = QgaClient::wait_ready(Duration::from_secs(240))?;
+
+        let start = Instant::now();
+        loop {
+            let (code, _) = qga.exec("pgrep -f 'hyperx-de --session-ui' >/dev/null")?;
+            if code == 0 {
+                break;
+            }
+            if start.elapsed() > Duration::from_secs(90) {
+                let (_, log) = qga
+                    .exec("journalctl -b -u sddm -n 30 --no-pager")
+                    .unwrap_or_default();
+                return Err(format!("hyperx-de session did not start. SDDM log:\n{}", log));
+            }
+            std::thread::sleep(Duration::from_secs(2));
+        }
+        println!("  [✓] [smoke] hyperx-de Wayland session is running.");
+
+        std::thread::sleep(Duration::from_secs(4));
+        let (_, b64) = qga.exec(
+            "WAYLAND_DISPLAY=$(ls /run/user/1000 | grep -E '^wayland-[0-9]+$' | head -n1) \
+             XDG_RUNTIME_DIR=/run/user/1000 grim /tmp/smoke.png && base64 -w0 /tmp/smoke.png",
+        )?;
+        let png = crate::qga::base64_decode(b64.trim());
+        if png.len() > 1000 {
+            let out = root.join("out/vm-smoke-installed.png");
+            let _ = std::fs::write(&out, &png);
+            println!("  [✓] [smoke] Desktop screenshot saved: {}", out.display());
+        }
+        println!("  [✓] [smoke] Installed system smoke test PASSED.");
+        Ok(())
     }
 
     /// Boot installed HyperXOS system directly from 40GB virtual disk
-    pub fn run_installed(root: &Path, config: &VmConfig) -> Result<(), String> {
+    pub fn run_installed(root: &Path, config: &VmConfig, smoke: bool) -> Result<(), String> {
         if !config.disk_image.exists() {
             return Err(format!(
                 "Virtual disk '{}' does not exist. Please run './hyperx install' first to install HyperXOS.",
@@ -97,7 +214,21 @@ impl VmEngine {
         ]);
 
         println!("==> [hyperx-vm] Booting installed HyperXOS from virtual disk...");
-        run_stream(&mut cmd, "hyperx-vm run")
+        if !smoke {
+            return run_stream(&mut cmd, "hyperx-vm run");
+        }
+
+        let _ = std::fs::remove_file(QGA_SOCKET);
+        let mut child = cmd
+            .spawn()
+            .map_err(|e| format!("Failed to start VM: {}", e))?;
+
+        if let Err(e) = Self::smoke_test_installed(root) {
+            eprintln!("  [-] [smoke] {}", e);
+        }
+        println!("==> [hyperx-vm] VM window stays open. Close it to exit.");
+        let _ = child.wait();
+        Ok(())
     }
 
     /// Build base QEMU/KVM command with UEFI firmware and hardware acceleration
@@ -162,6 +293,10 @@ impl VmEngine {
             "-device", "intel-hda",
             "-device", "hda-duplex,audiodev=snd0",
         ]);
+
+        // 6b. Absolute pointer (USB tablet on xHCI) so the guest cursor tracks the host
+        //     mouse 1:1 without offset/grab issues in the QEMU window.
+        cmd.args(["-device", "qemu-xhci,id=xhci", "-device", "usb-tablet,bus=xhci.0"]);
 
         // 7. Direct OpenGL Host GPU Display Acceleration
         let (_backend, display_args) = DisplayManager::detect(root);

@@ -24,9 +24,12 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
 
     fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
 
-    // Step 1: Ensure local repo packages are updated & synced
-    println!("==> [1/4] Ensuring HyperXOS custom packages repository is updated...");
-    crate::repo::ensure_packages(root)?;
+    // Step 1: Compile Rust packages (Dev vs Prod) & update local repo packages
+    println!(
+        "==> [1/4] Building & syncing HyperXOS Rust packages (mode: '{}')...",
+        mode
+    );
+    crate::repo::build_and_sync_rust_packages(root, prod)?;
 
     // Update archiso pacman.conf server path
     let pacman_conf = profile_dir.join("pacman.conf");
@@ -47,8 +50,6 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
 
     // Step 2: Configure compression and workspace caching
     println!("==> [2/4] Configuring build profile for mode '{}'...", mode);
-
-    let current_pkg_hash = compute_package_hash(&packages_file, &root.join("repo/x86_64/hyperxos.db.tar.gz"));
 
     if prod {
         println!("  -> Applying PRODUCTION settings: Ultra-compressed (SquashFS zstd -22 1M, Initramfs xz -9e)");
@@ -81,17 +82,36 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
         let mkinit_content = "HOOKS=(base udev microcode modconf memdisk archiso archiso_loop_mnt block filesystems keyboard)\nCOMPRESSION=\"zstd\"\nCOMPRESSION_OPTIONS=(-1 -T0)\nMODULES_DECOMPRESS=\"no\"\n";
         let _ = fs::write(&mkinit_conf, mkinit_content);
 
-        // Caching check
+        // Caching check (based on archiso/packages.x86_64 list so Rust binary updates still hit the fast cache!)
+        let current_pkg_list_hash = compute_package_list_hash(&packages_file);
         let cached_hash = fs::read_to_string(&hash_file).unwrap_or_default().trim().to_string();
         let airootfs_work = work_dir.join("x86_64/airootfs");
         let packages_marker = work_dir.join("base._make_packages");
 
-        if airootfs_work.exists() && packages_marker.exists() && cached_hash == current_pkg_hash {
+        if airootfs_work.exists() && packages_marker.exists() && cached_hash == current_pkg_list_hash {
             println!("  -> [CACHE HIT] Reusing cached pacstrap airootfs for instant build...");
-            println!("  -> Syncing overlay archiso/airootfs changes...");
+            println!("  -> Syncing overlay archiso/airootfs changes & newly built dev binaries...");
             let mut cp_cmd = Command::new("sudo");
             cp_cmd.args(["cp", "-af", "--no-preserve=ownership,mode", &format!("{}/.", profile_dir.join("airootfs").display()), &format!("{}/", airootfs_work.display())]);
             let _ = cp_cmd.status();
+
+            // Inject freshly built dev binaries directly into cached airootfs/usr/bin/
+            let debug_dir = root.join("rust/target/debug");
+            let usr_bin = airootfs_work.join("usr/bin");
+            for bin_name in ["hyperx-de", "hyper-x-tools", "hyper-x-installer", "hyper-x-hw"] {
+                let src_bin = debug_dir.join(bin_name);
+                let dst_bin = usr_bin.join(bin_name);
+                if src_bin.exists() {
+                    let _ = Command::new("sudo")
+                        .args([
+                            "install",
+                            "-Dm755",
+                            src_bin.to_str().unwrap(),
+                            dst_bin.to_str().unwrap(),
+                        ])
+                        .status();
+                }
+            }
 
             // Invalidate downstream packaging markers
             let invalidate = [
@@ -135,9 +155,10 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
 
     run_stream(&mut mkarchiso_cmd, "mkarchiso")?;
 
-    // Save package hash on successful dev build
+    // Save package list hash on successful dev build
     if !prod {
-        let _ = fs::write(&hash_file, &current_pkg_hash);
+        let current_pkg_list_hash = compute_package_list_hash(&packages_file);
+        let _ = fs::write(&hash_file, &current_pkg_list_hash);
     }
 
     // Step 4: Fix ownership of built artifacts
@@ -170,21 +191,19 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
             ));
         }
         println!("[✓] Production size check PASSED: strictly under 2.0 GB ({} < {}).", size_bytes, max_prod_bytes);
-        println!("==> Generating official production checksums...");
-        run_checksum(root)?;
     }
+
+    println!("==> Generating ISO checksums...");
+    let _ = run_checksum(root);
 
     println!("==================================================");
     Ok(())
 }
 
-fn compute_package_hash(pkg_file: &Path, db_file: &Path) -> String {
+fn compute_package_list_hash(pkg_file: &Path) -> String {
     let mut hasher = String::new();
     if let Ok(c1) = fs::read_to_string(pkg_file) {
         hasher.push_str(&c1);
-    }
-    if let Ok(m) = fs::metadata(db_file) {
-        hasher.push_str(&format!("{:?}", m.modified()));
     }
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};

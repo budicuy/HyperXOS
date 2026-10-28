@@ -35,14 +35,11 @@ fn get_euid() -> u32 {
 /// Automatically detects and sets `WAYLAND_DISPLAY` / `XDG_RUNTIME_DIR` or `DISPLAY`
 /// when a GUI app is launched via root (`pkexec`/`sudo`) or from a bare session.
 pub fn ensure_display_environment() {
-    let has_wayland =
+    let mut has_wayland =
         std::env::var("WAYLAND_DISPLAY").is_ok() || std::env::var("WAYLAND_SOCKET").is_ok();
-    let has_x11 = std::env::var("DISPLAY").is_ok();
 
-    if !has_wayland && !has_x11 {
+    if !has_wayland {
         let euid = get_euid();
-        let mut resolved = false;
-
         let runtimes = vec![
             format!("/run/user/{}", euid),
             "/run/user/1000".to_string(),
@@ -55,29 +52,25 @@ pub fn ensure_display_environment() {
                     if name.starts_with("wayland-") && !name.ends_with(".lock") {
                         std::env::set_var("WAYLAND_DISPLAY", &name);
                         std::env::set_var("XDG_RUNTIME_DIR", rdir);
-                        resolved = true;
+                        has_wayland = true;
                         break;
                     }
                 }
             }
-            if resolved {
+            if has_wayland {
                 break;
             }
         }
+    }
 
-        if !resolved {
-            if std::path::Path::new("/tmp/.X11-unix/X0").exists() {
-                std::env::set_var("DISPLAY", ":0");
-                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
-                resolved = true;
-            } else if std::path::Path::new("/tmp/.X11-unix/X1").exists() {
-                std::env::set_var("DISPLAY", ":1");
-                std::env::set_var("WINIT_UNIX_BACKEND", "x11");
-                resolved = true;
-            }
-        }
-
-        if !resolved {
+    if !has_wayland && std::env::var("DISPLAY").is_err() {
+        if std::path::Path::new("/tmp/.X11-unix/X0").exists() {
+            std::env::set_var("DISPLAY", ":0");
+            std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+        } else if std::path::Path::new("/tmp/.X11-unix/X1").exists() {
+            std::env::set_var("DISPLAY", ":1");
+            std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+        } else {
             std::env::set_var("DISPLAY", ":0");
         }
     }

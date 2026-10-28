@@ -63,7 +63,7 @@ pub fn scan_desktop_apps() -> Vec<DesktopAppEntry> {
             id: "terminal".to_string(),
             name: "Terminal".to_string(),
             comment: "Emulator Terminal Wayland".to_string(),
-            exec: "konsole".to_string(),
+            exec: "terminal".to_string(),
             icon_key: "terminal".to_string(),
             category: "Utilitas".to_string(),
         },
@@ -150,15 +150,15 @@ pub fn scan_desktop_apps() -> Vec<DesktopAppEntry> {
         }
     }
 
-    discovered_pacman_apps.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    discovered_pacman_apps.sort_by_key(|a| a.name.to_lowercase());
     apps.extend(discovered_pacman_apps);
 
     apps
 }
 
 pub fn spawn_external_command(cmd_line: &str) -> Result<String, String> {
-    if cmd_line == "terminal" || cmd_line == "konsole" {
-        for term in ["konsole", "foot", "alacritty", "kitty", "xterm"] {
+    if cmd_line == "terminal" {
+        for term in ["foot", "alacritty", "kitty", "xterm"] {
             if Command::new("which")
                 .arg(term)
                 .stdout(Stdio::null())
@@ -179,7 +179,15 @@ pub fn spawn_external_command(cmd_line: &str) -> Result<String, String> {
     }
 
     if cmd_line == "launch-installer" || cmd_line == "hyper-x-installer" {
-        for bin in ["hyper-x-installer", "launch-installer", "/usr/bin/hyper-x-installer"] {
+        for bin in [
+            "launch-installer",
+            "/usr/bin/launch-installer",
+            "/usr/local/bin/launch-installer",
+            "hyper-x-installer-launcher",
+            "/usr/bin/hyper-x-installer-launcher",
+            "hyper-x-installer",
+            "/usr/bin/hyper-x-installer",
+        ] {
             if Command::new(bin)
                 .stdin(Stdio::null())
                 .stdout(Stdio::null())

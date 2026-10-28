@@ -28,18 +28,25 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "networkmanager",
     "wireless-regdb",
     "curl",
-    // 4. Audio & Display Server Core
+    // 4. Audio & Wayland Display Core
     "pipewire",
     "pipewire-pulse",
     "pipewire-alsa",
     "wireplumber",
     "mesa",
-    "qt6-wayland",
+    "cage",
+    "grim",
+    "wl-clipboard",
+    "sddm",
+    "seatd",
+    "polkit",
+    "xdg-user-dirs",
     "xorg-xwayland",
+    "firefox",
     // 5. Bootloader (Default Limine)
     "limine",
     "efibootmgr",
-    // 6. HyperXOS Branding, Keyrings & Management Tool
+    // 6. HyperXOS Pure Rust Desktop Environment, Branding, Keyrings & Tools
     "archlinux-keyring",
     "cachyos-keyring",
     "hyperxos-branding",
@@ -50,26 +57,6 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "hyperx-de",
     "hyper-x-tools",
     "hyper-x-hw",
-    // 7. Minimal Core KDE Plasma 6 Desktop
-    "plasma-desktop",
-    "plasma-workspace",
-    "kwin",
-    "sddm",
-    "sddm-kcm",
-    "dolphin",
-    "konsole",
-    "firefox",
-    "plasma-nm",
-    "plasma-pa",
-    "powerdevil",
-    "kscreen",
-    "breeze",
-    "breeze-gtk",
-    "kde-gtk-config",
-    "polkit-kde-agent",
-    "xdg-user-dirs",
-    "kpipewire",
-    "ocean-sound-theme",
 ];
 
 pub struct PacstrapInstaller;
@@ -168,12 +155,12 @@ impl PacstrapInstaller {
 
         // Read output line by line
         let reader = BufReader::new(stdout);
-        for line in reader.lines().flatten() {
+        for line in reader.lines().map_while(Result::ok) {
             log_callback(&line);
         }
 
         let err_reader = BufReader::new(stderr);
-        for line in err_reader.lines().flatten() {
+        for line in err_reader.lines().map_while(Result::ok) {
             log_callback(&format!("[WARN] {}", line));
         }
 

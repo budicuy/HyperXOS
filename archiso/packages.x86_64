@@ -35,38 +35,24 @@ pipewire-alsa
 pipewire-pulse
 wireplumber
 
-# KDE Plasma 6 Minimal Wayland Desktop
-breeze
-breeze-gtk
-kde-gtk-config
-kpipewire
-kscreen
-kwin
-ocean-sound-theme
-plasma-desktop
-plasma-nm
-plasma-pa
-plasma-workspace
-powerdevil
-qt6-wayland
+# Wayland Display Server & HyperX-DE Session Utilities
+cage
+grim
+mesa
+polkit
 sddm
-sddm-kcm
-polkit-kde-agent
+seatd
+wl-clipboard
 xdg-user-dirs
 xorg-xwayland
 
-# Core Desktop Utilities
-dolphin
-konsole
+# Core Web Browser
 firefox
-
-# Open-Source Graphics Drivers (64-bit Only)
-mesa
 
 # Virtual Machine Guest Support
 qemu-guest-agent
 
-# HyperXOS Pure Rust Native Installer, Desktop Environment & System Tools
+# HyperXOS Pure Rust Native Desktop Environment, Installer & System Tools
 hyperx-de
 hyper-x-installer
 hyper-x-tools

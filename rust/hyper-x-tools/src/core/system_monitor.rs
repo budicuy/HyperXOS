@@ -109,9 +109,7 @@ impl SystemMonitor {
             parts.push(vendor.clone());
         }
         if !board.is_empty() && board != "Base Board Product Name" && board != "Default string" {
-            if !vendor.is_empty() && !board.starts_with(&vendor) {
-                parts.push(board);
-            } else if vendor.is_empty() {
+            if vendor.is_empty() || !board.starts_with(&vendor) {
                 parts.push(board);
             }
         } else if !product.is_empty() && product != "System Product Name" && product != "Default string" {
@@ -136,7 +134,7 @@ impl SystemMonitor {
                 return de;
             }
         }
-        "KDE Plasma".to_string()
+        "HyperX-DE".to_string()
     }
 
     pub fn collect_metrics(&mut self) -> SystemMetrics {
@@ -239,7 +237,7 @@ impl SystemMonitor {
             if disk.mount_point() == Path::new("/") {
                 let total = disk.total_space();
                 let avail = disk.available_space();
-                let used = if total > avail { total - avail } else { 0 };
+                let used = total.saturating_sub(avail);
                 let pct = if total > 0 {
                     (used as f64 / total as f64 * 100.0) as f32
                 } else {
@@ -254,7 +252,7 @@ impl SystemMonitor {
         if let Some(disk) = disks.first() {
             let total = disk.total_space();
             let avail = disk.available_space();
-            let used = if total > avail { total - avail } else { 0 };
+            let used = total.saturating_sub(avail);
             let pct = if total > 0 {
                 (used as f64 / total as f64 * 100.0) as f32
             } else {

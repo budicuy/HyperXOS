@@ -9,17 +9,32 @@ license=('GPL-3.0-or-later')
 depends=('fontconfig' 'freetype2' 'libxkbcommon' 'polkit')
 makedepends=('cargo' 'rust')
 provides=('hyperxtools')
+options=('!strip' '!debug')
 
 build() {
     cd "${startdir}/../../rust"
-    cargo build --release --bin hyper-x-tools --locked
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        if [ ! -f "target/debug/hyper-x-tools" ]; then
+            cargo build --bin hyper-x-tools --locked
+        fi
+    else
+        if [ ! -f "target/release/hyper-x-tools" ]; then
+            cargo build --release --bin hyper-x-tools --locked
+        fi
+    fi
 }
 
 package() {
-    install -Dm755 "${startdir}/../../rust/target/release/hyper-x-tools" "${pkgdir}/usr/bin/hyper-x-tools"
+    local target_dir="release"
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        target_dir="debug"
+    fi
+
+    install -Dm755 "${startdir}/../../rust/target/${target_dir}/hyper-x-tools" "${pkgdir}/usr/bin/hyper-x-tools"
     install -d "${pkgdir}/usr/local/bin"
     ln -sf /usr/bin/hyper-x-tools "${pkgdir}/usr/local/bin/hyperxtools"
     install -Dm644 "${startdir}/hyper-x-tools.desktop" "${pkgdir}/usr/share/applications/hyper-x-tools.desktop"
-    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-tools.png"
-    install -Dm644 "${startdir}/logo.png" "${pkgdir}/usr/share/pixmaps/hyper-x-tools.png"
+    local logo_src="${startdir}/../../rust/hyperx-ui-kit/assets/logo.png"
+    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-tools.png"
+    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/hyper-x-tools.png"
 }

@@ -128,7 +128,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .style(|_| text::Style {
                     color: Some(TEXT_MAIN)
                 }),
-            text("Deploying base packages, Limine bootloader, and KDE Plasma 6 Wayland desktop")
+            text("Deploying base packages, Limine bootloader, and HyperX Desktop Environment")
                 .size(12)
                 .font(FONT_BODY)
                 .style(|_| text::Style {

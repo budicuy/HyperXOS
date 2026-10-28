@@ -233,21 +233,30 @@ pub fn view_dock<'a>(
             ..container::Style::default()
         });
 
+    let has_installer = std::path::Path::new("/usr/bin/launch-installer").exists()
+        || std::path::Path::new("/usr/bin/hyper-x-installer").exists()
+        || std::path::Path::new("/usr/local/bin/launch-installer").exists();
+
     let mut dock_row = row![
         item_launchpad,
         item_mission,
         sep1,
-        item_installer,
-        item_firefox,
-        item_files,
-        item_terminal,
-        item_notes,
-        item_tools,
-        item_settings,
-    ]
-    .spacing(7)
-    .align_y(Alignment::Center)
-    .padding([8, 14]);
+    ];
+
+    if has_installer {
+        dock_row = dock_row.push(item_installer);
+    }
+
+    dock_row = dock_row
+        .push(item_firefox)
+        .push(item_files)
+        .push(item_terminal)
+        .push(item_notes)
+        .push(item_tools)
+        .push(item_settings)
+        .spacing(7)
+        .align_y(Alignment::Center)
+        .padding([8, 14]);
 
     for (idx, pinned) in pinned_dock_apps.iter().enumerate() {
         let short_label = if pinned.name.chars().count() > 9 {

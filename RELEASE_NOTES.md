@@ -2,7 +2,7 @@
 
 Selamat datang di rilis resmi pertama **HyperXOS** (`2026.10.26`).
 
-HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **KDE Plasma 6 (Wayland)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
+HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **HyperX Desktop Environment (`hyperx-de` - Pure Rust + Smithay Wayland + Iced WGPU)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
 
 ---
 
@@ -12,10 +12,10 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
   - Mengadopsi arsitektur *rolling-release* dengan repositori resmi Arch Linux dan repositori teroptimasi CachyOS.
   - Manajemen paket berkecepatan tinggi dengan `pacman`.
 
-- **KDE Plasma 6 Wayland Desktop:**
-  - Sesi desktop Wayland murni yang responsif dan hemat sumber daya.
-  - Skema warna gelap kustom *HyperXOS Dark* dengan integrasi Breeze Dark.
-  - Shortcut taskbar telah terkonfigurasi: **HyperXOS Installer**, **Firefox**, **Dolphin**, **Konsole**, dan **HyperXTools**.
+- **HyperX Desktop Environment (`hyperx-de`):**
+  - Sesi desktop Wayland murni yang responsif dan hemat sumber daya bertenaga Smithay 0.7 dan Iced 0.14 WGPU.
+  - Antarmuka visual Glassmorphic terpadu: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
+  - Integrasi wallpaper dinamis, manajemen audio PipeWire, dan tray sistem real-time.
 
 - **Peramban Web Firefox Terintegrasi:**
   - Mozilla Firefox langsung tersedia di media Live USB dan secara otomatis terpasang pada instalasi target.
@@ -92,7 +92,7 @@ sudo dd if=hyperxos-2026.10.26-x86_64.iso of=/dev/sdX bs=4M status=progress ofla
 | Komponen | Spesifikasi Minimum | Rekomendasi |
 | :--- | :--- | :--- |
 | **Prosesor** | CPU 64-bit Dual-Core x86_64 | CPU 64-bit Quad-Core atau lebih tinggi |
-| **Memori (RAM)** | 2 GB RAM (Mode teks/instalasi) | 4 GB+ RAM (Untuk pengalaman KDE Plasma 6 optimal) |
+| **Memori (RAM)** | 2 GB RAM (Mode teks/instalasi) | 4 GB+ RAM (Untuk pengalaman HyperX-DE optimal) |
 | **Penyimpanan (Disk)** | 20 GB ruang kosong | 40 GB+ ruang penyimpanan SSD/NVMe |
 | **Tampilan / GPU** | Resolusi 1024x768 | Resolusi 1920x1080 dengan akselerasi OpenGL/Vulkan |
 | **Koneksi Jaringan** | Opsional (Tersedia mode offline) | Koneksi internet aktif saat instalasi online |
@@ -109,6 +109,3 @@ sudo dd if=hyperxos-2026.10.26-x86_64.iso of=/dev/sdX bs=4M status=progress ofla
 Jika Anda menemukan bug, kendala perangkat keras, atau ingin berkontribusi:
 - Repositori Utama: [https://github.com/budicuy/HyperXOS](https://github.com/budicuy/HyperXOS)
 - Pelaporan Isu: [https://github.com/budicuy/HyperXOS/issues](https://github.com/budicuy/HyperXOS/issues)
-sekarang saya ingin bangun ulang dari nol Desktop environtment saya saya yang nama hyperx-de, menggunakan compositor smithey saya ingin kamu bikin plan rencana untuk bangun sistem Desktop environtment yang lengkap dari taskbar bergaya mac os, controler center notifikasi dengan dymanic island mirip mac gitu dengan tampilan besih dan fitur penting lainnya sehingga bisa di secara stabil, ada fitur file manager juga dengan nama hyperx-file-manager, silahkan bikin plan rencana
-
-silahkan riset pakai context7 atau tools pencarian

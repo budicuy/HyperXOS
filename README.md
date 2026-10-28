@@ -1,30 +1,33 @@
 # HyperXOS Linux
 
 <p align="center">
-  <strong>Distribusi Arch Linux Modern, Performa Tinggi, dan Siap Pakai dengan KDE Plasma 6 & Pure Rust Native Installer</strong>
+  <strong>Distribusi Arch Linux Modern, Performa Tinggi, dan Siap Pakai dengan HyperX Desktop Environment (Pure Rust + Wayland) & Native Installer</strong>
 </p>
 
 ---
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **KDE Plasma 6 (Wayland native)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis fleksibel (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **HyperX Desktop Environment (`hyperx-de`)** — lingkungan desktop native **100% Pure Rust** berbasis **Smithay Wayland Compositor** dan antarmuka **Iced 0.14 WGPU Glassmorphism**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
-- **Desktop Modern:** KDE Plasma 6 berbasis Wayland dengan tema kustom *HyperXOS Dark*, akselerasi grafis terpadu, dan rendering responsif.
+- **Desktop Modern Pure Rust (`hyperx-de`):**
+  - Desktop Environment mandiri yang dibangun sepenuhnya menggunakan bahasa pemrograman Rust.
+  - Compositor Wayland native bertenaga Smithay 0.7 dengan akselerasi perangkat keras Direct WGPU / OpenGL.
+  - Antarmuka visual Glassmorphic modern: macOS-style Dock dinamis, Control Center, App Launcher / Launchpad, Window Switcher, File Manager bawaan, System Settings, dan Terminal native.
 - **Pure Rust Native Installer (`hyper-x-installer`):**
   - Dibangun 100% menggunakan Rust murni dengan arsitektur UI Glassmorphic modern (Iced 0.14 + WGPU).
-  - Skema partisi otomatis: Partisi boot ESP FAT32 sebesar 4096 MiB (4 GB) di `/boot` dan partisi root **Btrfs** dengan subvolume terpisah (`@` untuk root dan `@home` untuk user data) dengan kompresi `zstd:1`.
+  - Skema partisi otomatis: Partisi boot ESP FAT32 sebesar 4096 MiB (4 GB) di `/boot` dan partisi root **Btrfs** dengan subvolume terpisah (`@`, `@home`, `@snapshots`, `@var`, `@opt`) dengan kompresi `zstd:1`.
   - Bootloader default eksklusif **Limine** dengan tema visual HyperXOS dan registrasi otomatis ke UEFI NVRAM.
-  - Mode instalasi *Full Online* yang memasang paket dasar Arch/CachyOS dan desktop KDE Plasma 6 terbaru langsung dari mirror dalam satu transaksi atomic `pacstrap`.
+  - Mode instalasi *Full Online* yang memasang paket dasar Arch/CachyOS dan desktop HyperX-DE terbaru langsung dari repositori resmi dalam satu transaksi atomic `pacstrap`.
   - Terminal eksekusi real-time terintegrasi untuk pemantauan proses transparan.
-- **Deteksi Driver GPU Multi-Tier (`hw-detect-gpu`):**
+- **Deteksi Driver GPU Multi-Tier (`hyper-x-hw`):**
   - **NVIDIA Turing ke atas (RTX 20xx+, GTX 16xx+):** Modul kernel terbuka `nvidia-open` + early KMS (`nvidia_drm.modeset=1 nvidia_drm.fbdev=1`).
   - **NVIDIA Pascal & Maxwell (GTX 10xx, GTX 9xx):** Driver legacy prebuilt branch 580 (`nvidia-580xx-dkms` + `nvidia-580xx-utils`).
   - **NVIDIA Kepler & Lawas (GTX 6xx/7xx):** Driver open-source kernel `nouveau` + `mesa` untuk stabilitas Wayland.
   - **Intel & AMD:** Mesa + Vulkan native (RADV / ANV).
   - **Laptop Hybrid:** PRIME offloading (`prime-run`) dan dynamic power management.
-  - **Mesin Virtual:** Auto-konfigurasi `qemu-guest-agent` dan `spice-vdagent`.
+  - **Mesin Virtual:** Auto-konfigurasi `qemu-guest-agent`.
 - **Audio Modern:** PipeWire dan WirePlumber dengan applet kontrol suara terintegrasi.
 
 ---
@@ -98,24 +101,30 @@ Image ISO hasil kompilasi akan otomatis disimpan di dalam direktori `out/` (misa
 HyperXOS menyediakan tiga alur pengujian virtual machine sejati dengan akselerasi GPU host (NVIDIA/Intel/AMD OpenGL):
 
 #### A. Uji Coba Cepat Live ISO (Live Environment)
-Mem-boot ISO secara langsung ke bootloader Limine UEFI -> systemd -> desktop KDE Plasma 6:
+Mem-boot ISO secara langsung ke bootloader Limine UEFI -> systemd -> desktop HyperX-DE:
 ```bash
 ./hyperx dev
 ```
 
-#### B. Uji Coba Instalasi Bersih (Clean 40GB Virtual Disk)
-Mereset disk virtual 40GB dan NVRAM, mem-boot installer grafis `hyper-x-installer`, dan menguji partisi otomatis Btrfs serta instalasi online:
+#### B. Uji Coba Instalasi Bersih Interaktif (Clean 40GB Virtual Disk)
+Mereset disk virtual 40GB dan NVRAM, mem-boot Live ISO langsung ke antarmuka GUI installer `hyper-x-installer` untuk pengujian interaktif:
 ```bash
 ./hyperx install
 ```
 
-#### C. Uji Coba Booting Sistem Terinstall
+#### C. Uji Coba Instalasi Otomatis Headless (CI/CD Automated Install Test)
+Menjalankan pengujian instalasi end-to-end tanpa interaksi via QEMU Guest Agent:
+```bash
+./hyperx install --auto
+```
+
+#### D. Uji Coba Booting Sistem Terinstall
 Mem-boot sistem HyperXOS yang sudah terinstal di dalam disk virtual 40GB tanpa menggunakan file ISO:
 ```bash
 ./hyperx run
 ```
 
-#### D. Pengujian Otomatis Non-Interactive (QA Smoke Test)
+#### E. Pengujian Otomatis Non-Interactive (QA Smoke Test)
 Menjalankan pengujian otomatis headless selama 25 detik untuk memvalidasi kernel booting dan konsol:
 ```bash
 ./hyperx test
@@ -199,12 +208,13 @@ Untuk membersihkan berkas build dan mount sementara:
 HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
 - **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
 - **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`).
+- **[Smithay](https://smithay.github.io):** Rust framework untuk pembangunan Wayland compositor modern dan aman.
+- **[Iced](https://iced.rs):** Cross-platform GUI library berbasis Rust dengan arsitektur reaktif dan akselerasi WGPU.
 - **[Limine Bootloader](https://limine-bootloader.org):** Bootloader modern yang tangguh, ringan, dan cepat.
-- **[KDE Community](https://kde.org):** Lingkungan desktop KDE Plasma 6 Wayland yang elegan, modern, dan kaya fitur.
 
 ---
 
 ## 📄 Lisensi & Kontribusi
 
-HyperXOS didistribusikan di bawah lisensi GPL-3.0. Seluruh komponen upstream Arch Linux dan KDE tunduk pada lisensi masing-masing.
+HyperXOS didistribusikan di bawah lisensi GPL-3.0. Seluruh komponen upstream Arch Linux dan Rust crates tunduk pada lisensi masing-masing.
 Laporkan isu dan kontribusi melalui repositori GitHub resmi HyperXOS: [https://github.com/budicuy/HyperXOS](https://github.com/budicuy/HyperXOS).

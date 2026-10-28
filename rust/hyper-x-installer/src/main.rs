@@ -566,7 +566,7 @@ impl App {
 
         // 4. Pacstrap fresh online installation
         let _ = tx.send(InstallerEvent::Stage {
-            name: "Downloading & Installing Base System + KDE Plasma 6 (pacstrap)...".to_string(),
+            name: "Downloading & Installing Base System + HyperX Desktop Environment (pacstrap)...".to_string(),
             pct: 45.0,
         });
 

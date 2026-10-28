@@ -10,14 +10,28 @@ depends=('glibc')
 makedepends=('cargo' 'rust')
 provides=('hw-detect-gpu')
 conflicts=('hw-detect-gpu')
+options=('!strip' '!debug')
 
 build() {
     cd "${startdir}/../../rust"
-    cargo build --release --bin hyper-x-hw --locked
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        if [ ! -f "target/debug/hyper-x-hw" ]; then
+            cargo build --bin hyper-x-hw --locked
+        fi
+    else
+        if [ ! -f "target/release/hyper-x-hw" ]; then
+            cargo build --release --bin hyper-x-hw --locked
+        fi
+    fi
 }
 
 package() {
-    install -Dm755 "${startdir}/../../rust/target/release/hyper-x-hw" "${pkgdir}/usr/bin/hyper-x-hw"
+    local target_dir="release"
+    if [ "${HYPERX_BUILD_MODE}" = "dev" ]; then
+        target_dir="debug"
+    fi
+
+    install -Dm755 "${startdir}/../../rust/target/${target_dir}/hyper-x-hw" "${pkgdir}/usr/bin/hyper-x-hw"
     install -d "${pkgdir}/usr/local/bin"
     ln -sf /usr/bin/hyper-x-hw "${pkgdir}/usr/local/bin/hw-detect-gpu"
 }
