@@ -5,10 +5,10 @@ use std::process::Command;
 use crate::checksum::run_checksum;
 use crate::util::{find_latest_iso, run_stream};
 
-pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
+pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String> {
     let mode = if prod { "prod" } else { "dev" };
     println!("==================================================");
-    println!("  HyperXOS ISO Build Engine (Pure Rust)");
+    println!("  HyperXOS Unified Build Engine (Pure Rust)");
     println!("  Mode: {}", mode);
     println!("  Time: {}", chrono_lite_timestamp());
     println!("==================================================");
@@ -24,12 +24,28 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
 
     fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
 
-    // Step 1: Compile Rust packages (Dev vs Prod) & update local repo packages
+    // Step 1: Build Base Packages
+    println!("==> [1/4] Building base system packages...");
+    crate::repo::build_base_packages(root)?;
+
+    // Step 2: Build Rust Packages
     println!(
-        "==> [1/4] Building & syncing HyperXOS Rust packages (mode: '{}')...",
+        "==> [2/4] Compiling & packaging HyperXOS Rust packages (mode: '{}')...",
         mode
     );
     crate::repo::build_and_sync_rust_packages(root, prod)?;
+
+    // Step 3: Build & update pacman repository database
+    println!("==> [3/4] Building local pacman repository database & mirroring to airootfs...");
+    crate::repo::run_repo(root, "update")?;
+
+    if repo_only {
+        println!("==================================================");
+        println!("  HyperXOS Packages & Repository Built Successfully!");
+        println!("  (--repo-only specified: skipping ISO creation)");
+        println!("==================================================");
+        return Ok(());
+    }
 
     // Update archiso pacman.conf server path
     let pacman_conf = profile_dir.join("pacman.conf");
@@ -48,8 +64,8 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
         }
     }
 
-    // Step 2: Configure compression and workspace caching
-    println!("==> [2/4] Configuring build profile for mode '{}'...", mode);
+    // Step 4: Build ISO and checksums
+    println!("==> [4/4] Building HyperXOS ISO and generating checksums (mode: '{}')...", mode);
 
     if prod {
         println!("  -> Applying PRODUCTION settings: Ultra-compressed (SquashFS zstd -22 1M, Initramfs xz -9e)");
@@ -138,11 +154,11 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
         }
     }
 
-    // Step 3: Run mkarchiso
-    println!("==> [3/4] Building ISO with mkarchiso...");
-    println!("  -> Workdir: {}", work_dir.display());
-    println!("  -> Output:  {}", out_dir.display());
-    println!("  -> Profile: {}", profile_dir.display());
+    // Run mkarchiso
+    println!("  -> Running mkarchiso...");
+    println!("     Workdir: {}", work_dir.display());
+    println!("     Output:  {}", out_dir.display());
+    println!("     Profile: {}", profile_dir.display());
 
     let mut mkarchiso_cmd = Command::new("sudo");
     mkarchiso_cmd.args([
@@ -161,8 +177,8 @@ pub fn run_build(root: &Path, prod: bool) -> Result<(), String> {
         let _ = fs::write(&hash_file, &current_pkg_list_hash);
     }
 
-    // Step 4: Fix ownership of built artifacts
-    println!("==> [4/4] Setting ownership of built artifacts in {}...", out_dir.display());
+    // Fix ownership of built artifacts
+    println!("  -> Setting ownership of built artifacts in {}...", out_dir.display());
     let uid = users_id();
     let mut chown_cmd = Command::new("sudo");
     chown_cmd.args(["chown", "-R", &uid, out_dir.to_str().unwrap()]);

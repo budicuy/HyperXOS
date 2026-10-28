@@ -21,7 +21,7 @@ pub enum RepoAction {
 
 pub fn run_repo_action(root: &Path, action: &RepoAction) -> Result<(), String> {
     match action {
-        RepoAction::Build { prod } => build_and_sync_rust_packages(root, *prod),
+        RepoAction::Build { prod } => build_and_sync_all_packages(root, *prod),
         RepoAction::Sync => run_repo(root, "update"),
         RepoAction::Check => ensure_packages(root),
     }
@@ -39,6 +39,14 @@ pub const OFFICIAL_PACKAGES: &[&str] = &[
     "hyperxos-mirrorlist-1.0.0-2-any.pkg.tar.zst",
 ];
 
+pub const BASE_PKG_DIRS: &[&str] = &[
+    "hyperxos-branding",
+    "hyperxos-default-settings",
+    "hyperxos-hooks",
+    "hyperxos-keyring",
+    "hyperxos-mirrorlist",
+];
+
 pub const RUST_PKG_DIRS: &[&str] = &[
     "hyperx-de",
     "hyper-x-tools",
@@ -47,6 +55,47 @@ pub const RUST_PKG_DIRS: &[&str] = &[
 ];
 
 pub const RELEASE_BASE_URL: &str = "https://github.com/budicuy/HyperXOS/releases/latest/download";
+
+/// Builds all non-Rust base configuration packages (branding, default settings, hooks, keyring, mirrorlist)
+pub fn build_base_packages(root: &Path) -> Result<(), String> {
+    let repo_dir = root.join("repo/x86_64");
+    fs::create_dir_all(&repo_dir).map_err(|e| e.to_string())?;
+
+    println!("==> [HyperXOS] Building base configuration packages...");
+    for pkg_name in BASE_PKG_DIRS {
+        let pkg_dir = root.join("packages").join(pkg_name);
+        if !pkg_dir.exists() {
+            continue;
+        }
+        println!("  -> Packaging {}...", pkg_name);
+
+        let mut makepkg = Command::new("makepkg");
+        makepkg
+            .current_dir(&pkg_dir)
+            .args(["-f", "-d", "--noconfirm"]);
+        run_stream(&mut makepkg, &format!("makepkg {}", pkg_name))?;
+
+        let _ = fs::remove_dir_all(pkg_dir.join("pkg"));
+        let _ = fs::remove_dir_all(pkg_dir.join("src"));
+        if let Ok(entries) = fs::read_dir(&pkg_dir) {
+            for entry in entries.flatten() {
+                let fname = entry.file_name().to_string_lossy().to_string();
+                if fname.starts_with(pkg_name) && fname.ends_with(".pkg.tar.zst") {
+                    let dest = repo_dir.join(&fname);
+                    fs::copy(entry.path(), &dest).map_err(|e| e.to_string())?;
+                    let _ = fs::remove_file(entry.path());
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Builds all base packages, compiles & packages all Rust packages, and updates the repo DB
+pub fn build_and_sync_all_packages(root: &Path, prod: bool) -> Result<(), String> {
+    build_base_packages(root)?;
+    build_and_sync_rust_packages(root, prod)
+}
 
 /// Compiles all 4 HyperXOS Rust packages in either Dev (`prod = false`) or Release (`prod = true`) mode,
 /// packages them via `makepkg -fd`, copies the `.pkg.tar.zst` archives into `repo/x86_64/`, and updates the repo DB.

@@ -21,7 +21,7 @@ use iced::border::Radius;
 use iced::gradient::{ColorStop, Linear};
 use iced::keyboard::{self, key::Named, Key, Modifiers};
 use iced::mouse;
-use iced::widget::{button, column, container, image as iced_image, mouse_area, row, stack, text};
+use iced::widget::{column, container, image as iced_image, mouse_area, row, stack, text};
 use iced::{
     Alignment, Background, Border, Color, ContentFit, Element, Event, Gradient, Length, Point,
     Subscription, Task,
@@ -190,6 +190,8 @@ pub enum Message {
 
     // Desktop Actions & Drag-and-Drop
     DesktopIconPress(usize),
+    DesktopIconHover(usize),
+    DesktopIconUnhover(usize),
     DesktopOpenIcon(usize),
     DesktopCursorMove(Point),
     DesktopMouseRelease,
@@ -301,6 +303,7 @@ pub struct HyperXDesktop {
     pub last_cursor_pos: Point,
     pub drag_started_at: Option<Instant>,
     pub drag_moved: bool,
+    pub hovered_desktop_icon: Option<usize>,
     pub created_desktop_folders: usize,
 
     // Popovers & Overlays
@@ -498,6 +501,7 @@ impl HyperXDesktop {
             last_cursor_pos: Point::new(340.0, 260.0),
             drag_started_at: None,
             drag_moved: false,
+            hovered_desktop_icon: None,
             created_desktop_folders: 0,
             wifi_modal_open: false,
             control_center_open: false,
@@ -704,7 +708,9 @@ impl HyperXDesktop {
 
         let mut subs = vec![
             iced::time::every(Duration::from_secs(2)).map(|_| Message::Tick),
-            iced::event::listen().map(Message::RuntimeEvent),
+            iced::event::listen_with(|event, _status, _window| {
+                Some(Message::RuntimeEvent(event))
+            }),
         ];
 
         if is_animating {
@@ -981,7 +987,10 @@ impl HyperXDesktop {
                 Event::Mouse(mouse::Event::CursorMoved { position }) => {
                     return self.update(Message::DesktopCursorMove(position));
                 }
-                Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
+                Event::Mouse(mouse::Event::ButtonReleased(_))
+                | Event::Mouse(mouse::Event::CursorLeft)
+                | Event::Touch(iced::touch::Event::FingerLifted { .. })
+                | Event::Touch(iced::touch::Event::FingerLost { .. }) => {
                     let mut tasks = Vec::new();
                     if self.wm.resizing_window.is_some() {
                         tasks.push(self.update(Message::EndWindowResize));
@@ -1063,6 +1072,16 @@ impl HyperXDesktop {
                     self.drag_start_pos = Some(self.last_cursor_pos);
                     self.drag_started_at = Some(Instant::now());
                     self.drag_moved = false;
+                }
+            }
+
+            Message::DesktopIconHover(idx) => {
+                self.hovered_desktop_icon = Some(idx);
+            }
+
+            Message::DesktopIconUnhover(idx) => {
+                if self.hovered_desktop_icon == Some(idx) {
+                    self.hovered_desktop_icon = None;
                 }
             }
 
@@ -2332,12 +2351,29 @@ impl HyperXDesktop {
                 .height(Length::Fill),
         )
         .on_press(Message::CloseContextMenu)
+        .on_release(Message::DesktopMouseRelease)
         .on_right_press(Message::OpenDesktopContextMenu);
 
         icon_layers.push(wallpaper_click_area.into());
 
-        for (idx, item) in self.desktop_icons.iter().enumerate() {
-            let _is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
+        // Render normal icons first, and dragging icon last (so it floats above other icons)
+        let mut ordered_indices: Vec<usize> = Vec::new();
+        let mut drag_idx_opt = None;
+        for (idx, _) in self.desktop_icons.iter().enumerate() {
+            if self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false) {
+                drag_idx_opt = Some(idx);
+            } else {
+                ordered_indices.push(idx);
+            }
+        }
+        if let Some(d_idx) = drag_idx_opt {
+            ordered_indices.push(d_idx);
+        }
+
+        for idx in ordered_indices {
+            let item = &self.desktop_icons[idx];
+            let is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
+            let is_hovered = self.hovered_desktop_icon == Some(idx);
 
             let icon_graphic: Element<'_, Message> = if let Some(svg_data) = item.svg_icon_data {
                 svg_icon(svg_data, 26.0, item.svg_color).into()
@@ -2348,52 +2384,55 @@ impl HyperXDesktop {
             let tile_box = container(icon_graphic)
                 .width(Length::Fixed(44.0))
                 .height(Length::Fixed(44.0))
-                .center_x(Length::Fixed(44.0))
-                .center_y(Length::Fixed(44.0))
+                .align_x(Alignment::Center)
+                .align_y(Alignment::Center)
                 .style(fluent_desktop_icon_tile_style);
 
-            let icon_btn = button(
+            let title_text = text(&item.title)
+                .size(11)
+                .font(FONT_BODY_SEMIBOLD)
+                .width(Length::Fill)
+                .align_x(Alignment::Center)
+                .style(|_| text::Style {
+                    color: Some(Color::WHITE),
+                });
+
+            let icon_card = container(
                 column![
-                    tile_box,
-                    text(&item.title)
-                        .size(11)
-                        .font(FONT_BODY_SEMIBOLD)
-                        .style(|_| text::Style {
-                            color: Some(Color::WHITE),
-                        }),
+                    container(tile_box).width(Length::Fill).align_x(Alignment::Center),
+                    title_text,
                 ]
-                .spacing(3)
+                .spacing(4)
+                .width(Length::Fill)
                 .align_x(Alignment::Center),
             )
             .width(Length::Fixed(76.0))
-            .height(Length::Fixed(74.0))
-            .padding([3, 2])
-            .style(|_theme, status| {
-                let (bg, border_color) = match status {
-                    button::Status::Hovered => (
-                        Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.16))),
-                        Color::from_rgba(1.0, 1.0, 1.0, 0.22),
-                    ),
-                    button::Status::Pressed => (
-                        Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.26))),
-                        Color::from_rgba(1.0, 1.0, 1.0, 0.35),
-                    ),
-                    _ => (None, Color::TRANSPARENT),
-                };
-                button::Style {
-                    background: bg,
-                    border: Border::default()
-                        .rounded(Radius::from(6.0))
-                        .width(1.0)
-                        .color(border_color),
-                    ..button::Style::default()
+            .height(Length::Fixed(76.0))
+            .padding([5, 4])
+            .align_x(Alignment::Center)
+            .align_y(Alignment::Center)
+            .style(move |_| {
+                if is_hovered || is_dragging {
+                    container::Style {
+                        background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
+                        border: Border::default()
+                            .rounded(Radius::from(6.0))
+                            .width(1.0)
+                            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.28)),
+                        ..container::Style::default()
+                    }
+                } else {
+                    container::Style::default()
                 }
-            })
-            .on_press(Message::DesktopIconPress(idx));
+            });
 
-            let interactive_icon = mouse_area(icon_btn)
+            let interactive_icon = mouse_area(icon_card)
+                .on_press(Message::DesktopIconPress(idx))
                 .on_release(Message::DesktopMouseRelease)
-                .on_right_press(Message::OpenDesktopIconContextMenu(idx));
+                .on_right_press(Message::OpenDesktopIconContextMenu(idx))
+                .on_enter(Message::DesktopIconHover(idx))
+                .on_exit(Message::DesktopIconUnhover(idx))
+                .interaction(mouse::Interaction::Pointer);
 
             let positioned = container(
                 column![

@@ -30,11 +30,15 @@ enum Commands {
     // Core Workflow Commands (Visible in `hyperx --help`)
     // ========================================================================
 
-    /// Build HyperXOS ISO (defaults to fast development mode, use --prod for release)
+    /// Build HyperXOS packages, repo, ISO image, and checksums
     Build {
         /// Build in production mode (ultra compression, clean release, size enforcement)
         #[arg(long, short)]
         prod: bool,
+
+        /// Only build packages and local repo database (skip ISO image creation)
+        #[arg(long)]
+        repo_only: bool,
     },
 
     /// Run automated QA testing and 25s non-interactive headless smoke test
@@ -222,7 +226,7 @@ fn main() {
 
     let res = match cli.command {
         // Core commands
-        Commands::Build { prod } => build::run_build(&root, prod),
+        Commands::Build { prod, repo_only } => build::run_build(&root, prod, repo_only),
         Commands::Test => qa::run_test(&root),
         Commands::Vm { action } => match action {
             VmAction::Install { auto } => vm::run_vm(&root, "install", auto),
@@ -248,7 +252,7 @@ fn main() {
             vm::run_vm(&root, "install", auto)
         }
         Commands::Run { auto } => vm::run_vm(&root, "run", auto),
-        Commands::Production | Commands::BuildProduction => build::run_build(&root, true),
+        Commands::Production | Commands::BuildProduction => build::run_build(&root, true, false),
         Commands::HyperxVm { mode } => vm::run_vm(&root, &mode, false),
         Commands::Tools | Commands::Hyperx => run_cargo_app("hyper-x-tools", &[]),
         Commands::Installer => run_cargo_app("hyper-x-installer", &[]),
