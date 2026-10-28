@@ -71,6 +71,18 @@ pub enum DesktopIconAction {
     OpenDirectory(PathBuf),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DockAppKey {
+    Installer,
+    Files,
+    Browser,
+    Terminal,
+    Notes,
+    Tools,
+    Settings,
+    Pinned(usize),
+}
+
 pub const DESKTOP_GRID_ORIGIN_X: f32 = 24.0;
 pub const DESKTOP_GRID_ORIGIN_Y: f32 = 24.0;
 pub const DESKTOP_GRID_CELL_WIDTH: f32 = 88.0;
@@ -131,12 +143,6 @@ pub fn find_free_desktop_slot(
     }
 
     target_slot
-}
-
-#[allow(dead_code)]
-pub fn snap_to_desktop_grid(pt: Point) -> Point {
-    let (col, row) = point_to_grid_slot(pt);
-    compute_grid_point(col, row)
 }
 
 #[derive(Debug, Clone)]
@@ -236,6 +242,9 @@ pub enum Message {
     LaunchPinnedDockApp(usize),
     AddPinnedDockAppToDesktop(usize),
     UnpinDockApp(usize),
+    StartDockDrag(usize),
+    DockDragOver(usize),
+    EndDockDrag,
 
     // File Manager, Clipboard & Trash Actions
     FileSelectPlace(FilePlace),
@@ -244,8 +253,6 @@ pub enum Message {
     FileRefresh,
     FileToggleViewMode,
     FileSearchChanged(String),
-    #[allow(dead_code)]
-    FileNewFolderNameChanged(String),
     FileCreateFolder,
     FileEntryClicked(usize),
     FileDeleteSelected,
@@ -336,6 +343,8 @@ pub struct HyperXDesktop {
     pub notes_app: NotesAppState,
     pub desktop_apps: Vec<DesktopAppEntry>,
     pub pinned_dock_apps: Vec<DesktopAppEntry>,
+    pub dock_app_order: Vec<DockAppKey>,
+    pub dragging_dock_idx: Option<usize>,
 
     // Hardware, Custom Wallpaper & OS state
     pub network: NetworkState,
@@ -490,6 +499,21 @@ impl HyperXDesktop {
             pos: next_grid_pos(),
         });
 
+        let has_installer = std::path::Path::new("/usr/bin/launch-installer").exists()
+            || std::path::Path::new("/usr/bin/hyper-x-installer").exists()
+            || std::path::Path::new("/usr/local/bin/launch-installer").exists();
+
+        let mut dock_app_order = Vec::new();
+        if has_installer {
+            dock_app_order.push(DockAppKey::Installer);
+        }
+        dock_app_order.push(DockAppKey::Files);
+        dock_app_order.push(DockAppKey::Browser);
+        dock_app_order.push(DockAppKey::Terminal);
+        dock_app_order.push(DockAppKey::Notes);
+        dock_app_order.push(DockAppKey::Tools);
+        dock_app_order.push(DockAppKey::Settings);
+
         let mut state = Self {
             compositor_snapshot,
             clock_str,
@@ -532,6 +556,8 @@ impl HyperXDesktop {
             notes_app: NotesAppState::default(),
             desktop_apps: scan_desktop_apps(),
             pinned_dock_apps: Vec::new(),
+            dock_app_order,
+            dragging_dock_idx: None,
             network: NetworkState::refresh(),
             audio: AudioState::get_current(),
             display: DisplayState::default(),
@@ -969,7 +995,7 @@ impl HyperXDesktop {
             }
 
             Message::AnimTick => {
-                let step = 0.14;
+                let step = 0.12;
                 if self.launcher_open {
                     self.launcher_anim = (self.launcher_anim + step).min(1.0);
                 } else {
@@ -1000,6 +1026,9 @@ impl HyperXDesktop {
                     }
                     if self.dragging_icon.is_some() {
                         tasks.push(self.update(Message::DesktopMouseRelease));
+                    }
+                    if self.dragging_dock_idx.is_some() {
+                        tasks.push(self.update(Message::EndDockDrag));
                     }
                     return Task::batch(tasks);
                 }
@@ -1646,16 +1675,26 @@ impl HyperXDesktop {
             Message::TogglePinAppToDock(app) => {
                 if let Some(pos) = self.pinned_dock_apps.iter().position(|p| p.id == app.id) {
                     let removed = self.pinned_dock_apps.remove(pos);
+                    self.dock_app_order.retain(|k| *k != DockAppKey::Pinned(pos));
+                    for k in &mut self.dock_app_order {
+                        if let DockAppKey::Pinned(p_idx) = k {
+                            if *p_idx > pos {
+                                *p_idx -= 1;
+                            }
+                        }
+                    }
                     self.push_notification(
                         "Dock HyperXOS",
                         format!("'{}' dilepas dari Dock.", removed.name),
                         ACCENT_AMBER,
                     );
                 } else {
+                    let new_idx = self.pinned_dock_apps.len();
                     self.pinned_dock_apps.push(app.clone());
+                    self.dock_app_order.push(DockAppKey::Pinned(new_idx));
                     self.push_notification(
                         "Pin ke Dock",
-                        format!("'{}' disematkan ke macOS Dock.", app.name),
+                        format!("'{}' disematkan ke Dock.", app.name),
                         ACCENT_PURPLE,
                     );
                 }
@@ -1679,12 +1718,37 @@ impl HyperXDesktop {
                 self.context_menu = None;
                 if idx < self.pinned_dock_apps.len() {
                     let removed = self.pinned_dock_apps.remove(idx);
+                    self.dock_app_order.retain(|k| *k != DockAppKey::Pinned(idx));
+                    for k in &mut self.dock_app_order {
+                        if let DockAppKey::Pinned(p_idx) = k {
+                            if *p_idx > idx {
+                                *p_idx -= 1;
+                            }
+                        }
+                    }
                     self.push_notification(
                         "Dock HyperXOS",
                         format!("'{}' dilepas dari Dock.", removed.name),
                         ACCENT_AMBER,
                     );
                 }
+            }
+
+            Message::StartDockDrag(idx) => {
+                self.dragging_dock_idx = Some(idx);
+            }
+
+            Message::DockDragOver(target_idx) => {
+                if let Some(src_idx) = self.dragging_dock_idx {
+                    if src_idx != target_idx && target_idx < self.dock_app_order.len() {
+                        self.dock_app_order.swap(src_idx, target_idx);
+                        self.dragging_dock_idx = Some(target_idx);
+                    }
+                }
+            }
+
+            Message::EndDockDrag => {
+                self.dragging_dock_idx = None;
             }
 
             // File Manager, Clipboard & Trash Actions
@@ -1707,9 +1771,6 @@ impl HyperXDesktop {
             }
             Message::FileSearchChanged(q) => {
                 self.file_manager.search_query = q;
-            }
-            Message::FileNewFolderNameChanged(name) => {
-                self.file_manager.new_folder_name = name;
             }
             Message::FileCreateFolder => match self.file_manager.create_folder() {
                 Ok(msg) => self.push_notification("HyperX Files", msg, ACCENT_GREEN),
@@ -1978,25 +2039,43 @@ impl HyperXDesktop {
             .width(Length::Fill)
             .height(Length::Fill);
 
-        let dock_row = container(dock::view_dock(
+        let dock_widget = dock::view_dock(
             &self.wm,
             self.launcher_open,
             self.mission_control_open,
             self.file_manager.trash_count,
             self.dock_icon_size,
             &self.pinned_dock_apps,
-        ))
-        .width(Length::Fill)
-        .height(Length::Shrink)
-        .align_x(Alignment::Center)
-        .padding([6, 0]);
+            &self.dock_app_order,
+            self.dragging_dock_idx,
+        );
 
-        let base_layout = column![
-            topbar_el,
+        let floating_dock = container(
+            column![
+                container("").height(Length::Fill),
+                row![
+                    container("").width(Length::Fill),
+                    dock_widget,
+                    container("").width(Length::Fill),
+                ],
+                container("").height(Length::Fixed(12.0)),
+            ],
+        )
+        .width(Length::Fill)
+        .height(Length::Fill);
+
+        let workspace_with_dock = stack![
             container(main_workspace_content)
                 .width(Length::Fill)
                 .height(Length::Fill),
-            dock_row,
+            floating_dock,
+        ]
+        .width(Length::Fill)
+        .height(Length::Fill);
+
+        let base_layout = column![
+            topbar_el,
+            workspace_with_dock,
         ]
         .width(Length::Fill)
         .height(Length::Fill);
@@ -2131,8 +2210,8 @@ impl HyperXDesktop {
 
         if self.launcher_anim > 0.005 {
             let t = 1.0 - (1.0 - self.launcher_anim).powi(3);
-            let dy = (1.0 - t) * 35.0;
-            let bottom_offset = (88.0 - dy).max(88.0);
+            let dy = (1.0 - t) * 45.0;
+            let bottom_offset = (80.0 - dy).max(10.0);
 
             let launcher_card = launcher::view_launcher(
                 &self.launcher_search,
