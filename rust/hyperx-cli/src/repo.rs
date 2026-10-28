@@ -1,8 +1,31 @@
 use std::fs;
 use std::path::Path;
 use std::process::Command;
+use clap::Subcommand;
 
 use crate::util::run_stream;
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum RepoAction {
+    /// Compile and package local Rust packages (defaults to dev mode, use --prod for release)
+    Build {
+        /// Compile in production mode (ultra optimized, stripped)
+        #[arg(long, short)]
+        prod: bool,
+    },
+    /// Update local pacman repository database and mirror to airootfs
+    Sync,
+    /// Verify all official HyperXOS packages exist locally
+    Check,
+}
+
+pub fn run_repo_action(root: &Path, action: &RepoAction) -> Result<(), String> {
+    match action {
+        RepoAction::Build { prod } => build_and_sync_rust_packages(root, *prod),
+        RepoAction::Sync => run_repo(root, "update"),
+        RepoAction::Check => ensure_packages(root),
+    }
+}
 
 pub const OFFICIAL_PACKAGES: &[&str] = &[
     "hyperx-de-1.0.0-1-x86_64.pkg.tar.zst",

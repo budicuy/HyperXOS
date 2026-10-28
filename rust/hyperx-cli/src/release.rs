@@ -4,7 +4,10 @@ use std::process::Command;
 use crate::checksum::run_checksum;
 use crate::util::{command_exists, find_latest_iso};
 
-pub fn run_release(root: &Path) -> Result<(), String> {
+pub fn run_release(root: &Path, checksum_only: bool) -> Result<(), String> {
+    if checksum_only {
+        return run_checksum(root);
+    }
     println!("======================================================================");
     println!("               HyperXOS GitHub Release Manager (Pure Rust)            ");
     println!("======================================================================");

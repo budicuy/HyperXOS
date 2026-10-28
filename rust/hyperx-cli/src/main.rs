@@ -10,7 +10,6 @@ mod util;
 mod vm;
 
 use clap::{Parser, Subcommand};
-use std::path::Path;
 use std::process::Command;
 
 use crate::util::{get_project_root, run_stream};
@@ -18,7 +17,7 @@ use crate::util::{get_project_root, run_stream};
 #[derive(Parser)]
 #[command(name = "hyperx")]
 #[command(author = "HyperXOS Development Team <dev@hyperxos.org>")]
-#[command(version = "1.0.0")]
+#[command(version = "2.2.0")]
 #[command(about = "Unified Pure Rust Developer & Build Automation Toolchain for HyperXOS Linux")]
 struct Cli {
     #[command(subcommand)]
@@ -27,88 +26,176 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Setup host build dependencies, cache directories, and permissions
-    Setup,
-    /// Validate host build dependencies, KVM hardware acceleration, and configurations
-    Check,
-    /// Build or synchronize local pacman repository database
-    Repo {
-        #[arg(default_value = "update")]
-        action: String,
-    },
+    // ========================================================================
+    // Core Workflow Commands (Visible in `hyperx --help`)
+    // ========================================================================
+
     /// Build HyperXOS ISO (defaults to fast development mode, use --prod for release)
     Build {
         /// Build in production mode (ultra compression, clean release, size enforcement)
         #[arg(long, short)]
         prod: bool,
     },
-    /// Alias for building HyperXOS ISO in production mode (zstd -22, <2.0GB enforcement)
-    Production,
-    /// Alias for building HyperXOS ISO in production mode
-    #[command(name = "build-production")]
-    BuildProduction,
-    /// Run HyperXOS in QEMU virtual machine test harness (dev, install, run)
-    Vm {
-        /// Mode to run: 'dev' (live ISO), 'install' (clean 40G disk), or 'run' (boot installed OS)
-        #[arg(default_value = "dev")]
-        mode: String,
-        /// Run non-interactive automated test via QEMU guest agent
-        #[arg(long)]
-        auto: bool,
-    },
-    /// Run fresh QEMU installation test on 40GB virtual disk
-    Install {
-        /// Run non-interactive automated installation test via QEMU guest agent
-        #[arg(long)]
-        auto: bool,
-    },
-    /// Alias for 'install'
-    #[command(name = "vm-install")]
-    VmInstall {
-        /// Run non-interactive automated installation test via QEMU guest agent
-        #[arg(long)]
-        auto: bool,
-    },
-    /// Run installed HyperXOS system from 40GB virtual disk
-    Run {
-        /// Run automated smoke test
-        #[arg(long)]
-        auto: bool,
-    },
-    /// Run live ISO in QEMU without formatting virtual disk
-    Dev,
+
     /// Run automated QA testing and 25s non-interactive headless smoke test
     Test,
+
+    /// Run HyperXOS in QEMU virtual machine test harness (dev, install, run, clean)
+    Vm {
+        #[command(subcommand)]
+        action: Option<VmAction>,
+    },
+
+    /// Manage local pacman repository database (build, sync, check)
+    Repo {
+        #[command(subcommand)]
+        action: Option<repo::RepoAction>,
+    },
+
+    /// Launch HyperXOS internal applications directly (tools, installer, hw)
+    #[command(alias = "app")]
+    Launch {
+        #[command(subcommand)]
+        app: AppTarget,
+    },
+
     /// Clean temporary build directories and artifacts
     Clean {
         /// Also remove output ISOs and virtual test disk images
         #[arg(long, short)]
         all: bool,
     },
-    /// Generate official SHA256 and BLAKE2b (b2sum) checksums for built ISOs
-    Checksum,
-    /// Prepare and publish GitHub release with git tag and ISO assets
-    Release,
-    /// Launch HyperXTools GUI application directly
-    Tools,
-    /// Alias for 'tools' (launches HyperXTools)
-    Hyperx,
-    /// Launch HyperXInstaller GUI application directly
-    Installer,
-    /// Run Hardware & GPU Diagnostic Engine (hyper-x-hw)
-    Hw {
-        #[arg(default_value = "detect")]
-        action: String,
+
+    /// Validate host build dependencies, KVM hardware acceleration, and configurations
+    Check,
+
+    /// Setup host build dependencies, cache directories, and permissions
+    Setup {
+        /// Also install 'hyperx' CLI launcher to /usr/local/bin
+        #[arg(long)]
+        cli: bool,
     },
-    /// Run Pure Rust Direct-GPU Virtual Environment Runner (hyperx-vm)
-    #[command(name = "hyperx-vm")]
+
+    /// Prepare and publish GitHub release with git tag and ISO assets
+    Release {
+        /// Only compute official SHA256 and BLAKE2b checksums without publishing
+        #[arg(long)]
+        checksum_only: bool,
+    },
+
+    // ========================================================================
+    // Ergonomic Shortcuts & Legacy Aliases (Hidden to maintain a clean --help)
+    // ========================================================================
+
+    /// Shortcut for 'vm dev' (run live ISO in QEMU without formatting virtual disk)
+    #[command(hide = true)]
+    Dev,
+
+    /// Shortcut for 'vm install' (run fresh QEMU installation test on 40GB virtual disk)
+    #[command(hide = true)]
+    Install {
+        /// Run non-interactive automated installation test via QEMU guest agent
+        #[arg(long)]
+        auto: bool,
+    },
+
+    /// Legacy alias for 'vm install'
+    #[command(hide = true, name = "vm-install")]
+    VmInstall {
+        /// Run non-interactive automated installation test via QEMU guest agent
+        #[arg(long)]
+        auto: bool,
+    },
+
+    /// Shortcut for 'vm run' (run installed HyperXOS system from 40GB virtual disk)
+    #[command(hide = true)]
+    Run {
+        /// Run automated smoke test
+        #[arg(long)]
+        auto: bool,
+    },
+
+    /// Legacy alias for 'build --prod'
+    #[command(hide = true)]
+    Production,
+
+    /// Legacy alias for 'build --prod'
+    #[command(hide = true, name = "build-production")]
+    BuildProduction,
+
+    /// Legacy alias for 'vm'
+    #[command(hide = true, name = "hyperx-vm")]
     HyperxVm {
         /// Mode to run: 'dev' / 'live', 'install', 'run', or 'clean'
         #[arg(default_value = "live")]
         mode: String,
     },
-    /// Install 'hyperx' CLI binary to /usr/local/bin or ~/.cargo/bin
+
+    /// Legacy shortcut for 'launch tools'
+    #[command(hide = true)]
+    Tools,
+
+    /// Legacy shortcut for 'launch tools'
+    #[command(hide = true)]
+    Hyperx,
+
+    /// Legacy shortcut for 'launch installer'
+    #[command(hide = true)]
+    Installer,
+
+    /// Legacy shortcut for 'launch hw'
+    #[command(hide = true)]
+    Hw {
+        #[arg(default_value = "detect")]
+        action: String,
+    },
+
+    /// Legacy shortcut for 'release --checksum-only'
+    #[command(hide = true)]
+    Checksum,
+
+    /// Legacy shortcut for 'setup --cli'
+    #[command(hide = true, name = "install-cli")]
     InstallCli,
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum VmAction {
+    /// Boot HyperXOS Live ISO in QEMU without formatting virtual disk
+    #[command(alias = "live")]
+    Dev,
+
+    /// Run fresh QEMU installation test on 40GB virtual disk
+    Install {
+        /// Run non-interactive automated installation test via QEMU guest agent
+        #[arg(long)]
+        auto: bool,
+    },
+
+    /// Run installed HyperXOS system from 40GB virtual disk
+    Run {
+        /// Run automated smoke test
+        #[arg(long)]
+        auto: bool,
+    },
+
+    /// Clean virtual machine disk images and runtime lockfiles
+    Clean,
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum AppTarget {
+    /// Launch HyperXTools Control Center & Hardware Monitor
+    Tools,
+
+    /// Launch HyperXOS Graphical Installer directly on host
+    Installer,
+
+    /// Run Hardware & GPU Diagnostic Engine (hyper-x-hw)
+    Hw {
+        #[arg(default_value = "detect")]
+        action: String,
+    },
 }
 
 fn run_cargo_app(bin_name: &str, extra_args: &[&str]) -> Result<(), String> {
@@ -137,52 +224,47 @@ fn run_cargo_app(bin_name: &str, extra_args: &[&str]) -> Result<(), String> {
     run_stream(&mut cmd, bin_name)
 }
 
-fn install_cli_binary(root: &Path) -> Result<(), String> {
-    println!("==> [HyperXOS] Installing 'hyperx' CLI launcher to system...");
-    // Install a thin wrapper (not a copy of the binary) so the global `hyperx`
-    // always runs the project's self-rebuilding ./hyperx script and never goes stale.
-    let project_script = root.join("hyperx");
-    let wrapper = format!(
-        "#!/bin/sh\n# HyperXOS CLI launcher (auto-generated by 'hyperx install-cli')\nexec \"{}\" \"$@\"\n",
-        project_script.display()
-    );
-    let tmp = std::env::temp_dir().join("hyperx-cli-wrapper");
-    std::fs::write(&tmp, wrapper).map_err(|e| e.to_string())?;
-
-    let dest = Path::new("/usr/local/bin/hyperx");
-    println!("  -> Installing to {} (requires sudo)...", dest.display());
-    let mut cp_cmd = Command::new("sudo");
-    cp_cmd.args(["install", "-m", "755", tmp.to_str().unwrap(), dest.to_str().unwrap()]);
-    run_stream(&mut cp_cmd, "install hyperx")?;
-    let _ = std::fs::remove_file(&tmp);
-
-    println!("[✓] 'hyperx' installed. It now always delegates to {}.", project_script.display());
-    Ok(())
-}
-
 fn main() {
     let cli = Cli::parse();
     let root = get_project_root();
 
     let res = match cli.command {
-        Commands::Setup => setup::run_setup(&root),
-        Commands::Check => check::run_check(&root),
-        Commands::Repo { action } => repo::run_repo(&root, &action),
+        // Core commands
         Commands::Build { prod } => build::run_build(&root, prod),
-        Commands::Production | Commands::BuildProduction => build::run_build(&root, true),
-        Commands::Vm { mode, auto } => vm::run_vm(&root, &mode, auto),
-        Commands::Install { auto } | Commands::VmInstall { auto } => vm::run_vm(&root, "install", auto),
-        Commands::Run { auto } => vm::run_vm(&root, "run", auto),
-        Commands::Dev => vm::run_vm(&root, "dev", false),
         Commands::Test => qa::run_test(&root),
+        Commands::Vm { action } => match action.unwrap_or(VmAction::Dev) {
+            VmAction::Dev => vm::run_vm(&root, "dev", false),
+            VmAction::Install { auto } => vm::run_vm(&root, "install", auto),
+            VmAction::Run { auto } => vm::run_vm(&root, "run", auto),
+            VmAction::Clean => vm::run_vm(&root, "clean", false),
+        },
+        Commands::Repo { action } => match action {
+            Some(act) => repo::run_repo_action(&root, &act),
+            None => repo::run_repo(&root, "update"),
+        },
+        Commands::Launch { app } => match app {
+            AppTarget::Tools => run_cargo_app("hyper-x-tools", &[]),
+            AppTarget::Installer => run_cargo_app("hyper-x-installer", &[]),
+            AppTarget::Hw { action } => run_cargo_app("hyper-x-hw", &[&action]),
+        },
         Commands::Clean { all } => clean::run_clean(&root, all),
-        Commands::Checksum => checksum::run_checksum(&root),
-        Commands::Release => release::run_release(&root),
+        Commands::Check => check::run_check(&root),
+        Commands::Setup { cli } => setup::run_setup(&root, cli),
+        Commands::Release { checksum_only } => release::run_release(&root, checksum_only),
+
+        // Hidden ergonomic shortcuts & legacy aliases
+        Commands::Dev => vm::run_vm(&root, "dev", false),
+        Commands::Install { auto } | Commands::VmInstall { auto } => {
+            vm::run_vm(&root, "install", auto)
+        }
+        Commands::Run { auto } => vm::run_vm(&root, "run", auto),
+        Commands::Production | Commands::BuildProduction => build::run_build(&root, true),
+        Commands::HyperxVm { mode } => vm::run_vm(&root, &mode, false),
         Commands::Tools | Commands::Hyperx => run_cargo_app("hyper-x-tools", &[]),
         Commands::Installer => run_cargo_app("hyper-x-installer", &[]),
         Commands::Hw { action } => run_cargo_app("hyper-x-hw", &[&action]),
-        Commands::HyperxVm { mode } => vm::run_vm(&root, &mode, false),
-        Commands::InstallCli => install_cli_binary(&root),
+        Commands::Checksum => checksum::run_checksum(&root),
+        Commands::InstallCli => setup::install_cli_binary(&root),
     };
 
     if let Err(e) = res {

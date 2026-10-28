@@ -170,29 +170,44 @@ Untuk membersihkan berkas build dan mount sementara:
 
 ---
 
-## 🛠️ Referensi Perintah Lengkap CLI (`./hyperx`)
+## 🛠️ Referensi Perintah CLI (`./hyperx`)
 
+### 1. Perintah Inti (Core Workflow)
 | Perintah | Deskripsi |
 | :--- | :--- |
-| `./hyperx help` | Menampilkan seluruh bantuan perintah CLI yang tersedia |
-| `./hyperx setup` | Menyiapkan dependensi host, modul kernel loop, dan direktori cache |
-| `./hyperx check` | Memvalidasi konfigurasi profiledef, berkas paket, dan integritas build |
-| `./hyperx repo` | Membangun atau menyinkronkan repositori paket pacman lokal |
-| `./hyperx build` | Membangun ISO HyperXOS dalam mode development (cepat) |
-| `./hyperx build --prod` | Membangun ISO HyperXOS dalam mode produksi resmi (< 2.0 GB) |
-| `./hyperx dev` | Menjalankan Live ISO di VM dengan akselerasi direct GPU host |
-| `./hyperx install` | Menjalankan pengujian instalasi bersih pada virtual disk 40 GB |
-| `./hyperx run` | Menjalankan sistem HyperXOS terinstal langsung dari virtual disk 40 GB |
-| `./hyperx test` | Menjalankan 25-detik automated QA smoke test tanpa GUI |
-| `./hyperx checksum` | Menghasilkan hash SHA256SUMS dan B2SUMS untuk ISO di `out/` |
-| `./hyperx release` | Mempersiapkan publikasi rilis GitHub |
-| `./hyperx hw` | Menjalankan modul diagnostik hardware & GPU (`hyper-x-hw`) |
-| `./hyperx tools` | Membuka aplikasi GUI HyperXTools secara langsung di host |
-| `./hyperx installer` | Membuka aplikasi GUI HyperXInstaller secara langsung di host |
-| `./hyperx hyperx-vm check` | Memeriksa kesiapan kapabilitas virtualisasi dan GPU host |
-| `./hyperx hyperx-vm provision`| Memaksa provisioning dan verifikasi hash bundel VMM hermetis |
+| `./hyperx build` | Membangun ISO HyperXOS dalam mode development (cepat, default) |
+| `./hyperx build --prod` | Membangun ISO HyperXOS dalam mode produksi resmi (< 2.0 GB, ultra-kompresi) |
+| `./hyperx test` | Menjalankan pengujian QA otomatis (ISO 9660 header, SHA256, 25s headless smoke test) |
 | `./hyperx clean` | Membersihkan folder build sementara |
-| `./hyperx clean --all` | Membersihkan folder build, ISO lama, dan disk virtual |
+| `./hyperx clean --all` | Membersihkan folder build, ISO lama di `out/`, dan disk virtual VM |
+
+### 2. Lingkungan Virtualisasi (`hyperx vm`)
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `./hyperx vm dev` *(atau `./hyperx dev`)* | Menjalankan Live ISO di VM dengan akselerasi direct GPU host |
+| `./hyperx vm install` *(atau `./hyperx install`)* | Menjalankan instalasi manual interaktif pada virtual disk 40 GB |
+| `./hyperx vm install --auto` | Menjalankan pengujian instalasi 100% otomatis via QEMU Guest Agent |
+| `./hyperx vm run` *(atau `./hyperx run`)* | Menjalankan sistem HyperXOS terinstal langsung dari virtual disk 40 GB |
+| `./hyperx vm clean` | Membersihkan disk virtual dan socket runtime VM |
+
+### 3. Repositori & Host
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `./hyperx check` | Memvalidasi kesiapan host (KVM hardware acceleration, mkarchiso, OVMF, PKGBUILDs) |
+| `./hyperx setup` | Menyiapkan dependensi host dan direktori kerja |
+| `./hyperx setup --cli` | Menyiapkan host sekaligus memasang launcher `hyperx` global ke `/usr/local/bin` |
+| `./hyperx repo build` | Mengompilasi dan memaketkan seluruh paket Rust lokal (`--prod` untuk release) |
+| `./hyperx repo sync` | Memperbarui database repositori `hyperxos.db` lokal dan menyinkronkan ke `airootfs` |
+| `./hyperx repo check` | Memeriksa ketersediaan seluruh 9 paket resmi HyperXOS |
+
+### 4. Peluncur Aplikasi Host & Rilis
+| Perintah | Deskripsi |
+| :--- | :--- |
+| `./hyperx launch tools` | Membuka aplikasi GUI HyperXTools secara langsung di host |
+| `./hyperx launch installer` | Membuka aplikasi GUI HyperXInstaller secara langsung di host |
+| `./hyperx launch hw` | Menjalankan modul diagnostik hardware & GPU (`hyper-x-hw`) |
+| `./hyperx release` | Mempersiapkan publikasi rilis GitHub (tagging, checksums, verifikasi ISO) |
+| `./hyperx release --checksum-only` | Menghasilkan hash SHA256SUMS dan B2SUMS resmi untuk ISO di `out/` |
 
 ---
 
