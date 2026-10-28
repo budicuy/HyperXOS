@@ -37,7 +37,9 @@ wireplumber
 
 # Wayland Display Server & Hyprland Windows 11 Desktop Stack
 hyprland
+xdg-desktop-portal
 xdg-desktop-portal-hyprland
+hyprpolkitagent
 waybar
 wofi
 swaync

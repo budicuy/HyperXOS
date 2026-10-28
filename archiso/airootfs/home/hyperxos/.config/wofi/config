@@ -1,0 +1,14 @@
+width=480
+height=560
+location=bottom
+yoffset=-68
+prompt=Type here to search...
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitive=true
+show=drun
+image_size=32

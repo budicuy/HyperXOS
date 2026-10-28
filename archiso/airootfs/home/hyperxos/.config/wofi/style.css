@@ -1,0 +1,63 @@
+* {
+    font-family: "Plus Jakarta Sans", "Inter", "Noto Sans", sans-serif;
+    font-size: 13px;
+}
+
+window {
+    margin: 0px;
+    background-color: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+#input {
+    margin: 16px 16px 12px 16px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #f8fafc;
+    background-color: rgba(30, 41, 59, 0.7);
+}
+
+#input:focus {
+    border: 1px solid #0078d4;
+    outline: none;
+}
+
+#inner-box {
+    margin: 4px 16px 16px 16px;
+    background-color: transparent;
+}
+
+#outer-box {
+    margin: 0px;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#text {
+    margin: 4px;
+    color: #cbd5e1;
+}
+
+#entry {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 2px 0px;
+    transition: background-color 0.15s ease;
+}
+
+#entry:selected {
+    background-color: rgba(0, 120, 212, 0.35);
+    border-left: 3px solid #0078d4;
+}
+
+#entry:selected #text {
+    color: #ffffff;
+    font-weight: 600;
+}

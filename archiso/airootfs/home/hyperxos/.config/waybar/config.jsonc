@@ -1,0 +1,102 @@
+{
+    "layer": "top",
+    "position": "bottom",
+    "height": 48,
+    "margin-bottom": 8,
+    "margin-left": 16,
+    "margin-right": 16,
+    "spacing": 4,
+
+    "modules-left": [
+        "custom/start",
+        "custom/explorer",
+        "custom/terminal"
+    ],
+
+    "modules-center": [
+        "wlr/taskbar"
+    ],
+
+    "modules-right": [
+        "tray",
+        "pulseaudio",
+        "network",
+        "clock",
+        "custom/notification"
+    ],
+
+    "custom/start": {
+        "format": " 󰍲 ",
+        "tooltip": "Start Menu (Super)",
+        "on-click": "pkill wofi || wofi --show drun"
+    },
+
+    "custom/explorer": {
+        "format": " 󰉋 ",
+        "tooltip": "File Explorer (Win + E)",
+        "on-click": "thunar"
+    },
+
+    "custom/terminal": {
+        "format": " 󰞷 ",
+        "tooltip": "Terminal (Win + Return)",
+        "on-click": "foot"
+    },
+
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "icon-size": 26,
+        "icon-theme": "Papirus-Dark",
+        "tooltip-format": "{title}",
+        "on-click": "activate",
+        "on-click-right": "close",
+        "all-outputs": true,
+        "active-first": false
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 8
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "tooltip-format": "Volume: {volume}%"
+    },
+
+    "network": {
+        "format-wifi": "󰤨 {signalStrength}%",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤮",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
+        "on-click": "nm-connection-editor"
+    },
+
+    "clock": {
+        "format": "{:%H:%M   %d/%m/%Y}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "right",
+            "on-scroll": 1,
+            "format": {
+                "months": "<span color='#0078d4'><b>{}</b></span>",
+                "days": "<span color='#cbd5e1'><b>{}</b></span>",
+                "weeks": "<span color='#64748b'><b>W{}</b></span>",
+                "weekdays": "<span color='#38bdf8'><b>{}</b></span>",
+                "today": "<span color='#f43f5e'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+
+    "custom/notification": {
+        "format": " 󰂚 ",
+        "tooltip": "Action Center (Win + A)",
+        "on-click": "swaync-client -t -sw"
+    }
+}
