@@ -38,6 +38,7 @@ wireplumber
 # Wayland Display Server & HyperX-DE Session Utilities
 labwc
 layer-shell-qt
+foot
 grim
 mesa
 polkit

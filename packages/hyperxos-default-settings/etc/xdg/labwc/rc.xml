@@ -34,22 +34,14 @@
     </windowRule>
   </windowRules>
 
-  <!-- Work Area margins: Top 34px for Top Bar, Bottom 68px for Floating Dock -->
-  <!-- This guarantees maximized/tiled windows never overlap the Floating Dock and Top Bar! -->
-  <margin top="34" bottom="68" left="0" right="0" />
-
   <keyboard>
     <default />
     <!-- Alt+Tab Window Switching -->
     <keybind key="A-Tab">
-      <action name="NextWindow">
-        <interactive>yes</interactive>
-      </action>
+      <action name="NextWindow" />
     </keybind>
     <keybind key="A-S-Tab">
-      <action name="PreviousWindow">
-        <interactive>yes</interactive>
-      </action>
+      <action name="PreviousWindow" />
     </keybind>
     <!-- Alt+F4 Close Window -->
     <keybind key="A-F4">

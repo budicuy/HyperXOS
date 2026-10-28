@@ -345,6 +345,7 @@ pub struct HyperXDesktop {
     pub pinned_dock_apps: Vec<DesktopAppEntry>,
     pub dock_app_order: Vec<DockAppKey>,
     pub dragging_dock_idx: Option<usize>,
+    pub dock_drag_moved: bool,
 
     // Hardware, Custom Wallpaper & OS state
     pub network: NetworkState,
@@ -558,6 +559,7 @@ impl HyperXDesktop {
             pinned_dock_apps: Vec::new(),
             dock_app_order,
             dragging_dock_idx: None,
+            dock_drag_moved: false,
             network: NetworkState::refresh(),
             audio: AudioState::get_current(),
             display: DisplayState::default(),
@@ -582,6 +584,25 @@ impl HyperXDesktop {
         state.load_persistent_settings();
 
         (state, Task::none())
+    }
+
+    fn dock_app_action(&self, key: &DockAppKey) -> Message {
+        match key {
+            DockAppKey::Installer => Message::LaunchExternalApp("launch-installer".to_string()),
+            DockAppKey::Files => Message::DockItemClicked(DesktopWindowId::Files),
+            DockAppKey::Browser => Message::LaunchExternalApp("firefox".to_string()),
+            DockAppKey::Terminal => Message::DockItemClicked(DesktopWindowId::Terminal),
+            DockAppKey::Notes => Message::DockItemClicked(DesktopWindowId::Notes),
+            DockAppKey::Tools => Message::LaunchExternalApp("hyper-x-tools".to_string()),
+            DockAppKey::Settings => Message::DockItemClicked(DesktopWindowId::Settings),
+            DockAppKey::Pinned(idx) => {
+                if let Some(pinned) = self.pinned_dock_apps.get(*idx) {
+                    Message::LaunchExternalApp(pinned.exec.clone())
+                } else {
+                    Message::AnimTick
+                }
+            }
+        }
     }
 
     fn settings_conf_path() -> PathBuf {
@@ -1736,6 +1757,7 @@ impl HyperXDesktop {
 
             Message::StartDockDrag(idx) => {
                 self.dragging_dock_idx = Some(idx);
+                self.dock_drag_moved = false;
             }
 
             Message::DockDragOver(target_idx) => {
@@ -1743,12 +1765,22 @@ impl HyperXDesktop {
                     if src_idx != target_idx && target_idx < self.dock_app_order.len() {
                         self.dock_app_order.swap(src_idx, target_idx);
                         self.dragging_dock_idx = Some(target_idx);
+                        self.dock_drag_moved = true;
                     }
                 }
             }
 
             Message::EndDockDrag => {
-                self.dragging_dock_idx = None;
+                if let Some(idx) = self.dragging_dock_idx.take() {
+                    if !self.dock_drag_moved {
+                        if let Some(key) = self.dock_app_order.get(idx).cloned() {
+                            let action = self.dock_app_action(&key);
+                            self.dock_drag_moved = false;
+                            return self.update(action);
+                        }
+                    }
+                }
+                self.dock_drag_moved = false;
             }
 
             // File Manager, Clipboard & Trash Actions
@@ -2050,19 +2082,12 @@ impl HyperXDesktop {
             self.dragging_dock_idx,
         );
 
-        let floating_dock = container(
-            column![
-                container("").height(Length::Fill),
-                row![
-                    container("").width(Length::Fill),
-                    dock_widget,
-                    container("").width(Length::Fill),
-                ],
-                container("").height(Length::Fixed(12.0)),
-            ],
-        )
-        .width(Length::Fill)
-        .height(Length::Fill);
+        let floating_dock = container(dock_widget)
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .align_x(Alignment::Center)
+            .align_y(Alignment::End)
+            .padding(iced::Padding::default().bottom(12.0));
 
         let workspace_with_dock = stack![
             container(main_workspace_content)
@@ -2422,8 +2447,6 @@ impl HyperXDesktop {
     }
 
     fn view_clean_desktop_canvas(&self) -> Element<'_, Message> {
-        let mut icon_layers: Vec<Element<'_, Message>> = Vec::new();
-
         let wallpaper_click_area = mouse_area(
             container("")
                 .width(Length::Fill)
@@ -2433,105 +2456,97 @@ impl HyperXDesktop {
         .on_release(Message::DesktopMouseRelease)
         .on_right_press(Message::OpenDesktopContextMenu);
 
-        icon_layers.push(wallpaper_click_area.into());
-
-        // Render normal icons first, and dragging icon last (so it floats above other icons)
-        let mut ordered_indices: Vec<usize> = Vec::new();
-        let mut drag_idx_opt = None;
-        for (idx, _) in self.desktop_icons.iter().enumerate() {
-            if self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false) {
-                drag_idx_opt = Some(idx);
-            } else {
-                ordered_indices.push(idx);
+        // Group desktop icons into vertical columns (max 6 items per column)
+        let mut columns: Vec<Vec<(usize, &DesktopShortcutItem)>> = Vec::new();
+        for (idx, item) in self.desktop_icons.iter().enumerate() {
+            let col = idx / 6;
+            while columns.len() <= col {
+                columns.push(Vec::new());
             }
-        }
-        if let Some(d_idx) = drag_idx_opt {
-            ordered_indices.push(d_idx);
+            columns[col].push((idx, item));
         }
 
-        for idx in ordered_indices {
-            let item = &self.desktop_icons[idx];
-            let is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
-            let is_hovered = self.hovered_desktop_icon == Some(idx);
+        let mut col_elements: Vec<Element<'_, Message>> = Vec::new();
+        for col_items in columns {
+            let mut col_col = column![].spacing(8);
+            for (idx, item) in col_items {
+                let is_hovered = self.hovered_desktop_icon == Some(idx);
+                let is_dragging = self.dragging_icon.map(|(i, _)| i == idx).unwrap_or(false);
 
-            let icon_graphic: Element<'_, Message> = if let Some(svg_data) = item.svg_icon_data {
-                svg_icon(svg_data, 26.0, item.svg_color).into()
-            } else {
-                app_icon(&item.app_icon_name, 28.0)
-            };
+                let icon_graphic: Element<'_, Message> = if let Some(svg_data) = item.svg_icon_data {
+                    svg_icon(svg_data, 26.0, item.svg_color).into()
+                } else {
+                    app_icon(&item.app_icon_name, 28.0)
+                };
 
-            let tile_box = container(icon_graphic)
-                .width(Length::Fixed(44.0))
-                .height(Length::Fixed(44.0))
+                let tile_box = container(icon_graphic)
+                    .width(Length::Fixed(44.0))
+                    .height(Length::Fixed(44.0))
+                    .align_x(Alignment::Center)
+                    .align_y(Alignment::Center)
+                    .style(fluent_desktop_icon_tile_style);
+
+                let title_text = text(&item.title)
+                    .size(11)
+                    .font(FONT_BODY_SEMIBOLD)
+                    .width(Length::Fill)
+                    .align_x(Alignment::Center)
+                    .style(|_| text::Style {
+                        color: Some(Color::WHITE),
+                    });
+
+                let icon_card = container(
+                    column![
+                        container(tile_box).width(Length::Fill).align_x(Alignment::Center),
+                        title_text,
+                    ]
+                    .spacing(4)
+                    .width(Length::Fill)
+                    .align_x(Alignment::Center),
+                )
+                .width(Length::Fixed(76.0))
+                .height(Length::Fixed(76.0))
+                .padding([5, 4])
                 .align_x(Alignment::Center)
                 .align_y(Alignment::Center)
-                .style(fluent_desktop_icon_tile_style);
-
-            let title_text = text(&item.title)
-                .size(11)
-                .font(FONT_BODY_SEMIBOLD)
-                .width(Length::Fill)
-                .align_x(Alignment::Center)
-                .style(|_| text::Style {
-                    color: Some(Color::WHITE),
+                .style(move |_| {
+                    if is_hovered || is_dragging {
+                        container::Style {
+                            background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
+                            border: Border::default()
+                                .rounded(Radius::from(6.0))
+                                .width(1.0)
+                                .color(Color::from_rgba(1.0, 1.0, 1.0, 0.28)),
+                            ..container::Style::default()
+                        }
+                    } else {
+                        container::Style::default()
+                    }
                 });
 
-            let icon_card = container(
-                column![
-                    container(tile_box).width(Length::Fill).align_x(Alignment::Center),
-                    title_text,
-                ]
-                .spacing(4)
-                .width(Length::Fill)
-                .align_x(Alignment::Center),
-            )
-            .width(Length::Fixed(76.0))
-            .height(Length::Fixed(76.0))
-            .padding([5, 4])
-            .align_x(Alignment::Center)
-            .align_y(Alignment::Center)
-            .style(move |_| {
-                if is_hovered || is_dragging {
-                    container::Style {
-                        background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.18))),
-                        border: Border::default()
-                            .rounded(Radius::from(6.0))
-                            .width(1.0)
-                            .color(Color::from_rgba(1.0, 1.0, 1.0, 0.28)),
-                        ..container::Style::default()
-                    }
-                } else {
-                    container::Style::default()
-                }
-            });
+                let interactive_icon = mouse_area(icon_card)
+                    .on_press(Message::DesktopIconPress(idx))
+                    .on_release(Message::DesktopMouseRelease)
+                    .on_right_press(Message::OpenDesktopIconContextMenu(idx))
+                    .on_enter(Message::DesktopIconHover(idx))
+                    .on_exit(Message::DesktopIconUnhover(idx))
+                    .interaction(mouse::Interaction::Pointer);
 
-            let interactive_icon = mouse_area(icon_card)
-                .on_press(Message::DesktopIconPress(idx))
-                .on_release(Message::DesktopMouseRelease)
-                .on_right_press(Message::OpenDesktopIconContextMenu(idx))
-                .on_enter(Message::DesktopIconHover(idx))
-                .on_exit(Message::DesktopIconUnhover(idx))
-                .interaction(mouse::Interaction::Pointer);
-
-            let positioned = container(
-                column![
-                    container("").height(Length::Fixed(item.pos.y.max(0.0))),
-                    row![
-                        container("").width(Length::Fixed(item.pos.x.max(0.0))),
-                        interactive_icon,
-                    ],
-                ],
-            )
-            .width(Length::Fill)
-            .height(Length::Fill);
-
-            icon_layers.push(positioned.into());
+                col_col = col_col.push(interactive_icon);
+            }
+            col_elements.push(col_col.into());
         }
 
-        container(stack(icon_layers))
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .into()
+        let grid_widget = container(row(col_elements).spacing(12))
+            .padding([28, 24]);
+
+        stack![
+            wallpaper_click_area,
+            grid_widget,
+        ]
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
     }
 }
 

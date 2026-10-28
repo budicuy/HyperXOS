@@ -36,6 +36,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "mesa",
     "labwc",
     "layer-shell-qt",
+    "foot",
     "grim",
     "wl-clipboard",
     "sddm",
