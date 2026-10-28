@@ -1,7 +1,7 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
-pkgrel=6
+pkgrel=7
 pkgdesc="Default shell, user skeleton, Hyprland, Waybar, and Windows 11 Fluent desktop configurations for HyperXOS"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
@@ -17,12 +17,6 @@ package() {
     fi
 
     if [ -d etc/skel ]; then
-        install -d "${pkgdir}/etc/skel"
         cp -af etc/skel/. "${pkgdir}/etc/skel/"
-    fi
-
-    if [ -d etc/xdg ]; then
-        install -d "${pkgdir}/etc/xdg"
-        cp -af etc/xdg/. "${pkgdir}/etc/xdg/"
     fi
 }
