@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<labwc_config>
+  <core>
+    <decoration>server</decoration>
+    <gap>0</gap>
+    <adaptiveSync>no</adaptiveSync>
+  </core>
+
+  <theme>
+    <name>HyperX-Fluent-Dark</name>
+    <cornerRadius>8</cornerRadius>
+    <titlebar>
+      <layout>icon:iconify,max,close</layout>
+      <showTitle>yes</showTitle>
+    </titlebar>
+    <font place="ActiveWindow">
+      <name>Plus Jakarta Sans</name>
+      <size>10</size>
+      <weight>bold</weight>
+    </font>
+    <font place="InactiveWindow">
+      <name>Plus Jakarta Sans</name>
+      <size>10</size>
+      <weight>normal</weight>
+    </font>
+  </theme>
+
+  <windowRules>
+    <!-- HyperX-DE Desktop canvas should stay at the bottom layer and skip window switcher -->
+    <windowRule identifier="hyperx-de">
+      <action name="ToggleAlwaysOnBottom" />
+      <skipTaskbar>yes</skipTaskbar>
+      <skipWindowSwitcher>yes</skipWindowSwitcher>
+    </windowRule>
+  </windowRules>
+
+  <!-- Work Area margins: Top 34px for Top Bar, Bottom 68px for Floating Dock -->
+  <!-- This guarantees maximized/tiled windows never overlap the Floating Dock and Top Bar! -->
+  <margin top="34" bottom="68" left="0" right="0" />
+
+  <keyboard>
+    <default />
+    <!-- Alt+Tab Window Switching -->
+    <keybind key="A-Tab">
+      <action name="NextWindow">
+        <interactive>yes</interactive>
+      </action>
+    </keybind>
+    <keybind key="A-S-Tab">
+      <action name="PreviousWindow">
+        <interactive>yes</interactive>
+      </action>
+    </keybind>
+    <!-- Alt+F4 Close Window -->
+    <keybind key="A-F4">
+      <action name="Close" />
+    </keybind>
+    <!-- Super+Left / Super+Right Snapping -->
+    <keybind key="W-Left">
+      <action name="SnapToEdge" direction="left" />
+    </keybind>
+    <keybind key="W-Right">
+      <action name="SnapToEdge" direction="right" />
+    </keybind>
+    <keybind key="W-Up">
+      <action name="ToggleMaximize" />
+    </keybind>
+    <keybind key="W-Down">
+      <action name="Iconify" />
+    </keybind>
+  </keyboard>
+
+  <mouse>
+    <default />
+    <context name="Title">
+      <mousebind button="Left" action="Press">
+        <action name="Focus" />
+        <action name="Raise" />
+      </mousebind>
+      <mousebind button="Left" action="Drag">
+        <action name="Move" />
+      </mousebind>
+      <mousebind button="Left" action="DoubleClick">
+        <action name="ToggleMaximize" />
+      </mousebind>
+    </context>
+    <context name="Frame">
+      <mousebind button="Left" action="Press">
+        <action name="Focus" />
+        <action name="Raise" />
+      </mousebind>
+      <mousebind button="Left" action="Drag">
+        <action name="Resize" />
+      </mousebind>
+    </context>
+    <context name="Client">
+      <mousebind button="Left" action="Press">
+        <action name="Focus" />
+        <action name="Raise" />
+      </mousebind>
+      <mousebind button="Middle" action="Press">
+        <action name="Focus" />
+        <action name="Raise" />
+      </mousebind>
+      <mousebind button="Right" action="Press">
+        <action name="Focus" />
+        <action name="Raise" />
+      </mousebind>
+    </context>
+  </mouse>
+</labwc_config>

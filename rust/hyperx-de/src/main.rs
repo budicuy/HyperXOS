@@ -30,7 +30,7 @@ fn main() -> iced::Result {
     }
 
     // If invoked directly on a raw Linux TTY without an active Wayland/X11 display server,
-    // automatically bootstrap a fullscreen Wayland display host (cage / weston / kwin_wayland)
+    // automatically bootstrap a fullscreen Wayland display host with Labwc stacking window manager
     let has_wayland = std::env::var("WAYLAND_DISPLAY")
         .map(|s| !s.is_empty())
         .unwrap_or(false);
@@ -44,12 +44,12 @@ fn main() -> iced::Result {
             .unwrap_or_else(|_| std::path::PathBuf::from("/usr/bin/hyperx-de"));
         let self_str = self_exe.to_string_lossy().to_string();
 
-        // Launch via cage (lightweight DRM Wayland kiosk host).
+        // Launch via labwc (lightweight Wayland stacking compositor with Server-Side Decorations).
         // Hardware cursor planes render flipped/offset on virtio-gpu (QEMU virgl),
-        // so force software cursor in cage.
-        let status = Command::new("cage")
+        // so force software cursor.
+        let status = Command::new("labwc")
             .env("WLR_NO_HARDWARE_CURSORS", "1")
-            .args(["-s", "--", &self_str, "--session-ui"])
+            .args(["-S", &format!("{} --session-ui", self_str)])
             .status();
 
         if let Ok(s) = status {

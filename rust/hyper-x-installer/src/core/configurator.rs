@@ -138,7 +138,7 @@ DisplayServer=wayland
 GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
 [Wayland]
-CompositorCommand=cage -s -- sddm-greeter-qt6 --layer-shell
+CompositorCommand=labwc
 "#;
         let _ = fs::write("/mnt/etc/sddm.conf.d/10-wayland.conf", sddm_cfg);
 

@@ -36,7 +36,8 @@ pipewire-pulse
 wireplumber
 
 # Wayland Display Server & HyperX-DE Session Utilities
-cage
+labwc
+layer-shell-qt
 grim
 mesa
 polkit

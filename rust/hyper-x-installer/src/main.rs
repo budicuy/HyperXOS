@@ -132,7 +132,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         min_size: Some(Size::new(960.0, 640.0)),
         transparent: true,
         blur: true,
-        decorations: false,
+        decorations: true,
         icon: load_window_icon(),
         platform_specific: iced::window::settings::PlatformSpecific {
             application_id: "hyper-x-installer".to_string(),

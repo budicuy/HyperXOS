@@ -25,7 +25,7 @@ fn main() -> iced::Result {
         min_size: Some(Size::new(920.0, 620.0)),
         transparent: true,
         blur: true,
-        decorations: false,
+        decorations: true,
         icon: load_window_icon(),
         platform_specific: iced::window::settings::PlatformSpecific {
             application_id: "hyper-x-tools".to_string(),

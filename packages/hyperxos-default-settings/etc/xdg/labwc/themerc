@@ -1,0 +1,31 @@
+# HyperXOS Fluent Dark Theme for Labwc
+border.width: 1
+window.active.border.color: #1e293b
+window.inactive.border.color: #0f172a
+
+window.*.title.bg: Solid
+window.active.title.bg.color: #0f172a
+window.inactive.title.bg.color: #0b0f19
+
+window.label.text.justify: left
+window.active.label.text.color: #f8fafc
+window.inactive.label.text.color: #64748b
+
+window.button.width: 36
+window.button.height: 28
+window.button.spacing: 2
+window.button.hover.bg.corner-radius: 4
+
+window.active.button.unpressed.image.color: #cbd5e1
+window.inactive.button.unpressed.image.color: #64748b
+window.button.hover.bg.color: #ffffff1f
+
+window.active.button.close.hover.bg.color: #e81123
+window.inactive.button.close.hover.bg.color: #e81123
+window.active.button.close.hover.image.color: #ffffff
+
+# Context / Right click menu
+menu.items.bg.color: #0f172a
+menu.items.text.color: #f8fafc
+menu.items.active.bg.color: #0078d4
+menu.items.active.text.color: #ffffff
