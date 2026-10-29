@@ -8,10 +8,11 @@ hl.config({
 })
 
 -- Monitor Configuration (Automatic display detection)
-hl.config({
-    monitor = {
-        { name = "", preferred = true, auto = true, scale = 1.0 },
-    },
+hl.monitor({
+    output   = "",
+    mode     = "preferred",
+    position = "auto",
+    scale    = "auto",
 })
 
 -- Input Configuration (Windows-style standard behavior)
@@ -31,36 +32,40 @@ hl.config({
 -- General Layout & Windows 11 Fluent Accent Borders
 hl.config({
     general = {
-        gaps_in = 6,
+        gaps_in  = 6,
         gaps_out = 10,
         border_size = 1,
-        ["col.active_border"] = "rgba(0078d4ff) rgba(8b5cf6ff) 45deg",
-        ["col.inactive_border"] = "rgba(1e293b99)",
+        col = {
+            active_border   = { colors = { "rgba(0078d4ff)", "rgba(8b5cf6ff)" }, angle = 45 },
+            inactive_border = "rgba(1e293b99)",
+        },
         layout = "dwindle",
         resize_on_border = true,
         hover_icon_on_border = true,
+        allow_tearing = false,
     },
 })
 
 -- Visual Decorations (Dual-Kawase Blur & Acrylic Glassmorphism)
 hl.config({
     decoration = {
-        rounding = 10,
-        active_opacity = 0.98,
+        rounding       = 10,
+        rounding_power = 2,
+        active_opacity   = 0.98,
         inactive_opacity = 0.92,
         blur = {
-            enabled = true,
-            size = 6,
-            passes = 3,
+            enabled           = true,
+            size              = 6,
+            passes            = 3,
             new_optimizations = true,
-            vibrancy = 0.20,
-            ignore_opacity = true,
+            vibrancy          = 0.20,
+            ignore_opacity    = true,
         },
         shadow = {
-            enabled = true,
-            range = 18,
+            enabled      = true,
+            range        = 18,
             render_power = 3,
-            color = "rgba(0, 0, 0, 0.40)",
+            color        = 0x66000000,
         },
     },
 })
@@ -69,24 +74,21 @@ hl.config({
 hl.config({
     animations = {
         enabled = true,
-        bezier = {
-            fluentDecel = { 0.05, 0.9, 0.1, 1.0 },
-            fluentEase = { 0.16, 1, 0.3, 1 },
-        },
-        animation = {
-            { name = "windows", enabled = true, speed = 4, curve = "fluentDecel", style = "popin 80%" },
-            { name = "windowsOut", enabled = true, speed = 3, curve = "fluentEase", style = "popin 80%" },
-            { name = "border", enabled = true, speed = 6, curve = "default" },
-            { name = "fade", enabled = true, speed = 4, curve = "fluentEase" },
-            { name = "workspaces", enabled = true, speed = 4, curve = "fluentDecel", style = "slide" },
-        },
     },
 })
+
+hl.curve("fluentDecel", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.0 } } })
+hl.curve("fluentEase",  { type = "bezier", points = { { 0.16, 1.0 }, { 0.3, 1.0 } } })
+
+hl.animation({ leaf = "windows",    enabled = true, speed = 4, bezier = "fluentDecel", style = "popin 80%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 3, bezier = "fluentEase",  style = "popin 80%" })
+hl.animation({ leaf = "border",     enabled = true, speed = 6, bezier = "default" })
+hl.animation({ leaf = "fade",       enabled = true, speed = 4, bezier = "fluentEase" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 4, bezier = "fluentDecel", style = "slide" })
 
 -- Dwindle Layout
 hl.config({
     dwindle = {
-        pseudotile = true,
         preserve_split = true,
     },
 })
@@ -94,10 +96,8 @@ hl.config({
 -- Misc Display Tweaks
 hl.config({
     misc = {
-        disable_hyprland_logo = true,
-        disable_splash_rendering = true,
+        disable_hyprland_logo   = true,
         force_default_wallpaper = 0,
-        vfr = true,
     },
 })
 
@@ -128,9 +128,9 @@ hl.window_rule({ match = { title = "Save File" }, float = true })
 -- Windows 11 Keyboard Shortcuts & Navigation
 -- ==============================================================================
 
--- Start Menu (Tap Super / Windows key)
-hl.bind("SUPER_L", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"), { release = true })
-hl.bind("SUPER", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"))
+-- Start Menu (Tap Super_L or Super_R / Windows key)
+hl.bind("Super_L", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"), { release = true })
+hl.bind("Super_R", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"), { release = true })
 
 -- File Explorer (Win + E)
 hl.bind("SUPER + E", hl.dsp.exec_cmd("thunar"))
@@ -153,19 +153,23 @@ hl.bind("SUPER + T", hl.dsp.exec_cmd("foot"))
 hl.bind("SUPER + B", hl.dsp.exec_cmd("firefox"))
 
 -- Window Controls ala Windows
-hl.bind("ALT + F4", hl.dsp.window.kill())
-hl.bind("SUPER + Q", hl.dsp.window.kill())
-hl.bind("SUPER + Up", hl.dsp.window.fullscreen({ mode = 1 }))
-hl.bind("SUPER + Down", function()
-    hl.dispatch(hl.dsp.window.float())
-end)
-hl.bind("SUPER + Left", hl.dsp.window.move({ direction = "l" }))
-hl.bind("SUPER + Right", hl.dsp.window.move({ direction = "r" }))
-hl.bind("SUPER + D", hl.dsp.workspace.toggle_special({ name = "desktop" }))
+hl.bind("ALT + F4", hl.dsp.window.close())
+hl.bind("SUPER + Q", hl.dsp.window.close())
+hl.bind("SUPER + Up", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+hl.bind("SUPER + Down", hl.dsp.window.float({ action = "toggle" }))
+hl.bind("SUPER + Left", hl.dsp.focus({ direction = "left" }))
+hl.bind("SUPER + Right", hl.dsp.focus({ direction = "right" }))
+hl.bind("SUPER + D", hl.dsp.workspace.toggle_special("magic"))
 hl.bind("ALT + Tab", function()
     hl.dispatch(hl.dsp.window.cycle_next())
     hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
 end)
+
+-- Workspace switching (Super + 1..9)
+for i = 1, 9 do
+    hl.bind("SUPER + " .. i, hl.dsp.focus({ workspace = i }))
+    hl.bind("SUPER + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }))
+end
 
 -- Mouse Window Control (Super + Drag / Resize)
 hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true })
