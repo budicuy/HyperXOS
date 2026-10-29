@@ -2,7 +2,7 @@
 
 Selamat datang di rilis resmi pertama **HyperXOS** (`2026.10.26`).
 
-HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **Windows 11 Fluent Suite (Hyprland + Waybar + Wofi + SwayNC)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
+HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi performa tinggi yang dibangun di atas fondasi **Arch Linux** dan **CachyOS**, ditenagai oleh lingkungan desktop **KDE Plasma 6 (Wayland)**, antarmuka penginstal grafis **HyperXOS Native Installer (Pure Rust)**, serta utilitas sistem terintegrasi **HyperXTools (Pure Rust + Iced + WGPU)**.
 
 ---
 
@@ -12,12 +12,11 @@ HyperXOS adalah distribusi sistem operasi Linux modern, ringan, dan berorientasi
   - Mengadopsi arsitektur *rolling-release* dengan repositori resmi Arch Linux dan repositori teroptimasi CachyOS.
   - Manajemen paket berkecepatan tinggi dengan `pacman`.
 
-- **HyperX Windows 11 Fluent Desktop (Hyprland):**
-  - Sesi desktop Wayland bertenaga Hyprland dengan efek kaca Dual-Kawase Blur, sudut membulat, bayangan halus, dan animasi cepat.
-  - Floating Centered Taskbar & System Tray bertenaga Waybar.
-  - Start Menu & App Search bertenaga Wofi.
-  - Action Center & Notification Hub bertenaga SwayNC.
-  - Shortcut Windows 11 native: `Win` (Start Menu), `Win + E` (Explorer), `Win + V` (Clipboard), `Win + Shift + S` (Snipping Tool), `Win + L` (Lock Screen), `Alt + F4`, dan window snapping.
+- **Lingkungan Desktop KDE Plasma 6 (Wayland):**
+  - Sesi desktop Wayland modern bertenaga KDE Plasma 6 dengan antarmuka elegan, stabilitas tinggi, dan performa responsif.
+  - Panel taskbar Windows-style dengan Kickoff Start Menu, System Tray lengkap, dan Task Manager terpadu.
+  - File manager Dolphin dan Terminal Konsole terintegrasi.
+  - Shortcut standar: `Win` (Start Menu), `Win + E` (Dolphin), `Win + Shift + S` (Spectacle), `Win + L` (Lock Screen), `Alt + F4`.
 
 - **Peramban Web Firefox Terintegrasi:**
   - Mozilla Firefox langsung tersedia di media Live USB dan secara otomatis terpasang pada instalasi target.

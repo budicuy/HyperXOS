@@ -1,0 +1,9 @@
+[General]
+ColorScheme=BreezeDark
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+ShowDeleteCommand=true
+
+[Icons]
+Theme=breeze-dark

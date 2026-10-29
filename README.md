@@ -8,15 +8,13 @@
 
 ## 🚀 Ringkasan Proyek
 
-**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan desktop **Windows 11 Fluent Suite (Hyprland + Waybar + Wofi + SwayNC)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
+**HyperXOS** adalah distribusi sistem operasi independen berbasis Arch Linux (x86_64) yang dirancang untuk kebutuhan desktop harian, pengembang peranti lunak, dan gamer. HyperXOS menggabungkan model rilis bergulir (*rolling release*) terkini dengan lingkungan desktop **KDE Plasma 6 (Wayland)**, penginstal grafis native **Pure Rust Installer (`hyper-x-installer`)**, bootloader modern **Limine**, serta arsitektur deteksi driver grafis otomatis (**NVIDIA Open**, driver legacy, Intel, dan AMD).
 
 ### Fitur Utama:
-- **Desktop Modern Windows 11 Fluent Suite (Hyprland):**
-  - Compositor Wayland modern bertenaga **Hyprland** dengan efek kaca Dual-Kawase Blur, sudut membulat, bayangan halus, dan animasi transisi cepat.
-  - Floating Centered Taskbar & System Tray bertenaga **Waybar**.
-  - Start Menu & Pencarian bergaya Windows 11 bertenaga **Wofi**.
-  - Action Center & Notification Hub bertenaga **SwayNC**.
-  - Shortcut Windows 11 native: `Win` (Start Menu), `Win + E` (Explorer), `Win + V` (Clipboard History), `Win + Shift + S` (Snipping Tool), `Win + L` (Lock Screen), `Alt + F4`, dan snapping jendela.
+- **Desktop Modern KDE Plasma 6 (Wayland):**
+  - Desktop Wayland modern bertenaga **KDE Plasma 6** dengan antarmuka elegan, taskbar terintegrasi, Dolphin file manager, dan ekosistem aplikasi kaya fitur.
+  - Panel taskbar Windows-style dengan Kickoff Start Menu, System Tray lengkap, Jam/Kalender, dan Task Manager.
+  - Shortcut keyboard standar: `Win` (Start Menu), `Win + E` (Dolphin), `Win + Shift + S` (Spectacle), `Win + L` (Lock Screen), `Alt + F4`, dan snapping jendela KWin.
 - **Pure Rust Native Installer (`hyper-x-installer`):**
   - Dibangun 100% menggunakan Rust murni dengan arsitektur UI Glassmorphic modern (Iced 0.14 + WGPU).
   - Skema partisi otomatis: Partisi boot ESP FAT32 sebesar 4096 MiB (4 GB) di `/boot` dan partisi root **Btrfs** dengan subvolume terpisah (`@`, `@home`, `@snapshots`, `@var`, `@opt`) dengan kompresi `zstd:1`.
@@ -221,8 +219,7 @@ Untuk membersihkan berkas build dan mount sementara:
 HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-source upstream:
 - **[Arch Linux](https://archlinux.org):** Fondasi distribusi Linux yang fleksibel, cepat, dan modern.
 - **[CachyOS](https://cachyos.org):** Repositori teroptimasi performa tinggi (`x86_64_v3`).
-- **[Hyprland](https://hyprland.org):** Wayland compositor dinamis modern dengan akselerasi GPU, animasi halus, dan efek kaca kustom.
-- **[Waybar](https://github.com/Alexays/Waybar):** Highly customizable Wayland bar untuk taskbar dan system tray.
+- **[KDE Plasma](https://kde.org/plasma-desktop/):** Lingkungan desktop Wayland canggih, kaya fitur, stabil, dan ramah pengguna.
 - **[Iced](https://iced.rs):** Cross-platform GUI library berbasis Rust dengan arsitektur reaktif dan akselerasi WGPU.
 - **[Limine Bootloader](https://limine-bootloader.org):** Bootloader modern yang tangguh, ringan, dan cepat.
 

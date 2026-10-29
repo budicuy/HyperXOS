@@ -1,8 +1,8 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
-pkgrel=8
-pkgdesc="Default shell, user skeleton, Hyprland, Waybar, and Windows 11 Fluent desktop configurations for HyperXOS"
+pkgrel=9
+pkgdesc="Default shell, user skeleton, and KDE Plasma 6 desktop configurations for HyperXOS"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')

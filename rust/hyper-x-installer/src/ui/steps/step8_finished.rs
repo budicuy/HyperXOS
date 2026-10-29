@@ -40,7 +40,7 @@ pub fn view<'a, Message: Clone + 'a>(
             column![
                 text("• Limine Bootloader is registered and ready in UEFI NVRAM").size(12).font(FONT_BODY).style(|_| text::Style { color: Some(TEXT_MUTED) }),
                 text("• Root filesystem is configured on Btrfs with @ and @home subvolumes").size(12).font(FONT_BODY).style(|_| text::Style { color: Some(TEXT_MUTED) }),
-                text("• HyperX Windows 11 Desktop (Hyprland) and SDDM display manager are enabled").size(12).font(FONT_BODY).style(|_| text::Style { color: Some(TEXT_MUTED) }),
+                text("• KDE Plasma 6 Desktop (Wayland) and SDDM display manager are enabled").size(12).font(FONT_BODY).style(|_| text::Style { color: Some(TEXT_MUTED) }),
             ]
             .spacing(4)
             .padding([10, 0]),

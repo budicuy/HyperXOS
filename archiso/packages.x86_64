@@ -35,31 +35,17 @@ pipewire-alsa
 pipewire-pulse
 wireplumber
 
-# Wayland Display Server & Hyprland Windows 11 Desktop Stack
-hyprland
-xdg-desktop-portal
-xdg-desktop-portal-hyprland
-hyprpolkitagent
-waybar
-wofi
-swaync
-hyprpaper
-hyprlock
-cliphist
-slurp
-swappy
-thunar
-papirus-icon-theme
-ttf-jetbrains-mono-nerd
-foot
-grim
+# Desktop Environment: KDE Plasma 6 (Wayland)
+plasma-meta
+dolphin
+konsole
+ark
 mesa
-polkit
 sddm
-seatd
-wl-clipboard
 xdg-user-dirs
 xorg-xwayland
+papirus-icon-theme
+ttf-jetbrains-mono-nerd
 
 # Core Web Browser
 firefox

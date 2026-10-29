@@ -152,14 +152,14 @@ impl VmEngine {
         }
     }
 
-    /// Smoke-test the booted installed system: Hyprland session alive + screenshot.
+    /// Smoke-test the booted installed system: KDE Plasma session alive + screenshot.
     fn smoke_test_installed(root: &Path) -> Result<(), String> {
         println!("  -> [smoke] Waiting for installed system guest agent (max 240s)...");
         let mut qga = QgaClient::wait_ready(Duration::from_secs(240))?;
 
         let start = Instant::now();
         loop {
-            let (code, _) = qga.exec("pgrep -x Hyprland >/dev/null || pgrep -x hyprland >/dev/null")?;
+            let (code, _) = qga.exec("pgrep -x kwin_wayland >/dev/null || pgrep -x plasmashell >/dev/null")?;
             if code == 0 {
                 break;
             }
@@ -167,11 +167,11 @@ impl VmEngine {
                 let (_, log) = qga
                     .exec("journalctl -b -u sddm -n 30 --no-pager")
                     .unwrap_or_default();
-                return Err(format!("Hyprland session did not start. SDDM log:\n{}", log));
+                return Err(format!("KDE Plasma session did not start. SDDM log:\n{}", log));
             }
             std::thread::sleep(Duration::from_secs(2));
         }
-        println!("  [✓] [smoke] Hyprland Wayland session is running.");
+        println!("  [✓] [smoke] KDE Plasma Wayland session is running.");
 
         let take_screenshot = |qga: &mut QgaClient, out_path: &Path| -> Result<(), String> {
             let (_, b64) = qga.exec(

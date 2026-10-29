@@ -87,7 +87,7 @@ pub fn run_check(root: &Path) -> Result<(), String> {
         let vital = [
             "linux",
             "base",
-            "hyprland",
+            "plasma-meta",
             "sddm",
             "hyper-x-installer",
             "hyper-x-tools",

@@ -1,0 +1,3 @@
+[Windows]
+BorderlessMaximizedWindows=false
+TitlebarDoubleClickCommand=Maximize
