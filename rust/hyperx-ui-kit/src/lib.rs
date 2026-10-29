@@ -1,8 +1,10 @@
+pub mod animation;
 pub mod components;
 pub mod icons;
 pub mod theme;
 pub mod utils;
 
+pub use animation::*;
 pub use components::*;
 pub use icons::*;
 pub use theme::*;

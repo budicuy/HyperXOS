@@ -8,6 +8,10 @@ use crate::ui::theme::*;
 
 pub fn view<'a, Message: Clone + 'a>(
     metrics: &SystemMetrics,
+    animated_cpu: f32,
+    animated_ram: f32,
+    animated_disk: f32,
+    animated_gpu: f32,
     on_quick_clean: Message,
     on_quick_tweaks: Message,
     on_quick_kernel: Message,
@@ -99,12 +103,12 @@ pub fn view<'a, Message: Clone + 'a>(
     } else {
         None
     };
-    let cpu_val = format!("{:.1}%", metrics.cpu_usage_percent);
+    let cpu_val = format!("{:.1}%", animated_cpu);
     let cpu_card = metric_card(
         "Prosesor (CPU)",
         icons::CPU,
         cpu_val,
-        metrics.cpu_usage_percent / 100.0,
+        animated_cpu / 100.0,
         cpu_sub,
         cpu_temp_opt,
         FLUENT_PRIMARY,
@@ -120,12 +124,12 @@ pub fn view<'a, Message: Clone + 'a>(
     } else {
         None
     };
-    let ram_val = format!("{:.1}%", metrics.ram_usage_percent);
+    let ram_val = format!("{:.1}%", animated_ram);
     let ram_card = metric_card(
         "Memori (RAM & Swap)",
         icons::RAM,
         &ram_val,
-        metrics.ram_usage_percent / 100.0,
+        animated_ram / 100.0,
         ram_sub,
         swap_opt,
         FLUENT_PRIMARY,
@@ -136,19 +140,19 @@ pub fn view<'a, Message: Clone + 'a>(
     let disk_total_gb = metrics.disk_total_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
     let disk_sub = format!("Terpakai: {:.1} GB / {:.1} GB", disk_used_gb, disk_total_gb);
     let fs_str = format!("FS: {}", metrics.disk_fs_type);
-    let disk_val = format!("{:.1}%", metrics.disk_usage_percent);
+    let disk_val = format!("{:.1}%", animated_disk);
     let disk_card = metric_card(
         "Penyimpanan Disk (Root /)",
         icons::DISK,
         disk_val,
-        metrics.disk_usage_percent / 100.0,
+        animated_disk / 100.0,
         disk_sub,
         Some(fs_str),
         FLUENT_PRIMARY,
     );
 
     // GPU
-    let gpu_val = format!("{:.1}%", metrics.gpu_usage_percent);
+    let gpu_val = format!("{:.1}%", animated_gpu);
     let gpu_sub = metrics.gpu_model.chars().take(30).collect::<String>();
     let vram_opt = if metrics.vram_total_bytes > 0 {
         let vram_used_mb = metrics.vram_used_bytes / (1024 * 1024);
@@ -161,7 +165,7 @@ pub fn view<'a, Message: Clone + 'a>(
         "Akselerasi Grafis (GPU)",
         icons::GPU,
         gpu_val,
-        metrics.gpu_usage_percent / 100.0,
+        animated_gpu / 100.0,
         gpu_sub,
         vram_opt,
         FLUENT_PRIMARY,

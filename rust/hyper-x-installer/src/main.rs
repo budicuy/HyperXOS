@@ -25,7 +25,8 @@ use crate::ui::steps::{
 };
 use hyperx_ui_kit::{
     ensure_display_environment, installer_header, load_window_icon, open_external_url,
-    print_cli_banner, FONT_BODY, FONT_INTER_BYTES, FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
+    print_cli_banner, PulseState, SmoothValue, TransitionState, FONT_BODY, FONT_INTER_BYTES,
+    FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
 };
 
 #[derive(Debug, Clone)]
@@ -81,6 +82,7 @@ pub enum Message {
     // Step 7: Progress & Real-time engine
     EngineTick,
     EngineEvent(InstallerEvent),
+    AnimationTick,
 
     // Step 8: Finished
     ToggleRestart(bool),
@@ -202,6 +204,11 @@ pub struct App {
 
     // Step 8 State
     restart_checked: bool,
+
+    // Motion & Animation States
+    step_transition: TransitionState,
+    install_progress: SmoothValue,
+    pulse: PulseState,
 }
 
 impl Default for App {
@@ -230,6 +237,9 @@ impl Default for App {
             engine_rx: None,
             is_installing: false,
             restart_checked: true,
+            step_transition: TransitionState::new(0.18),
+            install_progress: SmoothValue::new(0.0, 9.0),
+            pulse: PulseState::default(),
         }
     }
 }
@@ -256,6 +266,7 @@ impl App {
             }
             Message::GotoLocation => {
                 self.step = StepId::Location;
+                self.step_transition.start();
                 Task::none()
             }
 
@@ -270,10 +281,12 @@ impl App {
             }
             Message::GotoWelcome => {
                 self.step = StepId::Welcome;
+                self.step_transition.start();
                 Task::none()
             }
             Message::GotoKeyboard => {
                 self.step = StepId::Keyboard;
+                self.step_transition.start();
                 Task::none()
             }
 
@@ -288,6 +301,7 @@ impl App {
             }
             Message::GotoDisk => {
                 self.step = StepId::Disk;
+                self.step_transition.start();
                 Task::none()
             }
 
@@ -305,6 +319,7 @@ impl App {
             }
             Message::GotoUsers => {
                 self.step = StepId::Users;
+                self.step_transition.start();
                 Task::none()
             }
 
@@ -360,12 +375,15 @@ impl App {
                 self.user_config.locale = self.selected_locale.clone();
                 self.user_config.keymap = self.selected_keyboard.clone();
                 self.step = StepId::Summary;
+                self.step_transition.start();
                 Task::none()
             }
 
             // Step 6: Start Install
             Message::StartInstallation => {
                 self.step = StepId::Install;
+                self.step_transition.start();
+                self.install_progress.snap(0.0);
                 self.is_installing = true;
                 self.install_state = InstallState::default();
 
@@ -382,28 +400,38 @@ impl App {
                 Task::none()
             }
 
-            // Step 7: Engine Realtime Loop
-            Message::EngineTick => {
-                if let Some(ref rx) = self.engine_rx {
-                    while let Ok(event) = rx.try_recv() {
-                        match event {
-                            InstallerEvent::Stage { name, pct } => {
-                                self.install_state.stage_name = name;
-                                self.install_state.progress_pct = pct;
-                            }
-                            InstallerEvent::Log(line) => {
-                                self.install_state.log_lines.push(line);
-                            }
-                            InstallerEvent::Finished(result) => {
-                                self.is_installing = false;
-                                match result {
-                                    Ok(()) => {
-                                        self.install_state.progress_pct = 100.0;
-                                        self.step = StepId::Finished;
-                                    }
-                                    Err(err) => {
-                                        self.install_state.is_failed = true;
-                                        self.install_state.error_message = Some(err);
+            // Step 7: Engine Realtime Loop & Motion Smoothing
+            Message::AnimationTick | Message::EngineTick => {
+                let dt = 0.016;
+                self.step_transition.update(dt);
+                if self.is_installing {
+                    self.install_progress.update(dt);
+                    self.install_state.progress_pct = self.install_progress.current;
+                    self.pulse.update(dt);
+
+                    if let Some(ref rx) = self.engine_rx {
+                        while let Ok(event) = rx.try_recv() {
+                            match event {
+                                InstallerEvent::Stage { name, pct } => {
+                                    self.install_state.stage_name = name;
+                                    self.install_progress.set_target(pct);
+                                }
+                                InstallerEvent::Log(line) => {
+                                    self.install_state.log_lines.push(line);
+                                }
+                                InstallerEvent::Finished(result) => {
+                                    self.is_installing = false;
+                                    match result {
+                                        Ok(()) => {
+                                            self.install_progress.snap(100.0);
+                                            self.install_state.progress_pct = 100.0;
+                                            self.step = StepId::Finished;
+                                            self.step_transition.start();
+                                        }
+                                        Err(err) => {
+                                            self.install_state.is_failed = true;
+                                            self.install_state.error_message = Some(err);
+                                        }
                                     }
                                 }
                             }
@@ -434,8 +462,11 @@ impl App {
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        if self.is_installing {
-            iced::time::every(Duration::from_millis(100)).map(|_| Message::EngineTick)
+        let needs_anim = self.step_transition.is_animating()
+            || self.is_installing
+            || self.install_progress.is_animating();
+        if needs_anim {
+            iced::time::every(Duration::from_millis(16)).map(|_| Message::AnimationTick)
         } else {
             Subscription::none()
         }
@@ -505,7 +536,7 @@ impl App {
                 )
             }
             StepId::Install => {
-                step7_install::view(&self.install_state)
+                step7_install::view(&self.install_state, self.pulse.breathing(0.4, 1.0))
             }
             StepId::Finished => step8_finished::view(
                 self.restart_checked,
@@ -513,6 +544,16 @@ impl App {
                 Message::CompleteAndExit,
             ),
         };
+
+        let content_container = container(step_content)
+            .padding(iced::Padding {
+                top: self.step_transition.offset_y(8.0),
+                right: 0.0,
+                bottom: 0.0,
+                left: 0.0,
+            })
+            .width(Length::Fill)
+            .height(Length::Fill);
 
         let main_view = container(
             row![
@@ -523,7 +564,7 @@ impl App {
                         Message::HeaderHover,
                         Message::OpenUrl,
                     ),
-                    step_content,
+                    content_container,
                 ]
                 .width(Length::Fill)
                 .height(Length::Fill),

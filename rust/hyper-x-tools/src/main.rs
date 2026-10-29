@@ -15,8 +15,8 @@ use crate::core::system_monitor::{SystemMetrics, SystemMonitor};
 use crate::core::system_tweaker::SystemTweaker;
 use crate::ui::sidebar::{sidebar, Page};
 use hyperx_ui_kit::{
-    load_window_icon, open_external_url, tools_header, FONT_BODY, FONT_INTER_BYTES,
-    FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
+    load_window_icon, open_external_url, tools_header, SmoothValue, TransitionState, FONT_BODY,
+    FONT_INTER_BYTES, FONT_PLUS_JAKARTA_BYTES, TEXT_MAIN,
 };
 
 fn main() -> iced::Result {
@@ -85,6 +85,13 @@ pub struct App {
     // Header state
     hovered_header_btn: Option<&'static str>,
 
+    // Motion & Animation States
+    page_transition: TransitionState,
+    cpu_smooth: SmoothValue,
+    ram_smooth: SmoothValue,
+    disk_smooth: SmoothValue,
+    gpu_smooth: SmoothValue,
+
     // Terminal Logging
     terminal_log: String,
     log_tx: Sender<String>,
@@ -94,6 +101,7 @@ pub struct App {
 #[derive(Debug, Clone)]
 pub enum Message {
     Tick,
+    AnimTick,
     SelectPage(Page),
     RefreshMetrics,
     ClearLog,
@@ -145,6 +153,12 @@ impl Default for App {
         let (log_tx, log_rx) = unbounded();
         let mut monitor = SystemMonitor::new();
         let metrics = monitor.collect_metrics();
+        let (cpu_pct, ram_pct, disk_pct, gpu_pct) = (
+            metrics.cpu_usage_percent,
+            metrics.ram_usage_percent,
+            metrics.disk_usage_percent,
+            metrics.gpu_usage_percent,
+        );
 
         let (running_name, running_ver) = KernelManager::get_running_kernel_info();
         let kernels = KernelManager::get_catalog();
@@ -188,6 +202,12 @@ impl Default for App {
 
             hovered_header_btn: None,
 
+            page_transition: TransitionState::new(0.18),
+            cpu_smooth: SmoothValue::new(cpu_pct, 6.0),
+            ram_smooth: SmoothValue::new(ram_pct, 6.0),
+            disk_smooth: SmoothValue::new(disk_pct, 6.0),
+            gpu_smooth: SmoothValue::new(gpu_pct, 6.0),
+
             terminal_log: "HyperXTools v2.2.0 (Rust + Iced Glass WGPU) Siap.\n".to_string(),
             log_tx,
             log_rx,
@@ -197,7 +217,20 @@ impl Default for App {
 
 impl App {
     pub fn subscription(&self) -> Subscription<Message> {
-        iced::time::every(Duration::from_millis(1000)).map(|_| Message::Tick)
+        let is_animating = self.page_transition.is_animating()
+            || self.cpu_smooth.is_animating()
+            || self.ram_smooth.is_animating()
+            || self.disk_smooth.is_animating()
+            || self.gpu_smooth.is_animating();
+
+        let metrics_tick = iced::time::every(Duration::from_millis(1000)).map(|_| Message::Tick);
+
+        if is_animating {
+            let anim_tick = iced::time::every(Duration::from_millis(16)).map(|_| Message::AnimTick);
+            Subscription::batch([metrics_tick, anim_tick])
+        } else {
+            metrics_tick
+        }
     }
 
     pub fn update(&mut self, message: Message) -> Task<Message> {
@@ -209,20 +242,40 @@ impl App {
         match message {
             Message::Tick => {
                 self.metrics = self.monitor.collect_metrics();
+                self.cpu_smooth.set_target(self.metrics.cpu_usage_percent);
+                self.ram_smooth.set_target(self.metrics.ram_usage_percent);
+                self.disk_smooth.set_target(self.metrics.disk_usage_percent);
+                self.gpu_smooth.set_target(self.metrics.gpu_usage_percent);
+                Task::none()
+            }
+            Message::AnimTick => {
+                let dt = 0.016;
+                self.page_transition.update(dt);
+                self.cpu_smooth.update(dt);
+                self.ram_smooth.update(dt);
+                self.disk_smooth.update(dt);
+                self.gpu_smooth.update(dt);
                 Task::none()
             }
             Message::RefreshMetrics => {
                 self.metrics = self.monitor.collect_metrics();
+                self.cpu_smooth.set_target(self.metrics.cpu_usage_percent);
+                self.ram_smooth.set_target(self.metrics.ram_usage_percent);
+                self.disk_smooth.set_target(self.metrics.disk_usage_percent);
+                self.gpu_smooth.set_target(self.metrics.gpu_usage_percent);
                 Task::none()
             }
             Message::SelectPage(page) => {
-                self.current_page = page;
-                match page {
-                    Page::KernelManager => self.refresh_kernel_state(),
-                    Page::GameTweaks => self.refresh_tweaks_state(),
-                    Page::Snapshots => self.refresh_snapshots_state(),
-                    Page::PackageStore => self.refresh_store_state(),
-                    _ => {}
+                if self.current_page != page {
+                    self.current_page = page;
+                    self.page_transition.start();
+                    match page {
+                        Page::KernelManager => self.refresh_kernel_state(),
+                        Page::GameTweaks => self.refresh_tweaks_state(),
+                        Page::Snapshots => self.refresh_snapshots_state(),
+                        Page::PackageStore => self.refresh_store_state(),
+                        _ => {}
+                    }
                 }
                 Task::none()
             }
@@ -508,6 +561,10 @@ impl App {
         let main_content: Element<'_, Message> = match self.current_page {
             Page::Dashboard => ui::pages::dashboard::view(
                 &self.metrics,
+                self.cpu_smooth.current,
+                self.ram_smooth.current,
+                self.disk_smooth.current,
+                self.gpu_smooth.current,
                 Message::CleanCache,
                 Message::SelectPage(Page::GameTweaks),
                 Message::SelectPage(Page::KernelManager),
@@ -570,7 +627,17 @@ impl App {
             ),
         };
 
-        let right_panel = column![head, main_content].width(Length::Fill);
+        let content_container = container(main_content)
+            .padding(iced::Padding {
+                top: self.page_transition.offset_y(6.0),
+                right: 0.0,
+                bottom: 0.0,
+                left: 0.0,
+            })
+            .width(Length::Fill)
+            .height(Length::Fill);
+
+        let right_panel = column![head, content_container].width(Length::Fill);
 
         let divider = container("")
             .width(1)

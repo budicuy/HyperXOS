@@ -1,6 +1,6 @@
 use iced::widget::scrollable::{Direction, Scrollbar};
 use iced::widget::{column, container, progress_bar, row, scrollable, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
@@ -27,6 +27,7 @@ impl Default for InstallState {
 
 pub fn view<'a, Message: Clone + 'a>(
     state: &'a InstallState,
+    pulse_alpha: f32,
 ) -> Element<'a, Message> {
     let mut logs_col = column![].spacing(3);
     for line in &state.log_lines {
@@ -67,12 +68,17 @@ pub fn view<'a, Message: Clone + 'a>(
 
     let progress_widget = column![
         row![
-            text(&state.stage_name)
-                .size(13)
-                .font(FONT_BODY_SEMIBOLD)
-                .style(|_| text::Style {
-                    color: Some(TEXT_MAIN),
-                }),
+            row![
+                svg_icon(icons::ROCKET, 14.0, Color::from_rgba(0.0, 0.47, 0.83, pulse_alpha)),
+                text(&state.stage_name)
+                    .size(13)
+                    .font(FONT_BODY_SEMIBOLD)
+                    .style(|_| text::Style {
+                        color: Some(TEXT_MAIN),
+                    }),
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
             row![].width(Length::Fill),
             text(format!("{:.0}%", state.progress_pct))
                 .size(13)
