@@ -503,9 +503,6 @@ impl App {
             Message::HeaderBtnHovered,
             Message::OpenUrl,
             Message::WindowDrag,
-            Message::WindowMinimize,
-            Message::WindowMaximize,
-            Message::WindowClose,
         );
 
         let main_content: Element<'_, Message> = match self.current_page {

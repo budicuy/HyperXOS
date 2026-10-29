@@ -488,8 +488,6 @@ impl App {
                         self.hovered_btn,
                         Message::HeaderHover,
                         Message::OpenUrl,
-                        Message::Minimize,
-                        Message::Close,
                     ),
                     step_content,
                 ]

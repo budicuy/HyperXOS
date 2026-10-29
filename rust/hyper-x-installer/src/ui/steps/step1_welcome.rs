@@ -114,7 +114,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(8)
         .align_y(Alignment::Center),
     )
-    .padding([9, 20])
+    .padding([8, 20])
     .style(primary_button_style(ACCENT_CYAN));
 
     if can_continue {
@@ -123,7 +123,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
     let refresh_btn = button(
         row![
-            svg_icon(icons::REFRESH, 12.0, Color::WHITE),
+            svg_icon(icons::REFRESH, 12.0, TEXT_MAIN),
             text("Recheck System")
                 .size(12)
                 .font(FONT_BODY_MEDIUM),
@@ -133,7 +133,7 @@ pub fn view<'a, Message: Clone + 'a>(
     )
     .on_press(on_refresh)
     .style(secondary_button_style())
-    .padding([8, 14]);
+    .padding([8, 16]);
 
     column![
         column![

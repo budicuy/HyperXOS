@@ -1,19 +1,19 @@
 use iced::border::Radius;
 use iced::widget::{button, column, container, progress_bar, row, text};
-use iced::{Alignment, Background, Border, Color, Element, Length, Shadow, Vector};
+use iced::{Alignment, Background, Border, Color, Element, Length, Shadow};
 
 use crate::icons::{self, svg_icon};
 use crate::theme::*;
 
-// --- 1. Windows 11 Fluent Window Header Bar (Tabs + Minimize/Maximize/Close) ---
+// --- 1. Windows 11 Fluent Window Header Bar (Tabs) ---
 pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
     _title: impl Into<String>,
     tab_name: impl Into<String>,
     icon_svg: &'static str,
     accent: Color,
-    on_minimize: Message,
-    on_maximize: Message,
-    on_close: Message,
+    _on_minimize: Message,
+    _on_maximize: Message,
+    _on_close: Message,
 ) -> Element<'a, Message> {
     let tab_str = tab_name.into();
 
@@ -27,22 +27,6 @@ pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
                 .style(|_| text::Style {
                     color: Some(FLUENT_TEXT_DARK),
                 }),
-            button(svg_icon(icons::CLOSE, 10.0, FLUENT_TEXT_MUTED))
-                .padding([2, 4])
-                .style(|_theme, status| {
-                    let bg = match status {
-                        button::Status::Hovered | button::Status::Pressed => {
-                            Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08)))
-                        }
-                        _ => None,
-                    };
-                    button::Style {
-                        background: bg,
-                        border: Border::default().rounded(Radius::from(4.0)),
-                        ..button::Style::default()
-                    }
-                })
-                .on_press(on_close.clone()),
         ]
         .spacing(7)
         .align_y(Alignment::Center),
@@ -51,14 +35,10 @@ pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
     .style(|_| container::Style {
         background: Some(Background::Color(Color::WHITE)),
         border: Border::default()
-            .rounded(Radius::default().top(8.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(Color::from_rgba(0.0, 0.0, 0.0, 0.10)),
-        shadow: Shadow {
-            color: Color::from_rgba(0.0, 0.0, 0.0, 0.04),
-            offset: Vector::new(0.0, -1.0),
-            blur_radius: 4.0,
-        },
+        shadow: Shadow::default(),
         ..container::Style::default()
     });
 
@@ -73,7 +53,7 @@ pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
             };
             button::Style {
                 background: bg,
-                border: Border::default().rounded(Radius::from(6.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
                 ..button::Style::default()
             }
         });
@@ -82,82 +62,8 @@ pub fn fluent_window_header_bar<'a, Message: Clone + 'a>(
         .spacing(4)
         .align_y(Alignment::Center);
 
-    // Fluent Window Controls (Right Cluster: Minimize, Maximize, Close)
-    let btn_min = button(
-        container(svg_icon(icons::MINUS, 12.0, FLUENT_TEXT_DARK))
-            .width(Length::Fixed(40.0))
-            .height(Length::Fixed(32.0))
-            .center_x(Length::Fixed(40.0))
-            .center_y(Length::Fixed(32.0)),
-    )
-    .padding(0)
-    .style(|_theme, status| {
-        let bg = match status {
-            button::Status::Hovered | button::Status::Pressed => {
-                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
-            }
-            _ => None,
-        };
-        button::Style {
-            background: bg,
-            border: Border::default().rounded(Radius::from(4.0)),
-            ..button::Style::default()
-        }
-    })
-    .on_press(on_minimize);
-
-    let btn_max = button(
-        container(svg_icon(icons::SQUARE, 11.0, FLUENT_TEXT_DARK))
-            .width(Length::Fixed(40.0))
-            .height(Length::Fixed(32.0))
-            .center_x(Length::Fixed(40.0))
-            .center_y(Length::Fixed(32.0)),
-    )
-    .padding(0)
-    .style(|_theme, status| {
-        let bg = match status {
-            button::Status::Hovered | button::Status::Pressed => {
-                Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06)))
-            }
-            _ => None,
-        };
-        button::Style {
-            background: bg,
-            border: Border::default().rounded(Radius::from(4.0)),
-            ..button::Style::default()
-        }
-    })
-    .on_press(on_maximize);
-
-    let btn_close = button(
-        container(svg_icon(icons::CLOSE, 12.0, FLUENT_TEXT_DARK))
-            .width(Length::Fixed(42.0))
-            .height(Length::Fixed(32.0))
-            .center_x(Length::Fixed(42.0))
-            .center_y(Length::Fixed(32.0)),
-    )
-    .padding(0)
-    .style(|_theme, status| {
-        let (bg, fg) = match status {
-            button::Status::Hovered | button::Status::Pressed => (
-                Some(Background::Color(Color::from_rgb8(232, 17, 35))),
-                Color::WHITE,
-            ),
-            _ => (None, FLUENT_TEXT_DARK),
-        };
-        button::Style {
-            background: bg,
-            text_color: fg,
-            border: Border::default().rounded(Radius::from(4.0)),
-            ..button::Style::default()
-        }
-    })
-    .on_press(on_close);
-
-    let right_controls = row![btn_min, btn_max, btn_close].align_y(Alignment::Center);
-
     container(
-        row![left_tabs, container("").width(Length::Fill), right_controls]
+        row![left_tabs, container("").width(Length::Fill)]
             .align_y(Alignment::Center)
             .padding([4, 8]),
     )
@@ -192,7 +98,7 @@ pub fn fluent_sidebar_nav_item<'a, Message: Clone + 'a>(
             .height(Length::Fixed(16.0))
             .style(move |_| container::Style {
                 background: Some(Background::Color(col)),
-                border: Border::default().rounded(Radius::from(999.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
                 ..container::Style::default()
             })
             .into()
@@ -244,7 +150,7 @@ pub fn fluent_sidebar_nav_item<'a, Message: Clone + 'a>(
             };
             button::Style {
                 background: bg,
-                border: Border::default().rounded(Radius::from(6.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
                 ..button::Style::default()
             }
         })
@@ -276,7 +182,7 @@ pub fn fluent_toggle_switch<'a, Message: Clone + 'a>(
             } else {
                 Color::from_rgb(0.35, 0.35, 0.35)
             })),
-            border: Border::default().rounded(Radius::from(99.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
             ..container::Style::default()
         });
 
@@ -293,7 +199,7 @@ pub fn fluent_toggle_switch<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center)
         .style(move |_| container::Style {
             background: Some(Background::Color(bg)),
-            border: Border::default().rounded(Radius::from(99.0)).width(1.0).color(border_col),
+            border: Border::default().rounded(Radius::from(0.0)).width(1.0).color(border_col),
             ..container::Style::default()
         });
 
@@ -350,7 +256,7 @@ pub fn fluent_metric_card<'a, Message: 'a>(
         .style(move |_| progress_bar::Style {
             background: Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08)),
             bar: Background::Color(accent_color),
-            border: Border::default().rounded(Radius::from(3.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
         });
 
     let mut footer = row![text(sub_str).size(11).font(FONT_BODY_MEDIUM).style(|_| text::Style {
@@ -433,7 +339,7 @@ pub fn status_pill<'a, Message: 'a>(
         .height(Length::Fixed(6.0))
         .style(move |_| container::Style {
             background: Some(Background::Color(accent_color)),
-            border: Border::default().rounded(Radius::from(99.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
             ..container::Style::default()
         });
 
@@ -459,7 +365,7 @@ pub fn status_pill<'a, Message: 'a>(
             0.12,
         ))),
         border: Border::default()
-            .rounded(Radius::from(99.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(Color::from_rgba(accent_color.r, accent_color.g, accent_color.b, 0.25)),
         ..container::Style::default()
@@ -500,7 +406,7 @@ pub fn header_link_pill<'a, Message: Clone + 'a>(
     .padding([5, 10])
     .style(move |_theme, _status| button::Style {
         background: bg,
-        border: Border::default().rounded(Radius::from(6.0)),
+        border: Border::default().rounded(Radius::from(0.0)),
         ..button::Style::default()
     })
     .on_press(on_open_url(_url))
@@ -512,9 +418,6 @@ pub fn tools_header<'a, Message: Clone + 'a>(
     on_hover: impl Fn(Option<&'static str>) -> Message + 'a,
     on_open_url: impl Fn(&'static str) -> Message + 'a,
     on_drag: Message,
-    on_minimize: Message,
-    on_maximize: Message,
-    on_close: Message,
 ) -> Element<'a, Message> {
     let brand = row![
         icons::logo_image(24.0),
@@ -553,54 +456,12 @@ pub fn tools_header<'a, Message: Clone + 'a>(
     .spacing(6)
     .align_y(Alignment::Center);
 
-    let controls = row![
-        button(container(svg_icon(icons::MINUS, 12.0, FLUENT_TEXT_DARK)).width(32).height(26).center_x(32).center_y(26))
-            .padding(0)
-            .style(|_, s| button::Style {
-                background: match s {
-                    button::Status::Hovered | button::Status::Pressed => Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06))),
-                    _ => None,
-                },
-                border: Border::default().rounded(Radius::from(4.0)),
-                ..button::Style::default()
-            })
-            .on_press(on_minimize),
-        button(container(svg_icon(icons::SQUARE, 11.0, FLUENT_TEXT_DARK)).width(32).height(26).center_x(32).center_y(26))
-            .padding(0)
-            .style(|_, s| button::Style {
-                background: match s {
-                    button::Status::Hovered | button::Status::Pressed => Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06))),
-                    _ => None,
-                },
-                border: Border::default().rounded(Radius::from(4.0)),
-                ..button::Style::default()
-            })
-            .on_press(on_maximize),
-        button(container(svg_icon(icons::CLOSE, 12.0, FLUENT_TEXT_DARK)).width(36).height(26).center_x(36).center_y(26))
-            .padding(0)
-            .style(|_, s| button::Style {
-                background: match s {
-                    button::Status::Hovered | button::Status::Pressed => Some(Background::Color(Color::from_rgb8(232, 17, 35))),
-                    _ => None,
-                },
-                text_color: match s {
-                    button::Status::Hovered | button::Status::Pressed => Color::WHITE,
-                    _ => FLUENT_TEXT_DARK,
-                },
-                border: Border::default().rounded(Radius::from(4.0)),
-                ..button::Style::default()
-            })
-            .on_press(on_close),
-    ]
-    .align_y(Alignment::Center);
-
     let content = row![
         brand,
         container("").width(Length::Fixed(16.0)),
         links,
         iced::widget::mouse_area(container("").width(Length::Fill).height(32))
             .on_press(on_drag),
-        controls,
     ]
     .spacing(8)
     .align_y(Alignment::Center)
@@ -620,8 +481,6 @@ pub fn installer_header<'a, Message: Clone + 'a>(
     hovered_btn: Option<&'static str>,
     on_hover: impl Fn(Option<&'static str>) -> Message + 'a,
     on_open_url: impl Fn(&'static str) -> Message + 'a,
-    on_minimize: Message,
-    on_close: Message,
 ) -> Element<'a, Message> {
     let brand = row![
         icons::logo_image(24.0),
@@ -650,41 +509,10 @@ pub fn installer_header<'a, Message: Clone + 'a>(
     .spacing(6)
     .align_y(Alignment::Center);
 
-    let controls = row![
-        button(container(svg_icon(icons::MINUS, 12.0, FLUENT_TEXT_DARK)).width(32).height(26).center_x(32).center_y(26))
-            .padding(0)
-            .style(|_, s| button::Style {
-                background: match s {
-                    button::Status::Hovered | button::Status::Pressed => Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.06))),
-                    _ => None,
-                },
-                border: Border::default().rounded(Radius::from(4.0)),
-                ..button::Style::default()
-            })
-            .on_press(on_minimize),
-        button(container(svg_icon(icons::CLOSE, 12.0, FLUENT_TEXT_DARK)).width(36).height(26).center_x(36).center_y(26))
-            .padding(0)
-            .style(|_, s| button::Style {
-                background: match s {
-                    button::Status::Hovered | button::Status::Pressed => Some(Background::Color(Color::from_rgb8(232, 17, 35))),
-                    _ => None,
-                },
-                text_color: match s {
-                    button::Status::Hovered | button::Status::Pressed => Color::WHITE,
-                    _ => FLUENT_TEXT_DARK,
-                },
-                border: Border::default().rounded(Radius::from(4.0)),
-                ..button::Style::default()
-            })
-            .on_press(on_close),
-    ]
-    .align_y(Alignment::Center);
-
     let content = row![
         brand,
         container("").width(Length::Fill),
         links,
-        controls,
     ]
     .spacing(8)
     .align_y(Alignment::Center)
@@ -740,7 +568,7 @@ pub fn terminal_box<'a, Message: Clone + 'a>(
             .height(Length::Fill)
             .style(|_| container::Style {
                 background: Some(Background::Color(Color::from_rgb8(20, 24, 33))),
-                border: Border::default().rounded(Radius::from(6.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
                 ..container::Style::default()
             }),
     ]

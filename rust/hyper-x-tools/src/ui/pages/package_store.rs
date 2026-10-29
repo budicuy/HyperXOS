@@ -51,9 +51,9 @@ pub fn view<'a, Message: Clone + 'a>(
     let cat_btn = |cat: &'static str| {
         let is_act = active_cat == cat;
         let fg = if is_act {
-            iced::Color::from_rgb(0.06, 0.07, 0.10)
+            Color::WHITE
         } else {
-            iced::Color::WHITE
+            TEXT_MAIN
         };
         button(
             text(cat)
@@ -63,7 +63,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     color: Some(fg),
                 }),
         )
-        .padding([5, 14])
+        .padding([6, 14])
         .style(active_toggle_button_style(is_act, ACCENT_CYAN))
         .on_press(on_select_cat(cat))
     };
@@ -99,25 +99,25 @@ pub fn view<'a, Message: Clone + 'a>(
         let action_btn = if !p.installed {
             button(
                 row![
-                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_CYAN),
+                    svg_icon(icons::DOWNLOAD, 12.0, Color::WHITE),
                     text("Pasang").size(11).font(FONT_BODY_SEMIBOLD)
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center),
             )
-            .padding([5, 12])
+            .padding([6, 14])
             .style(primary_button_style(ACCENT_CYAN))
             .on_press(on_install(pkg_name))
         } else {
             button(
                 row![
-                    svg_icon(icons::TRASH, 12.0, ACCENT_RED),
+                    svg_icon(icons::TRASH, 12.0, Color::WHITE),
                     text("Copot").size(11).font(FONT_BODY_SEMIBOLD)
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center),
             )
-            .padding([5, 12])
+            .padding([6, 14])
             .style(primary_button_style(ACCENT_RED))
             .on_press(on_remove(pkg_name))
         };
@@ -195,7 +195,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .style(|_| container::Style {
                     background: Some(iced::Background::Color(Color::from_rgba(0.54, 0.71, 0.98, 0.12))),
                     border: iced::Border::default()
-                        .rounded(iced::border::Radius::from(6.0))
+                        .rounded(iced::border::Radius::from(0.0))
                         .width(1.0)
                         .color(Color::from_rgba(0.54, 0.71, 0.98, 0.30)),
                     ..container::Style::default()

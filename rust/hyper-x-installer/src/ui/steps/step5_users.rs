@@ -119,7 +119,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let back_btn = button(text("Back").size(12).font(FONT_BODY_MEDIUM))
         .on_press(on_back)
         .style(secondary_button_style())
-        .padding([8, 16]);
+        .padding([8, 20]);
 
     let mut next_btn = button(
         row![
@@ -132,7 +132,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .style(primary_button_style(ACCENT_CYAN))
-    .padding([9, 20]);
+    .padding([8, 20]);
 
     if can_proceed {
         next_btn = next_btn.on_press(on_next);

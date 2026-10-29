@@ -86,41 +86,33 @@ pub const ACCENT_ORANGE: Color = Color::from_rgb(0.98, 0.45, 0.09); // Orange
 
 // Compatibility Tokens (Clean Light equivalents)
 pub const TEXT_MAIN: Color = Color::from_rgb(0.12, 0.12, 0.12);
-pub const TEXT_SUB: Color = Color::from_rgb(0.38, 0.38, 0.38);
-pub const TEXT_MUTED: Color = Color::from_rgb(0.55, 0.58, 0.64);
+pub const TEXT_SUB: Color = Color::from_rgb(0.32, 0.32, 0.32);
+pub const TEXT_MUTED: Color = Color::from_rgb(0.30, 0.33, 0.38);
 pub const CARD_BG_BLACK: Color = Color::WHITE;
 pub const ACTIVE_DARK_FG: Color = Color::from_rgb(0.12, 0.12, 0.12);
 
-// --- 1. Windows 11 Fluent Window Style (Mica Translucency) ---
+// --- 1. Windows 11 Fluent Window Style (Clean Rectilinear) ---
 pub fn fluent_window_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(FLUENT_MICA_BG)),
         border: Border::default()
-            .rounded(Radius::from(12.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER_DARK),
-        shadow: Shadow {
-            color: Color::from_rgba(0.0, 0.0, 0.0, 0.18),
-            offset: Vector::new(0.0, 12.0),
-            blur_radius: 36.0,
-        },
+        shadow: Shadow::default(),
         ..container::Style::default()
     }
 }
 
-// --- 2. Windows 11 Fluent Card Style (Pure White Card) ---
+// --- 2. Windows 11 Fluent Card Style (Clean Rectilinear White Card) ---
 pub fn fluent_card_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(FLUENT_CARD)),
         border: Border::default()
-            .rounded(Radius::from(10.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER),
-        shadow: Shadow {
-            color: Color::from_rgba(0.0, 0.0, 0.0, 0.04),
-            offset: Vector::new(0.0, 2.0),
-            blur_radius: 8.0,
-        },
+        shadow: Shadow::default(),
         ..container::Style::default()
     }
 }
@@ -129,14 +121,10 @@ pub fn fluent_card_accent_style(accent: Color) -> impl Fn(&iced::Theme) -> conta
     move |_theme| container::Style {
         background: Some(Background::Color(FLUENT_CARD)),
         border: Border::default()
-            .rounded(Radius::from(10.0))
+            .rounded(Radius::from(0.0))
             .width(1.5)
             .color(accent),
-        shadow: Shadow {
-            color: Color::from_rgba(0.0, 0.0, 0.0, 0.06),
-            offset: Vector::new(0.0, 2.0),
-            blur_radius: 10.0,
-        },
+        shadow: Shadow::default(),
         ..container::Style::default()
     }
 }
@@ -146,7 +134,7 @@ pub fn fluent_acrylic_modal_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(FLUENT_ACRYLIC_BG)),
         border: Border::default()
-            .rounded(Radius::from(14.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER_DARK),
         shadow: Shadow {
@@ -163,7 +151,7 @@ pub fn fluent_dock_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(FLUENT_DOCK_BG)),
         border: Border::default()
-            .rounded(Radius::from(14.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER_LIGHT),
         shadow: Shadow {
@@ -180,7 +168,7 @@ pub fn fluent_status_pill_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(FLUENT_PILL_BG)),
         border: Border::default()
-            .rounded(Radius::from(9999.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER_LIGHT),
         shadow: Shadow {
@@ -197,7 +185,7 @@ pub fn fluent_desktop_icon_tile_style(_theme: &iced::Theme) -> container::Style 
     container::Style {
         background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.88))),
         border: Border::default()
-            .rounded(Radius::from(12.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(Color::from_rgba(1.0, 1.0, 1.0, 0.65)),
         shadow: Shadow {
@@ -219,7 +207,7 @@ pub fn fluent_input_style(_theme: &iced::Theme, status: text_input::Status) -> t
     text_input::Style {
         background: Background::Color(Color::WHITE),
         border: Border::default()
-            .rounded(Radius::from(8.0))
+            .rounded(Radius::from(0.0))
             .width(border_w)
             .color(border_col),
         icon: FLUENT_TEXT_MUTED,
@@ -238,7 +226,7 @@ pub fn fluent_ribbon_button_style(_theme: &iced::Theme, status: button::Status) 
     };
     button::Style {
         background: bg,
-        border: Border::default().rounded(Radius::from(6.0)),
+        border: Border::default().rounded(Radius::from(0.0)),
         ..button::Style::default()
     }
 }
@@ -276,7 +264,7 @@ pub fn fluent_button_style(
         button::Style {
             background: bg,
             border: Border::default()
-                .rounded(Radius::from(6.0))
+                .rounded(Radius::from(0.0))
                 .width(1.0)
                 .color(border_color),
             ..button::Style::default()
@@ -289,7 +277,7 @@ pub fn fluent_address_bar_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.85))),
         border: Border::default()
-            .rounded(Radius::from(8.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(Color::from_rgba(0.0, 0.0, 0.0, 0.10)),
         shadow: Shadow {
@@ -330,7 +318,7 @@ pub fn fluent_file_item_style(
         button::Style {
             background: bg,
             border: Border::default()
-                .rounded(Radius::from(8.0))
+                .rounded(Radius::from(0.0))
                 .width(border_w)
                 .color(border_col),
             ..button::Style::default()
@@ -354,31 +342,46 @@ pub fn fluent_quick_toggle_style(
     is_active: bool,
 ) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
     move |_theme, status| {
-        let bg = if is_active {
+        let (bg, text_color, border_col) = if is_active {
             match status {
-                button::Status::Hovered => Background::Color(FLUENT_PRIMARY_HOVER),
-                button::Status::Pressed => Background::Color(FLUENT_PRIMARY_ACTIVE),
-                _ => Background::Color(FLUENT_PRIMARY),
+                button::Status::Hovered => (
+                    Background::Color(FLUENT_PRIMARY_HOVER),
+                    Color::WHITE,
+                    FLUENT_PRIMARY_HOVER,
+                ),
+                button::Status::Pressed => (
+                    Background::Color(FLUENT_PRIMARY_ACTIVE),
+                    Color::WHITE,
+                    FLUENT_PRIMARY_ACTIVE,
+                ),
+                _ => (Background::Color(FLUENT_PRIMARY), Color::WHITE, FLUENT_PRIMARY),
             }
         } else {
             match status {
-                button::Status::Hovered => {
-                    Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08))
-                }
-                button::Status::Pressed => {
-                    Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.12))
-                }
-                _ => Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.04)),
+                button::Status::Hovered => (
+                    Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08)),
+                    FLUENT_TEXT_DARK,
+                    Color::from_rgba(0.0, 0.0, 0.0, 0.18),
+                ),
+                button::Status::Pressed => (
+                    Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.12)),
+                    FLUENT_TEXT_DARK,
+                    Color::from_rgba(0.0, 0.0, 0.0, 0.24),
+                ),
+                _ => (
+                    Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.04)),
+                    FLUENT_TEXT_DARK,
+                    Color::from_rgba(0.0, 0.0, 0.0, 0.14),
+                ),
             }
-        };
-        let border_col = if is_active {
-            FLUENT_PRIMARY
-        } else {
-            Color::from_rgba(0.0, 0.0, 0.0, 0.08)
         };
         button::Style {
             background: Some(bg),
-            border: Border::default().rounded(Radius::from(10.0)).width(1.0).color(border_col),
+            text_color,
+            border: Border::default()
+                .rounded(Radius::from(0.0))
+                .width(1.0)
+                .color(border_col),
             ..button::Style::default()
         }
     }
@@ -397,7 +400,7 @@ pub fn fluent_slider_style(_theme: &iced::Theme, status: slider::Status) -> slid
                 Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.12)),
             ),
             width: 4.0,
-            border: Border::default().rounded(Radius::from(2.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
         },
         handle: slider::Handle {
             shape: slider::HandleShape::Circle { radius: 8.0 },
@@ -419,12 +422,8 @@ pub fn primary_button_style(accent: Color) -> impl Fn(&iced::Theme, button::Stat
         button::Style {
             background: Some(Background::Color(bg)),
             text_color: text_col,
-            border: Border::default().rounded(Radius::from(8.0)),
-            shadow: Shadow {
-                color: Color::from_rgba(0.0, 0.47, 0.83, 0.20),
-                offset: Vector::new(0.0, 2.0),
-                blur_radius: 6.0,
-            },
+            border: Border::default().rounded(Radius::from(0.0)),
+            shadow: Shadow::default(),
             ..button::Style::default()
         }
     }
@@ -439,8 +438,9 @@ pub fn subtle_button_style(_theme: &iced::Theme, status: button::Status) -> butt
     };
     button::Style {
         background: bg,
+        text_color: FLUENT_TEXT_DARK,
         border: Border::default()
-            .rounded(Radius::from(8.0))
+            .rounded(Radius::from(0.0))
             .width(1.0)
             .color(FLUENT_BORDER),
         ..button::Style::default()
@@ -465,7 +465,7 @@ pub fn glass_scrollable<'a, Message: 'a>(
                 border: Border::default(),
                 scroller: Scroller {
                     background: Background::Color(col),
-                    border: Border::default().rounded(Radius::from(3.0)),
+                    border: Border::default().rounded(Radius::from(0.0)),
                 },
             },
             horizontal_rail: Rail {
@@ -473,7 +473,7 @@ pub fn glass_scrollable<'a, Message: 'a>(
                 border: Border::default(),
                 scroller: Scroller {
                     background: Background::Color(col),
-                    border: Border::default().rounded(Radius::from(3.0)),
+                    border: Border::default().rounded(Radius::from(0.0)),
                 },
             },
             gap: None,
@@ -507,7 +507,7 @@ pub fn fluent_dock_item_button_style(
         };
         button::Style {
             background: bg,
-            border: Border::default().rounded(Radius::from(8.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
             ..button::Style::default()
         }
     }
@@ -551,10 +551,10 @@ pub fn glass_slider_style(accent: Color) -> impl Fn(&iced::Theme, slider::Status
                     Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.12)),
                 ),
                 width: 4.0,
-                border: Border::default().rounded(Radius::from(2.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
             },
             handle: slider::Handle {
-                shape: slider::HandleShape::Circle { radius: 8.0 },
+                shape: slider::HandleShape::Rectangle { width: 8, border_radius: Radius::from(0.0) },
                 background: Background::Color(Color::WHITE),
                 border_width: 2.0,
                 border_color: handle_col,
@@ -591,7 +591,7 @@ pub fn context_menu_item_style(
         button::Style {
             background: bg,
             text_color: text_col,
-            border: Border::default().rounded(Radius::from(6.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
             ..button::Style::default()
         }
     }
@@ -612,14 +612,14 @@ pub fn glass_progress_bar_style(accent: Color) -> impl Fn(&iced::Theme) -> progr
     move |_theme| progress_bar::Style {
         background: Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08)),
         bar: Background::Color(accent),
-        border: Border::default().rounded(Radius::from(4.0)),
+        border: Border::default().rounded(Radius::from(0.0)),
     }
 }
 
 pub fn terminal_container_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(Color::from_rgb8(24, 28, 36))),
-        border: Border::default().rounded(Radius::from(8.0)),
+        border: Border::default().rounded(Radius::from(0.0)),
         ..container::Style::default()
     }
 }
@@ -627,7 +627,7 @@ pub fn terminal_container_style(_theme: &iced::Theme) -> container::Style {
 pub fn stepper_bar_style(_theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(Background::Color(Color::WHITE)),
-        border: Border::default().rounded(Radius::from(10.0)).width(1.0).color(FLUENT_BORDER),
+        border: Border::default().rounded(Radius::from(0.0)).width(1.0).color(FLUENT_BORDER),
         ..container::Style::default()
     }
 }
@@ -645,7 +645,7 @@ pub fn glass_scrollable_style(_theme: &iced::Theme, status: scrollable::Status) 
             border: Border::default(),
             scroller: Scroller {
                 background: Background::Color(scroller_color),
-                border: Border::default().rounded(Radius::from(3.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
             },
         },
         horizontal_rail: Rail {
@@ -653,7 +653,7 @@ pub fn glass_scrollable_style(_theme: &iced::Theme, status: scrollable::Status) 
             border: Border::default(),
             scroller: Scroller {
                 background: Background::Color(scroller_color),
-                border: Border::default().rounded(Radius::from(3.0)),
+                border: Border::default().rounded(Radius::from(0.0)),
             },
         },
         gap: None,
@@ -683,7 +683,7 @@ pub fn danger_button_style() -> impl Fn(&iced::Theme, button::Status) -> button:
         button::Style {
             background: Some(Background::Color(bg)),
             text_color: Color::WHITE,
-            border: Border::default().rounded(Radius::from(8.0)),
+            border: Border::default().rounded(Radius::from(0.0)),
             ..button::Style::default()
         }
     }
@@ -700,14 +700,14 @@ pub fn custom_progress_bar_style(accent: Color) -> impl Fn(&iced::Theme) -> prog
 pub fn selection_card_style(is_selected: bool) -> impl Fn(&iced::Theme) -> container::Style {
     move |_theme| {
         let (border_col, bg_col) = if is_selected {
-            (FLUENT_PRIMARY, Color::from_rgba(0.0, 0.47, 0.83, 0.08))
+            (FLUENT_PRIMARY, Color::from_rgba(0.0, 0.47, 0.83, 0.10))
         } else {
             (FLUENT_BORDER, Color::WHITE)
         };
         container::Style {
             background: Some(Background::Color(bg_col)),
             border: Border::default()
-                .rounded(Radius::from(8.0))
+                .rounded(Radius::from(0.0))
                 .width(if is_selected { 1.5 } else { 1.0 })
                 .color(border_col),
             ..container::Style::default()

@@ -33,7 +33,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(13)
                     .font(FONT_BODY_SEMIBOLD)
                     .style(move |_| text::Style {
-                        color: Some(if is_sel { Color::WHITE } else { TEXT_MAIN }),
+                        color: Some(if is_sel { ACCENT_AMBER } else { TEXT_MAIN }),
                     }),
                 row![].width(Length::Fill),
                 if is_sel {
@@ -52,7 +52,7 @@ pub fn view<'a, Message: Clone + 'a>(
             button::Style {
                 background: style.background,
                 border: style.border,
-                text_color: Color::WHITE,
+                text_color: FLUENT_TEXT_DARK,
                 ..button::Style::default()
             }
         })
@@ -79,7 +79,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let back_btn = button(text("Back").size(12).font(FONT_BODY_MEDIUM))
         .on_press(on_back)
         .style(secondary_button_style())
-        .padding([8, 16]);
+        .padding([8, 20]);
 
     let next_btn = button(
         row![
@@ -93,7 +93,7 @@ pub fn view<'a, Message: Clone + 'a>(
     )
     .on_press(on_next)
     .style(primary_button_style(ACCENT_CYAN))
-    .padding([9, 20]);
+    .padding([8, 20]);
 
     column![
         column![

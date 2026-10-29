@@ -1,5 +1,5 @@
 use iced::widget::{button, column, container, row, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::ui::components::{glass_scrollable, terminal_box};
 use crate::ui::icons::{self, svg_icon};
@@ -49,13 +49,13 @@ pub fn view<'a, Message: Clone + 'a>(
                 container("").width(Length::Fill),
                 button(
                     row![
-                        svg_icon(icon_svg, 12.0, accent),
+                        svg_icon(icon_svg, 12.0, Color::WHITE),
                         text(btn_text).size(11)
                     ]
                     .spacing(6)
                     .align_y(Alignment::Center)
                 )
-                .padding([6, 12])
+                .padding([6, 14])
                 .style(primary_button_style(accent))
                 .on_press(msg),
             ]

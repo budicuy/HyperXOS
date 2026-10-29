@@ -53,7 +53,7 @@ pub fn view<'a, Message: Clone + 'a>(
                                 .size(14)
                                 .font(FONT_BODY_SEMIBOLD)
                                 .style(move |_| text::Style {
-                                    color: Some(if is_sel { Color::WHITE } else { TEXT_MAIN }),
+                                    color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
                                 }),
                             container(
                                 text(&disk.transport)
@@ -100,7 +100,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 button::Style {
                     background: style.background,
                     border: style.border,
-                    text_color: Color::WHITE,
+                    text_color: FLUENT_TEXT_DARK,
                     ..button::Style::default()
                 }
             })
@@ -139,11 +139,11 @@ pub fn view<'a, Message: Clone + 'a>(
     let back_btn = button(text("Back").size(12).font(FONT_BODY_MEDIUM))
         .on_press(on_back)
         .style(secondary_button_style())
-        .padding([8, 16]);
+        .padding([8, 20]);
 
     let refresh_btn = button(
         row![
-            svg_icon(icons::REFRESH, 12.0, Color::WHITE),
+            svg_icon(icons::REFRESH, 12.0, TEXT_MAIN),
             text("Scan Drives").size(12).font(FONT_BODY_MEDIUM),
         ]
         .spacing(6)
@@ -151,7 +151,7 @@ pub fn view<'a, Message: Clone + 'a>(
     )
     .on_press(on_refresh_disks)
     .style(secondary_button_style())
-    .padding([8, 14]);
+    .padding([8, 16]);
 
     let mut next_btn = button(
         row![
@@ -164,7 +164,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .style(primary_button_style(ACCENT_CYAN))
-    .padding([9, 20]);
+    .padding([8, 20]);
 
     if selected_disk_path.is_some() {
         next_btn = next_btn.on_press(on_next);

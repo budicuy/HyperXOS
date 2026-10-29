@@ -66,24 +66,24 @@ pub fn stepper_sidebar<'a, Message: 'a>(current_step: StepId) -> Element<'a, Mes
 
         let (bg, border, fg_color, icon_color) = if is_current {
             (
-                Color::WHITE,
-                Color::WHITE,
-                Color::from_rgb(0.06, 0.07, 0.10),
-                Color::from_rgb(0.06, 0.07, 0.10),
+                Color::from_rgba(0.0, 0.47, 0.83, 0.10),
+                FLUENT_PRIMARY,
+                FLUENT_PRIMARY,
+                FLUENT_PRIMARY,
             )
         } else if is_completed {
             (
-                Color::from_rgba(1.0, 1.0, 1.0, 0.18),
-                Color::from_rgba(1.0, 1.0, 1.0, 0.35),
-                Color::WHITE,
+                Color::from_rgba(16.0 / 255.0, 185.0 / 255.0, 129.0 / 255.0, 0.08),
+                Color::from_rgba(16.0 / 255.0, 185.0 / 255.0, 129.0 / 255.0, 0.25),
+                TEXT_MAIN,
                 ACCENT_GREEN,
             )
         } else {
             (
                 Color::TRANSPARENT,
                 Color::TRANSPARENT,
-                Color::from_rgba(1.0, 1.0, 1.0, 0.65),
-                Color::from_rgba(1.0, 1.0, 1.0, 0.45),
+                TEXT_MUTED,
+                TEXT_MUTED,
             )
         };
 
@@ -116,7 +116,7 @@ pub fn stepper_sidebar<'a, Message: 'a>(current_step: StepId) -> Element<'a, Mes
         .style(move |_| container::Style {
             background: Some(Background::Color(bg)),
             border: Border::default()
-                .rounded(Radius::from(9.0))
+                .rounded(Radius::from(0.0))
                 .width(1.2)
                 .color(border),
             ..container::Style::default()

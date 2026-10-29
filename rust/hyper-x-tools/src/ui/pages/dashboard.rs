@@ -22,13 +22,13 @@ pub fn view<'a, Message: Clone + 'a>(
                 .font(FONT_DISPLAY_BOLD)
                 .width(115)
                 .style(|_| text::Style {
-                    color: Some(Color::from_rgb(0.68, 0.72, 0.82)),
+                    color: Some(TEXT_MUTED),
                 }),
             text(":")
                 .size(10)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(Color::from_rgb(0.45, 0.50, 0.60)),
+                    color: Some(TEXT_MUTED),
                 }),
             text(val)
                 .size(11)
@@ -45,7 +45,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let col1 = column![
         spec_row("SISTEM OPERASI", format!("{} (Arch)", metrics.os_name), ACCENT_CYAN),
         spec_row("PROSESOR (CPU)", format!("{} ({} Cores)", metrics.cpu_model, metrics.cpu_cores), ACCENT_AMBER),
-        spec_row("PERANGKAT HOST", format!("{} • {}", metrics.hardware_board, metrics.host_name), Color::WHITE),
+        spec_row("PERANGKAT HOST", format!("{} • {}", metrics.hardware_board, metrics.host_name), TEXT_MAIN),
     ]
     .spacing(6)
     .width(Length::FillPortion(1));
@@ -53,7 +53,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let col2 = column![
         spec_row("KERNEL AKTIF", metrics.kernel_version.clone(), ACCENT_GREEN),
         spec_row("AKSELERASI GPU", metrics.gpu_model.clone(), ACCENT_PURPLE),
-        spec_row("DESKTOP & SESI", format!("{} ({}) • Uptime {}", metrics.desktop_env, metrics.display_session, metrics.uptime_string), Color::WHITE),
+        spec_row("DESKTOP & SESI", format!("{} ({}) • Uptime {}", metrics.desktop_env, metrics.display_session, metrics.uptime_string), TEXT_MAIN),
     ]
     .spacing(6)
     .width(Length::FillPortion(1));
@@ -67,10 +67,10 @@ pub fn view<'a, Message: Clone + 'a>(
             .size(16)
             .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
-                color: Some(Color::WHITE),
+                color: Some(TEXT_MAIN),
             }),
         container("").height(1).width(Length::Fill).style(|_| container::Style {
-            background: Some(iced::Background::Color(Color::from_rgba(1.0, 1.0, 1.0, 0.12))),
+            background: Some(iced::Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.08))),
             ..container::Style::default()
         }),
         banner_specs,
@@ -180,7 +180,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .spacing(8)
             .align_y(Alignment::Center),
         )
-        .padding([8, 14])
+        .padding([8, 16])
         .style(glass_action_button)
         .on_press(msg)
     };
@@ -199,7 +199,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .size(16)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(Color::WHITE),
+                    color: Some(TEXT_MAIN),
                 }),
             text("Status sumber daya komputasi HyperXOS diperbarui secara langsung.")
                 .size(11)

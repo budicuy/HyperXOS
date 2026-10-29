@@ -3,7 +3,7 @@ use iced::{Alignment, Element, Length};
 
 use hyperx_ui_kit::{
     brand_sidebar_header, glass_card_style, icons, sidebar_container_style, sidebar_nav_item,
-    sidebar_section_header, FONT_BODY_MEDIUM, FONT_DISPLAY_BOLD,
+    sidebar_section_header, FONT_BODY_MEDIUM, FONT_DISPLAY_BOLD, TEXT_MAIN, TEXT_MUTED,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub fn sidebar<'a, Message: Clone + 'a>(
         .width(Length::Fill)
         .height(1)
         .style(|_| container::Style {
-            background: Some(iced::Background::Color(iced::Color::from_rgba(1.0, 1.0, 1.0, 0.20))),
+            background: Some(iced::Background::Color(iced::Color::from_rgba(0.0, 0.0, 0.0, 0.08))),
             ..container::Style::default()
         });
 
@@ -82,13 +82,13 @@ pub fn sidebar<'a, Message: Clone + 'a>(
                 .size(11)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(iced::Color::WHITE),
+                    color: Some(TEXT_MAIN),
                 }),
             text("Rust + Iced Glass v2.2")
                 .size(10)
                 .font(FONT_BODY_MEDIUM)
                 .style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.78, 0.82, 0.92)),
+                    color: Some(TEXT_MUTED),
                 }),
         ]
         .spacing(4)

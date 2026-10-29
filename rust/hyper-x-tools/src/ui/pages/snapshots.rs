@@ -1,5 +1,5 @@
 use iced::widget::{button, column, container, row, text, text_input};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::core::snapshot_manager::SnapshotRecord;
 use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
@@ -47,13 +47,13 @@ pub fn view<'a, Message: Clone + 'a>(
 
     let create_btn = button(
         row![
-            svg_icon(icons::SNAPSHOT, 13.0, ACCENT_CYAN),
+            svg_icon(icons::SNAPSHOT, 13.0, Color::WHITE),
             text("Ambil Snapshot").size(11)
         ]
         .spacing(6)
         .align_y(Alignment::Center),
     )
-    .padding([8, 14])
+    .padding([8, 16])
     .style(primary_button_style(ACCENT_CYAN))
     .on_press(on_create);
 
@@ -89,7 +89,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 text("Belum ada snapshot yang tersimpan di /.snapshots.")
                     .size(11)
                     .style(|_| text::Style {
-                        color: Some(TEXT_MUTED),
+                        color: Some(TEXT_SUB),
                     }),
             )
             .padding(20)
@@ -121,24 +121,24 @@ pub fn view<'a, Message: Clone + 'a>(
                 row![
                     button(
                         row![
-                            svg_icon(icons::CHECK, 11.0, ACCENT_GREEN),
+                            svg_icon(icons::CHECK, 11.0, Color::WHITE),
                             text("Pulihkan").size(10)
                         ]
                         .spacing(5)
                         .align_y(Alignment::Center)
                     )
-                    .padding([5, 10])
+                    .padding([6, 12])
                     .style(primary_button_style(ACCENT_GREEN))
                     .on_press(on_restore(snap_name.clone())),
                     button(
                         row![
-                            svg_icon(icons::TRASH, 11.0, ACCENT_RED),
+                            svg_icon(icons::TRASH, 11.0, Color::WHITE),
                             text("Hapus").size(10)
                         ]
                         .spacing(5)
                         .align_y(Alignment::Center)
                     )
-                    .padding([5, 10])
+                    .padding([6, 12])
                     .style(primary_button_style(ACCENT_RED))
                     .on_press(on_delete(snap_name)),
                 ]

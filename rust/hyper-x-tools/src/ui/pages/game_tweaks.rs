@@ -37,9 +37,9 @@ pub fn view<'a, Message: Clone + 'a>(
     // 1. CPU Governor Card
     let gov_btn = |gov: &'static str, label: &'static str, is_active: bool| {
         let fg = if is_active {
-            Color::from_rgb(0.06, 0.07, 0.10)
-        } else {
             Color::WHITE
+        } else {
+            TEXT_MAIN
         };
         button(
             text(label)
@@ -118,7 +118,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     svg_icon(
                         if is_max_map_opt { icons::CHECK } else { icons::ZAP },
                         12.0,
-                        if is_max_map_opt { Color::from_rgb(0.06, 0.07, 0.10) } else { ACCENT_CYAN }
+                        if is_max_map_opt { Color::WHITE } else { ACCENT_CYAN }
                     ),
                     text(if is_max_map_opt {
                         "Sudah Optimal (2.1M)"
@@ -128,13 +128,13 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(if is_max_map_opt { FONT_DISPLAY_BOLD } else { FONT_BODY_SEMIBOLD })
                     .style(move |_| text::Style {
-                        color: Some(if is_max_map_opt { Color::from_rgb(0.06, 0.07, 0.10) } else { Color::WHITE }),
+                        color: Some(if is_max_map_opt { Color::WHITE } else { TEXT_MAIN }),
                     })
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center)
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(active_toggle_button_style(is_max_map_opt, ACCENT_CYAN))
             .on_press(on_toggle_max_map),
         ]
@@ -168,7 +168,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     svg_icon(
                         if is_split_lock_disabled { icons::CHECK } else { icons::SHIELD },
                         12.0,
-                        if is_split_lock_disabled { Color::from_rgb(0.06, 0.07, 0.10) } else { TEXT_SUB }
+                        if is_split_lock_disabled { Color::WHITE } else { TEXT_SUB }
                     ),
                     text(if is_split_lock_disabled {
                         "Mitigasi Aktif (Off)"
@@ -178,13 +178,13 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(if is_split_lock_disabled { FONT_DISPLAY_BOLD } else { FONT_BODY_SEMIBOLD })
                     .style(move |_| text::Style {
-                        color: Some(if is_split_lock_disabled { Color::from_rgb(0.06, 0.07, 0.10) } else { Color::WHITE }),
+                        color: Some(if is_split_lock_disabled { Color::WHITE } else { TEXT_MAIN }),
                     })
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center)
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(active_toggle_button_style(is_split_lock_disabled, ACCENT_CYAN))
             .on_press(on_toggle_split_lock),
         ]
@@ -218,7 +218,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     svg_icon(
                         if is_gamemode_active { icons::CHECK } else { icons::GAMING },
                         12.0,
-                        if is_gamemode_active { Color::from_rgb(0.06, 0.07, 0.10) } else { TEXT_SUB }
+                        if is_gamemode_active { Color::WHITE } else { TEXT_SUB }
                     ),
                     text(if is_gamemode_active {
                         "Aktif (Running)"
@@ -228,13 +228,13 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(if is_gamemode_active { FONT_DISPLAY_BOLD } else { FONT_BODY_SEMIBOLD })
                     .style(move |_| text::Style {
-                        color: Some(if is_gamemode_active { Color::from_rgb(0.06, 0.07, 0.10) } else { Color::WHITE }),
+                        color: Some(if is_gamemode_active { Color::WHITE } else { TEXT_MAIN }),
                     })
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center)
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(active_toggle_button_style(is_gamemode_active, ACCENT_GREEN))
             .on_press(on_toggle_gamemode),
         ]
@@ -270,13 +270,13 @@ pub fn view<'a, Message: Clone + 'a>(
             container("").width(Length::Fill),
             button(
                 row![
-                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_PURPLE),
+                    svg_icon(icons::DOWNLOAD, 12.0, Color::WHITE),
                     text("Pasang Toolchain Gaming").size(11)
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center)
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(primary_button_style(ACCENT_PURPLE))
             .on_press(on_install_runtimes),
         ]

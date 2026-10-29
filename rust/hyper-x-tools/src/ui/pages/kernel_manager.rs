@@ -1,5 +1,5 @@
 use iced::widget::{button, column, container, row, text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Color, Element, Length};
 
 use crate::core::kernel_manager::KernelEntry;
 use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
@@ -35,13 +35,13 @@ pub fn view<'a, Message: Clone + 'a>(
         container("").width(Length::Fill),
         button(
             row![
-                svg_icon(icons::SLIDERS, 13.0, ACCENT_PURPLE),
+                svg_icon(icons::SLIDERS, 13.0, Color::WHITE),
                 text("Rebuild Initramfs").size(11)
             ]
             .spacing(6)
             .align_y(Alignment::Center),
         )
-        .padding([6, 12])
+        .padding([6, 14])
         .style(primary_button_style(ACCENT_PURPLE))
         .on_press(on_rebuild),
     ]
@@ -125,25 +125,25 @@ pub fn view<'a, Message: Clone + 'a>(
         let action_btn = if !k.installed {
             button(
                 row![
-                    svg_icon(icons::DOWNLOAD, 12.0, ACCENT_CYAN),
+                    svg_icon(icons::DOWNLOAD, 12.0, Color::WHITE),
                     text("Pasang (+Headers)").size(11)
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center),
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(primary_button_style(ACCENT_CYAN))
             .on_press(on_install(pkg))
         } else if !k.is_running {
             button(
                 row![
-                    svg_icon(icons::TRASH, 12.0, ACCENT_RED),
+                    svg_icon(icons::TRASH, 12.0, Color::WHITE),
                     text("Hapus").size(11)
                 ]
                 .spacing(6)
                 .align_y(Alignment::Center),
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(primary_button_style(ACCENT_RED))
             .on_press(on_remove(pkg))
         } else {
@@ -155,7 +155,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .spacing(6)
                 .align_y(Alignment::Center),
             )
-            .padding([6, 12])
+            .padding([6, 14])
             .style(nav_button_style(false))
         };
 

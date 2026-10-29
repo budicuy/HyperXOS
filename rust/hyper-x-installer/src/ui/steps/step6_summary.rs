@@ -77,7 +77,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let back_btn = button(text("Back").size(12).font(FONT_BODY_MEDIUM))
         .on_press(on_back)
         .style(secondary_button_style())
-        .padding([8, 16]);
+        .padding([8, 20]);
 
     let install_btn = button(
         row![
