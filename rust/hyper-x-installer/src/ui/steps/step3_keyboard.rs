@@ -28,16 +28,16 @@ pub fn view<'a, Message: Clone + 'a>(
 
         let btn = button(
             row![
-                svg_icon(icons::KEYBOARD, 16.0, if is_sel { ACCENT_AMBER } else { TEXT_MUTED }),
+                svg_icon(icons::KEYBOARD, 16.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
                 text(*name)
                     .size(13)
                     .font(FONT_BODY_SEMIBOLD)
                     .style(move |_| text::Style {
-                        color: Some(if is_sel { ACCENT_AMBER } else { TEXT_MAIN }),
+                        color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
                     }),
                 row![].width(Length::Fill),
                 if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 16.0, ACCENT_AMBER)
+                    svg_icon(icons::CHECK_CIRCLE, 16.0, FLUENT_PRIMARY)
                 } else {
                     svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
                 },
@@ -66,7 +66,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .size(11)
             .font(FONT_DISPLAY_BOLD)
             .style(|_| text::Style {
-                color: Some(ACCENT_CYAN)
+                color: Some(FLUENT_PRIMARY)
             }),
         text_input("Type here to test special keys, symbols, and accents...", test_text)
             .on_input(on_change_test_text)
@@ -92,7 +92,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .on_press(on_next)
-    .style(primary_button_style(ACCENT_CYAN))
+    .style(primary_button_style(FLUENT_PRIMARY))
     .padding([8, 20]);
 
     column![
@@ -116,7 +116,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .size(11)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(ACCENT_AMBER)
+                    color: Some(FLUENT_PRIMARY)
                 }),
             layout_col,
         ]

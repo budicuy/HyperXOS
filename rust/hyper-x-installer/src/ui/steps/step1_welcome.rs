@@ -115,7 +115,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .padding([8, 20])
-    .style(primary_button_style(ACCENT_CYAN));
+    .style(primary_button_style(FLUENT_PRIMARY));
 
     if can_continue {
         next_btn = next_btn.on_press(on_next);
@@ -156,7 +156,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .size(11)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(ACCENT_CYAN)
+                    color: Some(FLUENT_PRIMARY)
                 }),
             uefi_row,
             ram_row,

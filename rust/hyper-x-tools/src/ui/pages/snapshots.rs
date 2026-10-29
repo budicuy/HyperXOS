@@ -34,7 +34,7 @@ pub fn view<'a, Message: Clone + 'a>(
         ]
         .spacing(2),
         container("").width(Length::Fill),
-        status_pill(format!("Filesystem: {}", fs_type_name), ACCENT_TEAL, is_btrfs),
+        status_pill(format!("Filesystem: {}", fs_type_name), FLUENT_PRIMARY, is_btrfs),
     ]
     .align_y(Alignment::Center);
 
@@ -128,7 +128,7 @@ pub fn view<'a, Message: Clone + 'a>(
                         .align_y(Alignment::Center)
                     )
                     .padding([6, 12])
-                    .style(primary_button_style(ACCENT_GREEN))
+                    .style(primary_button_style(FLUENT_PRIMARY))
                     .on_press(on_restore(snap_name.clone())),
                     button(
                         row![

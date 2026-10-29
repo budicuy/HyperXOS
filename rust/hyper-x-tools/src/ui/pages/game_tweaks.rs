@@ -235,7 +235,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .align_y(Alignment::Center)
             )
             .padding([6, 14])
-            .style(active_toggle_button_style(is_gamemode_active, ACCENT_GREEN))
+            .style(active_toggle_button_style(is_gamemode_active, FLUENT_PRIMARY))
             .on_press(on_toggle_gamemode),
         ]
         .spacing(12)
@@ -249,7 +249,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let toolchain_card = container(
         row![
             row![
-                svg_icon(icons::STORE, 18.0, ACCENT_PURPLE),
+                svg_icon(icons::STORE, 18.0, FLUENT_PRIMARY),
                 column![
                     text("Pasang Ekosistem Gaming Lengkap")
                         .size(13)
@@ -277,7 +277,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .align_y(Alignment::Center)
             )
             .padding([6, 14])
-            .style(primary_button_style(ACCENT_PURPLE))
+            .style(primary_button_style(FLUENT_PRIMARY))
             .on_press(on_install_runtimes),
         ]
         .spacing(12)

@@ -89,7 +89,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 "Belum Terpasang"
             },
             if p.installed {
-                ACCENT_GREEN
+                FLUENT_PRIMARY
             } else {
                 TEXT_MUTED
             },
@@ -106,7 +106,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .align_y(Alignment::Center),
             )
             .padding([6, 14])
-            .style(primary_button_style(ACCENT_CYAN))
+            .style(primary_button_style(FLUENT_PRIMARY))
             .on_press(on_install(pkg_name))
         } else {
             button(

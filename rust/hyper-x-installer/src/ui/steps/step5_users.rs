@@ -131,7 +131,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(8)
         .align_y(Alignment::Center),
     )
-    .style(primary_button_style(ACCENT_CYAN))
+    .style(primary_button_style(FLUENT_PRIMARY))
     .padding([8, 20]);
 
     if can_proceed {

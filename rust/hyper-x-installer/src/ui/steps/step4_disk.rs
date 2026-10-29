@@ -18,7 +18,7 @@ pub fn view<'a, Message: Clone + 'a>(
         disk_list = disk_list.push(
             container(
                 column![
-                    svg_icon(icons::ALERT_TRIANGLE, 32.0, ACCENT_AMBER),
+                    svg_icon(icons::ALERT_TRIANGLE, 32.0, ACCENT_RED),
                     text("No storage drives detected")
                         .size(14)
                         .font(FONT_BODY_SEMIBOLD)
@@ -46,7 +46,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
             let card = button(
                 row![
-                    svg_icon(icons::HARD_DRIVE, 24.0, if is_sel { ACCENT_CYAN } else { TEXT_MUTED }),
+                    svg_icon(icons::HARD_DRIVE, 24.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
                     column![
                         row![
                             text(&disk.model)
@@ -60,17 +60,17 @@ pub fn view<'a, Message: Clone + 'a>(
                                     .size(9)
                                     .font(FONT_DISPLAY_BOLD)
                                     .style(move |_| text::Style {
-                                        color: Some(ACCENT_AMBER),
+                                        color: Some(TEXT_SUB),
                                     }),
                             )
                             .padding([2, 6])
-                            .style(glass_card_accent_style(ACCENT_AMBER)),
+                            .style(glass_card_style),
                         ]
                         .spacing(8)
                         .align_y(Alignment::Center),
                         row![
                             text(&disk.path).size(12).font(FONT_BODY).style(|_| text::Style {
-                                color: Some(ACCENT_CYAN),
+                                color: Some(TEXT_SUB),
                             }),
                             text("•").size(12).style(|_| text::Style {
                                 color: Some(TEXT_MUTED),
@@ -85,7 +85,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     .spacing(4)
                     .width(Length::Fill),
                     if is_sel {
-                        svg_icon(icons::CHECK_CIRCLE, 18.0, ACCENT_CYAN)
+                        svg_icon(icons::CHECK_CIRCLE, 18.0, FLUENT_PRIMARY)
                     } else {
                         svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
                     },
@@ -113,12 +113,12 @@ pub fn view<'a, Message: Clone + 'a>(
     let scheme_info = container(
         column![
             row![
-                svg_icon(icons::SHIELD_CHECK, 16.0, ACCENT_GREEN),
+                svg_icon(icons::SHIELD_CHECK, 16.0, FLUENT_PRIMARY),
                 text("AUTOMATIC STORAGE ARCHITECTURE")
                     .size(11)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_GREEN),
+                        color: Some(FLUENT_PRIMARY),
                     }),
             ]
             .spacing(8)
@@ -163,7 +163,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(8)
         .align_y(Alignment::Center),
     )
-    .style(primary_button_style(ACCENT_CYAN))
+    .style(primary_button_style(FLUENT_PRIMARY))
     .padding([8, 20]);
 
     if selected_disk_path.is_some() {
@@ -192,7 +192,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_CYAN)
+                        color: Some(FLUENT_PRIMARY)
                     }),
                 row![].width(Length::Fill),
                 refresh_btn,

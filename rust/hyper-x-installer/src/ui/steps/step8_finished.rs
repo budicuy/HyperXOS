@@ -24,7 +24,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
     let success_card = container(
         column![
-            svg_icon(icons::CHECK_CIRCLE, 56.0, ACCENT_GREEN),
+            svg_icon(icons::CHECK_CIRCLE, 56.0, FLUENT_PRIMARY),
             text("Installation Complete!")
                 .size(24)
                 .font(FONT_DISPLAY_BOLD)
@@ -51,7 +51,7 @@ pub fn view<'a, Message: Clone + 'a>(
     )
     .padding(32)
     .width(Length::Fill)
-    .style(glass_card_accent_style(ACCENT_GREEN));
+    .style(glass_card_accent_style(FLUENT_PRIMARY));
 
     let finish_btn = button(
         row![
@@ -64,7 +64,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .on_press(on_finish)
-    .style(primary_button_style(ACCENT_GREEN))
+    .style(primary_button_style(FLUENT_PRIMARY))
     .padding([10, 28]);
 
     column![

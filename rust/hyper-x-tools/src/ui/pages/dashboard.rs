@@ -43,16 +43,16 @@ pub fn view<'a, Message: Clone + 'a>(
     };
 
     let col1 = column![
-        spec_row("SISTEM OPERASI", format!("{} (Arch)", metrics.os_name), ACCENT_CYAN),
-        spec_row("PROSESOR (CPU)", format!("{} ({} Cores)", metrics.cpu_model, metrics.cpu_cores), ACCENT_AMBER),
+        spec_row("SISTEM OPERASI", format!("{} (Arch)", metrics.os_name), FLUENT_PRIMARY),
+        spec_row("PROSESOR (CPU)", format!("{} ({} Cores)", metrics.cpu_model, metrics.cpu_cores), TEXT_MAIN),
         spec_row("PERANGKAT HOST", format!("{} • {}", metrics.hardware_board, metrics.host_name), TEXT_MAIN),
     ]
     .spacing(6)
     .width(Length::FillPortion(1));
 
     let col2 = column![
-        spec_row("KERNEL AKTIF", metrics.kernel_version.clone(), ACCENT_GREEN),
-        spec_row("AKSELERASI GPU", metrics.gpu_model.clone(), ACCENT_PURPLE),
+        spec_row("KERNEL AKTIF", metrics.kernel_version.clone(), FLUENT_PRIMARY),
+        spec_row("AKSELERASI GPU", metrics.gpu_model.clone(), TEXT_MAIN),
         spec_row("DESKTOP & SESI", format!("{} ({}) • Uptime {}", metrics.desktop_env, metrics.display_session, metrics.uptime_string), TEXT_MAIN),
     ]
     .spacing(6)
@@ -85,7 +85,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .padding(16)
     )
     .width(Length::Fill)
-    .style(glass_card_accent_style(Color::from_rgb(0.92, 0.32, 0.12))); // Colored border
+    .style(glass_card_accent_style(FLUENT_PRIMARY));
 
     // --- 2. Metric Cards Grid (2x2) ---
     // CPU
@@ -107,7 +107,7 @@ pub fn view<'a, Message: Clone + 'a>(
         metrics.cpu_usage_percent / 100.0,
         cpu_sub,
         cpu_temp_opt,
-        ACCENT_CYAN,
+        FLUENT_PRIMARY,
     );
 
     // RAM
@@ -128,7 +128,7 @@ pub fn view<'a, Message: Clone + 'a>(
         metrics.ram_usage_percent / 100.0,
         ram_sub,
         swap_opt,
-        ACCENT_PURPLE,
+        FLUENT_PRIMARY,
     );
 
     // Disk
@@ -144,7 +144,7 @@ pub fn view<'a, Message: Clone + 'a>(
         metrics.disk_usage_percent / 100.0,
         disk_sub,
         Some(fs_str),
-        ACCENT_TEAL,
+        FLUENT_PRIMARY,
     );
 
     // GPU
@@ -164,7 +164,7 @@ pub fn view<'a, Message: Clone + 'a>(
         metrics.gpu_usage_percent / 100.0,
         gpu_sub,
         vram_opt,
-        ACCENT_GREEN,
+        FLUENT_PRIMARY,
     );
 
     let row1 = row![cpu_card, ram_card].spacing(16);

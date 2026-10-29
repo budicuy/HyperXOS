@@ -78,14 +78,14 @@ pub fn view<'a, Message: Clone + 'a>(
                 .size(13)
                 .font(FONT_DISPLAY_BOLD)
                 .style(|_| text::Style {
-                    color: Some(ACCENT_CYAN),
+                    color: Some(FLUENT_PRIMARY),
                 }),
         ]
         .align_y(Alignment::Center),
         progress_bar(0.0..=100.0, state.progress_pct)
             .length(Length::Fill)
             .girth(8.0)
-            .style(custom_progress_bar_style(ACCENT_CYAN)),
+            .style(custom_progress_bar_style(FLUENT_PRIMARY)),
     ]
     .spacing(8);
 
@@ -140,12 +140,12 @@ pub fn view<'a, Message: Clone + 'a>(
         error_view,
         column![
             row![
-                svg_icon(icons::TERMINAL, 14.0, ACCENT_GREEN),
+                svg_icon(icons::TERMINAL, 14.0, FLUENT_PRIMARY),
                 text("REAL-TIME INSTALLATION TERMINAL OUTPUT")
                     .size(11)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_GREEN)
+                        color: Some(FLUENT_PRIMARY)
                     }),
             ]
             .spacing(8)

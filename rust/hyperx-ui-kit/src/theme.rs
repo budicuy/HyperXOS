@@ -75,14 +75,19 @@ pub const FLUENT_BORDER: Color = Color::from_rgba(0.0, 0.0, 0.0, 0.08);
 pub const FLUENT_BORDER_LIGHT: Color = Color::from_rgba(1.0, 1.0, 1.0, 0.80);
 pub const FLUENT_BORDER_DARK: Color = Color::from_rgba(0.0, 0.0, 0.0, 0.10);
 
-// Accent Colors
-pub const ACCENT_CYAN: Color = Color::from_rgb(0.0, 0.47, 0.83); // Fluent Blue
-pub const ACCENT_PURPLE: Color = Color::from_rgb(0.55, 0.36, 0.96); // Purple
-pub const ACCENT_TEAL: Color = Color::from_rgb(0.08, 0.68, 0.70); // Teal
-pub const ACCENT_GREEN: Color = Color::from_rgb(0.06, 0.65, 0.38); // Emerald Green
-pub const ACCENT_RED: Color = Color::from_rgb(0.91, 0.07, 0.14); // Crimson Red
-pub const ACCENT_AMBER: Color = Color::from_rgb(0.96, 0.62, 0.04); // Fluent Amber
-pub const ACCENT_ORANGE: Color = Color::from_rgb(0.98, 0.45, 0.09); // Orange
+// --- Unified 2-3 Color System ---
+// 1. Primary Brand Accent: HyperX Royal Blue (Used for all buttons, active states, progress, highlights)
+// 2. Semantic Alerts: Red (Danger / Warning / Destructive Actions) & Green (Passed / Success)
+// 3. Monochrome Base: White cards, light neutral canvas, dark high-contrast typography
+pub const ACCENT_RED: Color = Color::from_rgb(0.85, 0.15, 0.15); // Crimson Red (Danger/Destructive)
+pub const ACCENT_GREEN: Color = Color::from_rgb(0.08, 0.62, 0.36); // Emerald Green (Success/Passed)
+
+// Consolidated Primary Accents (Replaced rainbow palette with unified brand blue)
+pub const ACCENT_CYAN: Color = FLUENT_PRIMARY;
+pub const ACCENT_PURPLE: Color = FLUENT_PRIMARY;
+pub const ACCENT_TEAL: Color = FLUENT_PRIMARY;
+pub const ACCENT_AMBER: Color = FLUENT_PRIMARY;
+pub const ACCENT_ORANGE: Color = FLUENT_PRIMARY;
 
 // Compatibility Tokens (Clean Light equivalents)
 pub const TEXT_MAIN: Color = Color::from_rgb(0.12, 0.12, 0.12);

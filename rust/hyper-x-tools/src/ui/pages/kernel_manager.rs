@@ -42,7 +42,7 @@ pub fn view<'a, Message: Clone + 'a>(
             .align_y(Alignment::Center),
         )
         .padding([6, 14])
-        .style(primary_button_style(ACCENT_PURPLE))
+        .style(primary_button_style(FLUENT_PRIMARY))
         .on_press(on_rebuild),
     ]
     .align_y(Alignment::Center);
@@ -50,7 +50,7 @@ pub fn view<'a, Message: Clone + 'a>(
     // 2. Active Running Kernel Banner
     let running_banner = container(
         row![
-            svg_icon(icons::KERNEL, 22.0, ACCENT_GREEN),
+            svg_icon(icons::KERNEL, 22.0, FLUENT_PRIMARY),
             column![
                 text(format!("Kernel Aktif: {}", running_name))
                     .size(13)
@@ -65,14 +65,14 @@ pub fn view<'a, Message: Clone + 'a>(
             ]
             .spacing(2),
             container("").width(Length::Fill),
-            status_pill("Aktif Berjalan", ACCENT_GREEN, true),
+            status_pill("Aktif Berjalan", FLUENT_PRIMARY, true),
         ]
         .spacing(12)
         .align_y(Alignment::Center)
         .padding(14),
     )
     .width(Length::Fill)
-    .style(glass_card_accent_style(ACCENT_GREEN));
+    .style(glass_card_accent_style(FLUENT_PRIMARY));
 
     // 3. Catalog List
     let catalog_title = text("Katalog Kernel Performa & Komunitas:")
@@ -89,9 +89,9 @@ pub fn view<'a, Message: Clone + 'a>(
 
         let badges = row![
             if k.is_running {
-                status_pill("Running", ACCENT_GREEN, true)
+                status_pill("Running", FLUENT_PRIMARY, true)
             } else if k.installed {
-                status_pill("Terpasang", ACCENT_CYAN, true)
+                status_pill("Terpasang", FLUENT_PRIMARY, true)
             } else {
                 status_pill("Tersedia", TEXT_MUTED, false)
             }
@@ -117,7 +117,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 text(format!("Versi Terpasang: {}", k.installed_version))
                     .size(10)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_PURPLE),
+                        color: Some(FLUENT_PRIMARY),
                     }),
             );
         }
@@ -132,7 +132,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .align_y(Alignment::Center),
             )
             .padding([6, 14])
-            .style(primary_button_style(ACCENT_CYAN))
+            .style(primary_button_style(FLUENT_PRIMARY))
             .on_press(on_install(pkg))
         } else if !k.is_running {
             button(
@@ -149,7 +149,7 @@ pub fn view<'a, Message: Clone + 'a>(
         } else {
             button(
                 row![
-                    svg_icon(icons::CHECK, 12.0, ACCENT_GREEN),
+                    svg_icon(icons::CHECK, 12.0, FLUENT_PRIMARY),
                     text("Kernel Aktif").size(11)
                 ]
                 .spacing(6)

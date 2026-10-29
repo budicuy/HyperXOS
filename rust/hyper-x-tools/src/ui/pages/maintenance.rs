@@ -73,7 +73,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Menghapus installer paket lama di /var/cache/pacman/pkg (menyisakan 2 versi terakhir).",
             "Bersihkan Cache",
             icons::TRASH,
-            ACCENT_CYAN,
+            FLUENT_PRIMARY,
             on_clean_cache,
         ),
         action_card(
@@ -81,7 +81,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Mengompresi dan memangkas ukuran riwayat log sistem hingga di bawah 100 MB.",
             "Vakum Log",
             icons::MAINTENANCE,
-            ACCENT_TEAL,
+            FLUENT_PRIMARY,
             on_vacuum_journal,
         ),
         action_card(
@@ -89,7 +89,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Mencari dan mencopot dependensi yang sudah tidak lagi digunakan oleh aplikasi manapun.",
             "Copot Orphans",
             icons::SPARKLES,
-            ACCENT_AMBER,
+            FLUENT_PRIMARY,
             on_remove_orphans,
         ),
         action_card(
@@ -97,7 +97,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Menjalankan Reflector untuk menguji unduhan dan memilih mirror pacman tercepat.",
             "Uji & Urutkan Mirror",
             icons::REFRESH,
-            ACCENT_PURPLE,
+            FLUENT_PRIMARY,
             on_rank_mirrors,
         ),
         action_card(
@@ -105,7 +105,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "Menginisialisasi ulang kunci GPG archlinux, cachyos, dan hyperxos jika ada error signature.",
             "Perbaiki Kunci GPG",
             icons::SHIELD,
-            ACCENT_GREEN,
+            FLUENT_PRIMARY,
             on_fix_keyrings,
         ),
     ]

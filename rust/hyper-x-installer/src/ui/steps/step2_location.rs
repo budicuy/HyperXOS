@@ -39,7 +39,7 @@ pub fn view<'a, Message: Clone + 'a>(
 
         let btn = button(
             row![
-                svg_icon(icons::GLOBE, 14.0, if is_sel { ACCENT_CYAN } else { TEXT_MUTED }),
+                svg_icon(icons::GLOBE, 14.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
                 column![
                     text(*tz_code).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
                         color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
@@ -51,7 +51,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 .spacing(2)
                 .width(Length::Fill),
                 if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 14.0, ACCENT_CYAN)
+                    svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY)
                 } else {
                     svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
                 },
@@ -87,7 +87,7 @@ pub fn view<'a, Message: Clone + 'a>(
                 }),
                 row![].width(Length::Fill),
                 if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 14.0, ACCENT_GREEN)
+                    svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY)
                 } else {
                     svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
                 },
@@ -127,7 +127,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .on_press(on_next)
-    .style(primary_button_style(ACCENT_CYAN))
+    .style(primary_button_style(FLUENT_PRIMARY))
     .padding([8, 20]);
 
     column![
@@ -152,7 +152,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_CYAN)
+                        color: Some(FLUENT_PRIMARY)
                     }),
                 scrollable(tz_list)
                     .height(Length::Fixed(380.0))
@@ -165,7 +165,7 @@ pub fn view<'a, Message: Clone + 'a>(
                     .size(11)
                     .font(FONT_DISPLAY_BOLD)
                     .style(|_| text::Style {
-                        color: Some(ACCENT_GREEN)
+                        color: Some(FLUENT_PRIMARY)
                     }),
                 scrollable(locale_list)
                     .height(Length::Fixed(380.0))
