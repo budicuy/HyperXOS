@@ -70,6 +70,9 @@ pub enum Message {
     ChangeConfirmPassword(String),
     ToggleSameRoot(bool),
     ChangeRootPassword(String),
+    ToggleShowPassword,
+    ToggleShowConfirmPassword,
+    ToggleShowRootPassword,
     GotoSummary,
 
     // Step 6: Summary & Confirm
@@ -96,7 +99,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let (tx, rx) = unbounded();
         let handle = thread::spawn(move || {
-            App::execute_installation(disk, UserConfig::default(), tx);
+            let mut auto_cfg = UserConfig::default();
+            if auto_cfg.password.is_empty() {
+                auto_cfg.password = "hyperx".to_string();
+            }
+            if auto_cfg.root_password.is_empty() {
+                auto_cfg.root_password = "hyperx".to_string();
+            }
+            App::execute_installation(disk, auto_cfg, tx);
         });
 
         while let Ok(event) = rx.recv() {
@@ -181,6 +191,9 @@ pub struct App {
     user_config: UserConfig,
     confirm_password: String,
     use_same_root_password: bool,
+    show_password: bool,
+    show_confirm_password: bool,
+    show_root_password: bool,
 
     // Step 7 State
     install_state: InstallState,
@@ -208,8 +221,11 @@ impl Default for App {
             disks,
             selected_disk_path: first_disk,
             user_config: UserConfig::default(),
-            confirm_password: "password".to_string(),
+            confirm_password: String::new(),
             use_same_root_password: true,
+            show_password: false,
+            show_confirm_password: false,
+            show_root_password: false,
             install_state: InstallState::default(),
             engine_rx: None,
             is_installing: false,
@@ -325,6 +341,18 @@ impl App {
             }
             Message::ChangeRootPassword(val) => {
                 self.user_config.root_password = val;
+                Task::none()
+            }
+            Message::ToggleShowPassword => {
+                self.show_password = !self.show_password;
+                Task::none()
+            }
+            Message::ToggleShowConfirmPassword => {
+                self.show_confirm_password = !self.show_confirm_password;
+                Task::none()
+            }
+            Message::ToggleShowRootPassword => {
+                self.show_root_password = !self.show_root_password;
                 Task::none()
             }
             Message::GotoSummary => {
@@ -448,6 +476,9 @@ impl App {
                 &self.user_config,
                 &self.confirm_password,
                 self.use_same_root_password,
+                self.show_password,
+                self.show_confirm_password,
+                self.show_root_password,
                 Message::ChangeFullname,
                 Message::ChangeUsername,
                 Message::ChangeHostname,
@@ -455,6 +486,9 @@ impl App {
                 Message::ChangeConfirmPassword,
                 Message::ToggleSameRoot,
                 Message::ChangeRootPassword,
+                Message::ToggleShowPassword,
+                Message::ToggleShowConfirmPassword,
+                Message::ToggleShowRootPassword,
                 Message::GotoDisk,
                 Message::GotoSummary,
             ),

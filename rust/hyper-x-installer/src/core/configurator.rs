@@ -21,8 +21,8 @@ impl Default for UserConfig {
         Self {
             username: "hyperx".to_string(),
             fullname: "HyperX User".to_string(),
-            password: "password".to_string(),
-            root_password: "password".to_string(),
+            password: String::new(),
+            root_password: String::new(),
             hostname: "hyperxos".to_string(),
             timezone: "Asia/Jakarta".to_string(),
             keymap: "us".to_string(),

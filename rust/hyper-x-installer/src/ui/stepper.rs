@@ -73,10 +73,10 @@ pub fn stepper_sidebar<'a, Message: 'a>(current_step: StepId) -> Element<'a, Mes
             )
         } else if is_completed {
             (
-                Color::from_rgba(16.0 / 255.0, 185.0 / 255.0, 129.0 / 255.0, 0.08),
-                Color::from_rgba(16.0 / 255.0, 185.0 / 255.0, 129.0 / 255.0, 0.25),
+                Color::from_rgba(0.0, 0.47, 0.83, 0.05),
+                Color::from_rgba(0.0, 0.47, 0.83, 0.20),
                 TEXT_MAIN,
-                ACCENT_GREEN,
+                FLUENT_PRIMARY,
             )
         } else {
             (

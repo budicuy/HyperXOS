@@ -8,6 +8,9 @@ pub fn view<'a, Message: Clone + 'a>(
     cfg: &UserConfig,
     confirm_password: &str,
     use_same_root_password: bool,
+    show_password: bool,
+    show_confirm_password: bool,
+    show_root_password: bool,
     on_change_fullname: impl Fn(String) -> Message + 'a,
     on_change_username: impl Fn(String) -> Message + 'a,
     on_change_hostname: impl Fn(String) -> Message + 'a,
@@ -15,6 +18,9 @@ pub fn view<'a, Message: Clone + 'a>(
     on_change_confirm: impl Fn(String) -> Message + 'a,
     on_toggle_same_root: impl Fn(bool) -> Message + 'a,
     on_change_root_password: impl Fn(String) -> Message + 'a,
+    on_toggle_show_password: Message,
+    on_toggle_show_confirm_password: Message,
+    on_toggle_show_root_password: Message,
     on_back: Message,
     on_next: Message,
 ) -> Element<'a, Message> {
@@ -25,8 +31,11 @@ pub fn view<'a, Message: Clone + 'a>(
     let is_valid_hostname = !cfg.hostname.trim().is_empty();
 
     let can_proceed = is_valid_username && is_valid_password && is_valid_root && is_valid_hostname;
+    let password_mismatch = !cfg.password.is_empty()
+        && !confirm_password.is_empty()
+        && cfg.password != confirm_password;
 
-    let field_box = |label: &'static str, input_element: Element<'a, Message>| {
+    let field_box = |label: &'static str, input_element: Element<'a, Message>| -> Element<'a, Message> {
         column![
             text(label).size(11).font(FONT_BODY_SEMIBOLD).style(|_| text::Style {
                 color: Some(TEXT_SUB),
@@ -35,6 +44,7 @@ pub fn view<'a, Message: Clone + 'a>(
         ]
         .spacing(4)
         .width(Length::Fill)
+        .into()
     };
 
     let fullname_in = text_input("Full Name (e.g. John Doe)", &cfg.fullname)
@@ -55,19 +65,70 @@ pub fn view<'a, Message: Clone + 'a>(
         .size(13)
         .style(custom_text_input_style());
 
-    let password_in = text_input("Password", &cfg.password)
-        .on_input(on_change_password)
-        .secure(true)
-        .padding([10, 14])
-        .size(13)
-        .style(custom_text_input_style());
+    let password_field: Element<'a, Message> = row![
+        text_input("Password", &cfg.password)
+            .on_input(on_change_password)
+            .secure(!show_password)
+            .padding([10, 14])
+            .size(13)
+            .style(custom_text_input_style())
+            .width(Length::Fill),
+        button(
+            svg_icon(
+                if show_password { icons::EYE_OFF } else { icons::EYE },
+                16.0,
+                if show_password { FLUENT_PRIMARY } else { TEXT_SUB },
+            )
+        )
+        .on_press(on_toggle_show_password)
+        .style(secondary_button_style())
+        .padding([9, 12]),
+    ]
+    .spacing(6)
+    .align_y(Alignment::Center)
+    .into();
 
-    let confirm_in = text_input("Confirm Password", confirm_password)
-        .on_input(on_change_confirm)
-        .secure(true)
-        .padding([10, 14])
-        .size(13)
-        .style(custom_text_input_style());
+    let confirm_field: Element<'a, Message> = row![
+        text_input("Confirm Password", confirm_password)
+            .on_input(on_change_confirm)
+            .secure(!show_confirm_password)
+            .padding([10, 14])
+            .size(13)
+            .style(custom_text_input_style())
+            .width(Length::Fill),
+        button(
+            svg_icon(
+                if show_confirm_password { icons::EYE_OFF } else { icons::EYE },
+                16.0,
+                if show_confirm_password { FLUENT_PRIMARY } else { TEXT_SUB },
+            )
+        )
+        .on_press(on_toggle_show_confirm_password)
+        .style(secondary_button_style())
+        .padding([9, 12]),
+    ]
+    .spacing(6)
+    .align_y(Alignment::Center)
+    .into();
+
+    let mut confirm_box = column![
+        text("CONFIRM PASSWORD").size(11).font(FONT_BODY_SEMIBOLD).style(|_| text::Style {
+            color: Some(TEXT_SUB),
+        }),
+        confirm_field,
+    ]
+    .spacing(4)
+    .width(Length::Fill);
+
+    if password_mismatch {
+        confirm_box = confirm_box.push(
+            text("Passwords do not match").size(11).font(FONT_BODY).style(|_| text::Style {
+                color: Some(ACCENT_RED),
+            }),
+        );
+    }
+
+    let confirm_box_el: Element<'a, Message> = confirm_box.into();
 
     let mut user_form = column![
         row![
@@ -77,8 +138,8 @@ pub fn view<'a, Message: Clone + 'a>(
         .spacing(16),
         field_box("COMPUTER HOSTNAME", hostname_in.into()),
         row![
-            field_box("USER PASSWORD", password_in.into()),
-            field_box("CONFIRM PASSWORD", confirm_in.into()),
+            field_box("USER PASSWORD", password_field),
+            confirm_box_el,
         ]
         .spacing(16),
     ]
@@ -101,14 +162,30 @@ pub fn view<'a, Message: Clone + 'a>(
     user_form = user_form.push(same_pwd_cb);
 
     if !use_same_root_password {
-        let root_pwd_in = text_input("Root Administrator Password", &cfg.root_password)
-            .on_input(on_change_root_password)
-            .secure(true)
-            .padding([10, 14])
-            .size(13)
-            .style(custom_text_input_style());
+        let root_field: Element<'a, Message> = row![
+            text_input("Root Administrator Password", &cfg.root_password)
+                .on_input(on_change_root_password)
+                .secure(!show_root_password)
+                .padding([10, 14])
+                .size(13)
+                .style(custom_text_input_style())
+                .width(Length::Fill),
+            button(
+                svg_icon(
+                    if show_root_password { icons::EYE_OFF } else { icons::EYE },
+                    16.0,
+                    if show_root_password { FLUENT_PRIMARY } else { TEXT_SUB },
+                )
+            )
+            .on_press(on_toggle_show_root_password)
+            .style(secondary_button_style())
+            .padding([9, 12]),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center)
+        .into();
 
-        user_form = user_form.push(field_box("ROOT (ADMIN) PASSWORD", root_pwd_in.into()));
+        user_form = user_form.push(field_box("ROOT (ADMIN) PASSWORD", root_field));
     }
 
     let form_card = container(user_form)
