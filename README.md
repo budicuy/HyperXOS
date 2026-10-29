@@ -229,3 +229,5 @@ HyperXOS tidak akan terwujud tanpa dedikasi luar biasa dari komunitas open-sourc
 
 HyperXOS didistribusikan di bawah lisensi GPL-3.0. Seluruh komponen upstream Arch Linux dan Rust crates tunduk pada lisensi masing-masing.
 Laporkan isu dan kontribusi melalui repositori GitHub resmi HyperXOS: [https://github.com/budicuy/HyperXOS](https://github.com/budicuy/HyperXOS).
+
+
