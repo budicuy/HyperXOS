@@ -8,11 +8,15 @@ impl Maintenance {
     where
         F: Fn(String) + Send + 'static + Clone,
     {
-        let log_clone = log_cb.clone();
-        let _ = KernelManager::execute_action("pkexec", &["paccache", "-rk2"], move |s| {
-            log_clone(s);
-        });
-        let _ = KernelManager::execute_action("pkexec", &["paccache", "-ruk0"], log_cb);
+        let _ = KernelManager::execute_action(
+            "pkexec",
+            &[
+                "sh",
+                "-c",
+                "if command -v paccache >/dev/null 2>&1; then paccache -rk2 && paccache -ruk0; else pacman -Sc --noconfirm; fi",
+            ],
+            log_cb,
+        );
     }
 
     pub fn clean_journal<F>(log_cb: F)
@@ -72,13 +76,13 @@ impl Maintenance {
     where
         F: Fn(String) + Send + 'static + Clone,
     {
-        let log_clone = log_cb.clone();
-        let _ = KernelManager::execute_action("pkexec", &["pacman-key", "--init"], move |s| {
-            log_clone(s);
-        });
         let _ = KernelManager::execute_action(
             "pkexec",
-            &["pacman-key", "--populate", "archlinux", "cachyos", "hyperxos"],
+            &[
+                "sh",
+                "-c",
+                "pacman-key --init && pacman-key --populate archlinux cachyos hyperxos",
+            ],
             log_cb,
         );
     }

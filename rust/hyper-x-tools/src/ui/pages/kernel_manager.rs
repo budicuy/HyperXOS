@@ -6,6 +6,7 @@ use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     running_name: &'a str,
     running_ver: &'a str,
@@ -65,7 +66,7 @@ pub fn view<'a, Message: Clone + 'a>(
             ]
             .spacing(2),
             container("").width(Length::Fill),
-            status_pill("Aktif Berjalan", FLUENT_PRIMARY, true),
+            status_pill("Aktif Berjalan", FLUENT_PRIMARY),
         ]
         .spacing(12)
         .align_y(Alignment::Center)
@@ -89,11 +90,11 @@ pub fn view<'a, Message: Clone + 'a>(
 
         let badges = row![
             if k.is_running {
-                status_pill("Running", FLUENT_PRIMARY, true)
+                status_pill("Running", FLUENT_PRIMARY)
             } else if k.installed {
-                status_pill("Terpasang", FLUENT_PRIMARY, true)
+                status_pill("Terpasang", FLUENT_PRIMARY)
             } else {
-                status_pill("Tersedia", TEXT_MUTED, false)
+                status_pill("Tersedia", TEXT_MUTED)
             }
         ];
 

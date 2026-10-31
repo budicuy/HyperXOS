@@ -66,7 +66,7 @@ pub fn view<'a, Message: Clone + 'a>(
             preflight.total_ram_gb
         ),
         preflight.has_min_ram,
-        icons::RAM_CHIP,
+        icons::RAM,
     );
 
     let net_row = check_row(
@@ -88,7 +88,7 @@ pub fn view<'a, Message: Clone + 'a>(
             "No suitable storage drive with >= 20.0 GB detected".to_string()
         },
         preflight.has_min_disk,
-        icons::HARD_DRIVE,
+        icons::DISK,
     );
 
     let power_row = check_row(

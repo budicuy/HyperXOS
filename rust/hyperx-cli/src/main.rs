@@ -6,13 +6,12 @@ mod qa;
 mod release;
 mod repo;
 mod setup;
-mod util;
 mod vm;
 
 use clap::{Parser, Subcommand};
 use std::process::Command;
 
-use crate::util::{get_project_root, run_stream};
+use hyperx_ui_kit::{get_project_root, run_stream};
 
 #[derive(Parser)]
 #[command(name = "hyperx")]

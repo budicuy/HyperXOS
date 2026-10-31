@@ -5,6 +5,7 @@ use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     current_governor: &'a str,
     max_map_count_val: &'a str,
@@ -75,7 +76,6 @@ pub fn view<'a, Message: Clone + 'a>(
                 status_pill(
                     format!("Aktif: {}", current_governor),
                     ACCENT_CYAN,
-                    true
                 ),
             ]
             .align_y(Alignment::Center),

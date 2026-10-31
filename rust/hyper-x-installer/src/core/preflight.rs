@@ -19,7 +19,7 @@ impl PreflightStatus {
         let is_uefi = Path::new("/sys/firmware/efi").exists();
 
         // 2. RAM Check (min ~3.5 GB for 4GB systems)
-        let mut sys = System::new_all();
+        let mut sys = System::new();
         sys.refresh_memory();
         let total_ram_gb = sys.total_memory() as f64 / (1024.0 * 1024.0 * 1024.0);
         let has_min_ram = total_ram_gb >= 3.5;

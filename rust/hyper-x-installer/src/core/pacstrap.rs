@@ -34,7 +34,10 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "pipewire-alsa",
     "wireplumber",
     "plasma-meta",
+    "plasma-vault",
     "power-profiles-daemon",
+    "cpupower",
+    "pacman-contrib",
     "dolphin",
     "konsole",
     "ark",
@@ -42,7 +45,6 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "sddm",
     "xdg-user-dirs",
     "xorg-xwayland",
-    "papirus-icon-theme",
     "ttf-jetbrains-mono-nerd",
     "firefox",
     // 5. Bootloader (Default Limine)
@@ -154,16 +156,29 @@ impl PacstrapInstaller {
         let stdout = child.stdout.take().ok_or("Failed to capture stdout")?;
         let stderr = child.stderr.take().ok_or("Failed to capture stderr")?;
 
-        // Read output line by line
-        let reader = BufReader::new(stdout);
-        for line in reader.lines().map_while(Result::ok) {
+        let (tx, rx) = std::sync::mpsc::channel::<String>();
+        let tx_err = tx.clone();
+
+        let out_handle = std::thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines().map_while(Result::ok) {
+                let _ = tx.send(line);
+            }
+        });
+
+        let err_handle = std::thread::spawn(move || {
+            let err_reader = BufReader::new(stderr);
+            for line in err_reader.lines().map_while(Result::ok) {
+                let _ = tx_err.send(format!("[WARN] {}", line));
+            }
+        });
+
+        while let Ok(line) = rx.recv() {
             log_callback(&line);
         }
 
-        let err_reader = BufReader::new(stderr);
-        for line in err_reader.lines().map_while(Result::ok) {
-            log_callback(&format!("[WARN] {}", line));
-        }
+        let _ = out_handle.join();
+        let _ = err_handle.join();
 
         let status = child
             .wait()

@@ -10,12 +10,6 @@ pub fn ease_out_cubic(t: f32) -> f32 {
     1.0 - (1.0 - t).powi(3)
 }
 
-/// Linear interpolation between a and b
-#[inline]
-pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
-    a + (b - a) * t.clamp(0.0, 1.0)
-}
-
 /// Dynamically smoothed value with exponential easing (ideal for progress bars, gauges, meters)
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SmoothValue {
@@ -197,7 +191,7 @@ mod tests {
         for _ in 0..50 {
             pulse.update(0.016);
             let b = pulse.breathing(0.3, 1.0);
-            assert!(b >= 0.299 && b <= 1.001);
+            assert!((0.299..=1.001).contains(&b));
         }
     }
 }

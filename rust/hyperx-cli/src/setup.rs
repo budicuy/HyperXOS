@@ -3,7 +3,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::process::Command;
 
-use crate::util::{command_exists, run_stream};
+use hyperx_ui_kit::{command_exists, run_stream};
 
 pub fn install_cli_binary(root: &Path) -> Result<(), String> {
     println!("==> [HyperXOS] Installing 'hyperx' CLI launcher to system...");

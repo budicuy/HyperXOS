@@ -1,7 +1,7 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-mirrorlist
 pkgver=1.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="HyperXOS official repository mirror list"
 arch=('any')
 url="https://github.com/budicuy/HyperXOS"
@@ -12,10 +12,13 @@ package() {
     install -d "${pkgdir}/etc/pacman.d"
     cat << 'EOF' > "${pkgdir}/etc/pacman.d/hyperxos-mirrorlist"
 # HyperXOS Official Repository Mirrorlist
-# Online Mirror (GitHub Releases)
-Server = https://github.com/budicuy/HyperXOS/releases/download/repo/$arch
+# Local Offline Repository Cache Fallback
+Server = file:///opt/hyperxos-repo/$arch
 
 # Local ISO Live Media Fallback Mirror
 Server = file:///run/archiso/bootmnt/hyperxos/repo/$arch
+
+# Online Mirror (GitHub Releases)
+Server = https://github.com/budicuy/HyperXOS/releases/download/repo/$arch
 EOF
 }

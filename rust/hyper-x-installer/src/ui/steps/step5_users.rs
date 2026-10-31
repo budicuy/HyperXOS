@@ -4,6 +4,7 @@ use crate::core::configurator::UserConfig;
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     cfg: &UserConfig,
     confirm_password: &str,

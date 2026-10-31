@@ -3,7 +3,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::process::Command;
 
-use crate::util::command_exists;
+use hyperx_ui_kit::command_exists;
 
 pub fn run_check(root: &Path) -> Result<(), String> {
     println!("==> [HyperXOS] Validating host environment and project configurations...");

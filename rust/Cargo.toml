@@ -61,8 +61,8 @@ toml = "0.8"
 sha2 = "0.10"
 
 [profile.dev]
-opt-level = 0
-debug = true
+opt-level = 1
+debug = "line-tables-only"
 strip = "none"
 incremental = true
 codegen-units = 256

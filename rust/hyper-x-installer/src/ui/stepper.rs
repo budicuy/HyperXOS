@@ -48,7 +48,7 @@ impl StepId {
             StepId::Welcome => icons::SHIELD_CHECK,
             StepId::Location => icons::GLOBE,
             StepId::Keyboard => icons::KEYBOARD,
-            StepId::Disk => icons::HARD_DRIVE,
+            StepId::Disk => icons::DISK,
             StepId::Users => icons::USER,
             StepId::Summary => icons::CHECK_CIRCLE,
             StepId::Install => icons::ROCKET,

@@ -42,6 +42,9 @@ pub struct SystemMetrics {
 
 pub struct SystemMonitor {
     sys: System,
+    disks: Disks,
+    components: Components,
+    has_nvidia: bool,
     cached_cpu_model: String,
     cached_gpu_model: String,
     cached_os_name: String,
@@ -55,6 +58,8 @@ impl SystemMonitor {
     pub fn new() -> Self {
         let mut sys = System::new_all();
         sys.refresh_all();
+        let disks = Disks::new_with_refreshed_list();
+        let components = Components::new_with_refreshed_list();
 
         // Read static CPU model
         let cpu_model = if let Some(cpu) = sys.cpus().first() {
@@ -77,6 +82,9 @@ impl SystemMonitor {
 
         let mut monitor = Self {
             sys,
+            disks,
+            components,
+            has_nvidia: false,
             cached_cpu_model: cpu_model,
             cached_gpu_model: String::new(),
             cached_os_name: os_name,
@@ -86,7 +94,9 @@ impl SystemMonitor {
             cached_desktop_env: desktop_env,
         };
 
-        monitor.cached_gpu_model = monitor.detect_gpu_name();
+        let (gpu_name, is_nv) = monitor.detect_gpu_name();
+        monitor.cached_gpu_model = gpu_name;
+        monitor.has_nvidia = is_nv;
         monitor
     }
 
@@ -203,9 +213,9 @@ impl SystemMonitor {
         }
     }
 
-    fn read_cpu_temperature(&self) -> i32 {
-        let components = Components::new_with_refreshed_list();
-        for component in &components {
+    fn read_cpu_temperature(&mut self) -> i32 {
+        self.components.refresh(false);
+        for component in &self.components {
             let label = component.label().to_lowercase();
             if label.contains("core") || label.contains("cpu") || label.contains("k10temp") || label.contains("tctl") {
                 if let Some(temp) = component.temperature() {
@@ -231,9 +241,9 @@ impl SystemMonitor {
         0
     }
 
-    fn read_root_disk(&self) -> (u64, u64, f32, String) {
-        let disks = Disks::new_with_refreshed_list();
-        for disk in &disks {
+    fn read_root_disk(&mut self) -> (u64, u64, f32, String) {
+        self.disks.refresh(false);
+        for disk in &self.disks {
             if disk.mount_point() == Path::new("/") {
                 let total = disk.total_space();
                 let avail = disk.available_space();
@@ -249,7 +259,7 @@ impl SystemMonitor {
         }
 
         // If no explicit / mount found, pick the first disk
-        if let Some(disk) = disks.first() {
+        if let Some(disk) = self.disks.first() {
             let total = disk.total_space();
             let avail = disk.available_space();
             let used = total.saturating_sub(avail);
@@ -265,7 +275,7 @@ impl SystemMonitor {
         (0, 0, 0.0, "BTRFS".to_string())
     }
 
-    fn detect_gpu_name(&self) -> String {
+    fn detect_gpu_name(&self) -> (String, bool) {
         // 1. Check NVIDIA via nvidia-smi
         if let Ok(out) = Command::new("nvidia-smi")
             .args(["--query-gpu=name", "--format=csv,noheader"])
@@ -274,7 +284,7 @@ impl SystemMonitor {
             if out.status.success() {
                 let name = String::from_utf8_lossy(&out.stdout).trim().to_string();
                 if !name.is_empty() {
-                    return name;
+                    return (name, true);
                 }
             }
         }
@@ -291,34 +301,37 @@ impl SystemMonitor {
                 }
 
                 if driver == "amdgpu" {
-                    return "AMD Radeon Graphics (amdgpu)".to_string();
+                    return ("AMD Radeon Graphics (amdgpu)".to_string(), false);
                 } else if driver == "i915" || driver == "xe" {
-                    return "Intel HD/Iris/Arc Graphics".to_string();
+                    return ("Intel HD/Iris/Arc Graphics".to_string(), false);
                 } else if driver == "virtio-gpu" || driver == "qxl" || driver == "vmwgfx" {
-                    return "Akselerator Grafis Virtual (VirtIO/KVM)".to_string();
+                    return ("Akselerator Grafis Virtual (VirtIO/KVM)".to_string(), false);
                 } else if !driver.is_empty() {
-                    return format!("GPU ({})", driver);
+                    let is_nv = driver.contains("nvidia");
+                    return (format!("GPU ({})", driver), is_nv);
                 }
             }
         }
 
-        "Standard VGA / Virtual GPU".to_string()
+        ("Standard VGA / Virtual GPU".to_string(), false)
     }
 
     fn read_gpu_metrics(&self) -> (f32, u64, u64) {
-        // 1. Try NVIDIA
-        if let Ok(out) = Command::new("nvidia-smi")
-            .args(["--query-gpu=utilization.gpu,memory.total,memory.used", "--format=csv,noheader,nounits"])
-            .output()
-        {
-            if out.status.success() {
-                let text = String::from_utf8_lossy(&out.stdout);
-                let parts: Vec<&str> = text.trim().split(',').map(|s| s.trim()).collect();
-                if parts.len() >= 3 {
-                    let usage: f32 = parts[0].parse().unwrap_or(0.0);
-                    let total_mb: u64 = parts[1].parse().unwrap_or(0);
-                    let used_mb: u64 = parts[2].parse().unwrap_or(0);
-                    return (usage, total_mb * 1024 * 1024, used_mb * 1024 * 1024);
+        // 1. Try NVIDIA only if an NVIDIA GPU was detected at startup
+        if self.has_nvidia {
+            if let Ok(out) = Command::new("nvidia-smi")
+                .args(["--query-gpu=utilization.gpu,memory.total,memory.used", "--format=csv,noheader,nounits"])
+                .output()
+            {
+                if out.status.success() {
+                    let text = String::from_utf8_lossy(&out.stdout);
+                    let parts: Vec<&str> = text.trim().split(',').map(|s| s.trim()).collect();
+                    if parts.len() >= 3 {
+                        let usage: f32 = parts[0].parse().unwrap_or(0.0);
+                        let total_mb: u64 = parts[1].parse().unwrap_or(0);
+                        let used_mb: u64 = parts[2].parse().unwrap_or(0);
+                        return (usage, total_mb * 1024 * 1024, used_mb * 1024 * 1024);
+                    }
                 }
             }
         }

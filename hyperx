@@ -5,12 +5,17 @@ set -e
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 BIN="$SCRIPT_DIR/rust/target/release/hyperx"
+VM_BIN="$SCRIPT_DIR/rust/target/release/hyperx-vm"
 
-SRC_DIR="$SCRIPT_DIR/rust/hyperx-cli/src"
+CLI_SRC="$SCRIPT_DIR/rust/hyperx-cli/src"
+VM_SRC="$SCRIPT_DIR/rust/hyperx-vm/src"
+KIT_SRC="$SCRIPT_DIR/rust/hyperx-ui-kit/src"
 
-if [ ! -x "$BIN" ] || [ -n "$(find "$SRC_DIR" -type f -newer "$BIN" 2>/dev/null)" ]; then
-    echo "==> [HyperXOS] Mengompilasi/memperbarui toolchain CLI 'hyperx'..."
-    cargo build --release --manifest-path "$SCRIPT_DIR/rust/Cargo.toml" --bin hyperx
+if [ ! -x "$BIN" ] || [ ! -x "$VM_BIN" ] || \
+   [ -n "$(find "$CLI_SRC" "$VM_SRC" "$KIT_SRC" -type f -newer "$BIN" 2>/dev/null)" ] || \
+   [ -n "$(find "$VM_SRC" "$KIT_SRC" -type f -newer "$VM_BIN" 2>/dev/null)" ]; then
+    echo "==> [HyperXOS] Mengompilasi/memperbarui toolchain CLI ('hyperx' & 'hyperx-vm')..."
+    cargo build --release --manifest-path "$SCRIPT_DIR/rust/Cargo.toml" --bin hyperx --bin hyperx-vm
 fi
 
 exec "$BIN" "$@"

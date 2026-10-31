@@ -26,25 +26,24 @@ pub fn view<'a, Message: Clone + 'a>(
         let is_sel = *code == selected_layout;
         let code_str = code.to_string();
 
-        let btn = button(
-            row![
-                svg_icon(icons::KEYBOARD, 16.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
-                text(*name)
-                    .size(13)
-                    .font(FONT_BODY_SEMIBOLD)
-                    .style(move |_| text::Style {
-                        color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
-                    }),
-                row![].width(Length::Fill),
-                if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 16.0, FLUENT_PRIMARY)
-                } else {
-                    svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
-                },
-            ]
-            .spacing(12)
-            .align_y(Alignment::Center),
-        )
+        let mut kb_row = row![
+            svg_icon(icons::KEYBOARD, 16.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
+            text(*name)
+                .size(13)
+                .font(FONT_BODY_SEMIBOLD)
+                .style(move |_| text::Style {
+                    color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
+                }),
+            row![].width(Length::Fill),
+        ]
+        .spacing(12)
+        .align_y(Alignment::Center);
+
+        if is_sel {
+            kb_row = kb_row.push(svg_icon(icons::CHECK_CIRCLE, 16.0, FLUENT_PRIMARY));
+        }
+
+        let btn = button(kb_row)
         .padding([12, 16])
         .width(Length::Fill)
         .style(move |_, _| {

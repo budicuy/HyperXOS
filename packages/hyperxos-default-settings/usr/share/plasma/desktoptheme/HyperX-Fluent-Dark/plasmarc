@@ -1,0 +1,14 @@
+[Wallpaper]
+defaultWallpaperTheme=/usr/share/wallpapers/hyperxos-default.png
+defaultFileSuffix=.png
+defaultWidth=1920
+defaultHeight=1080
+
+[ContrastEffect]
+enabled=true
+contrast=0.3
+intensity=0.9
+saturation=1.4
+
+[AdaptiveTransparency]
+enabled=true

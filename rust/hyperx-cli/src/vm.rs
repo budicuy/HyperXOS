@@ -1,13 +1,13 @@
 use std::path::Path;
 use std::process::Command;
 
-use crate::util::run_stream;
+use hyperx_ui_kit::run_stream;
 
 pub fn run_vm(root: &Path, mode: &str, auto: bool) -> Result<(), String> {
     let hyperx_vm_bin = root.join("rust/target/release/hyperx-vm");
 
-    // Always invoke cargo: it is a no-op when up to date and picks up source changes.
-    {
+    // Only build if the binary is missing (the ./hyperx wrapper already keeps both hyperx and hyperx-vm up to date)
+    if !hyperx_vm_bin.exists() {
         let mut build = Command::new("cargo");
         build.args([
             "build",

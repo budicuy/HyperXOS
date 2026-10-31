@@ -4,6 +4,6 @@ Operation = Upgrade
 Target = systemd
 
 [Action]
-Description = Updating systemd-boot on ESP...
+Description = Updating systemd-boot on ESP (if active)...
 When = PostTransaction
-Exec = /usr/bin/bootctl update
+Exec = /bin/sh -c 'if bootctl is-installed >/dev/null 2>&1; then /usr/bin/bootctl update; fi'

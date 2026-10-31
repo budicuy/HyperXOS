@@ -1,0 +1,25 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "dev@hyperxos.org",
+                "Name": "HyperXOS Design Team"
+            }
+        ],
+        "Category": "",
+        "Description": "HyperX Fluent Design Dark Global Theme for HyperXOS",
+        "Description[id]": "Tema Global HyperX Fluent Design Gelap untuk HyperXOS",
+        "Id": "org.hyperxos.fluent.dark",
+        "License": "GPL-3.0-or-later",
+        "Name": "HyperX Fluent Dark",
+        "Name[id]": "HyperX Fluent Dark",
+        "Version": "2.0.0",
+        "Website": "https://github.com/budicuy/HyperXOS"
+    },
+    "X-KPackage-Dependencies": [
+        "kns://colorschemes.knsrc/api.kde-look.org/HyperXFluentDark",
+        "kns://plasma-themes.knsrc/api.kde-look.org/HyperX-Fluent-Dark",
+        "kns://icons.knsrc/api.kde-look.org/Fluent-yellow-dark"
+    ]
+}

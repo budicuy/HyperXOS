@@ -1,40 +1,12 @@
 use std::fs;
-use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::config::VmConfig;
-use crate::util::run_stream;
+use hyperx_ui_kit::run_stream;
 
 pub struct StorageManager;
 
 impl StorageManager {
-    /// Find latest built ISO image in out/
-    pub fn find_latest_iso(root: &Path) -> Option<PathBuf> {
-        let out_dir = root.join("out");
-        if !out_dir.exists() {
-            return None;
-        }
-
-        let mut isos: Vec<(PathBuf, std::time::SystemTime)> = Vec::new();
-        if let Ok(entries) = fs::read_dir(&out_dir) {
-            for entry in entries.flatten() {
-                let path = entry.path();
-                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                    if name.starts_with("hyperxos-") && name.ends_with(".iso") {
-                        let mtime = entry
-                            .metadata()
-                            .and_then(|m| m.modified())
-                            .unwrap_or(std::time::SystemTime::UNIX_EPOCH);
-                        isos.push((path, mtime));
-                    }
-                }
-            }
-        }
-
-        isos.sort_by_key(|a| std::cmp::Reverse(a.1));
-        isos.first().map(|(p, _)| p.clone())
-    }
-
     /// Ensure 40GB virtual disk exists
     pub fn ensure_disk_exists(config: &VmConfig) -> Result<(), String> {
         if !config.disk_image.exists() {

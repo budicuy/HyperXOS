@@ -1,0 +1,25 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "dev@hyperxos.org",
+                "Name": "HyperXOS Design Team"
+            }
+        ],
+        "Category": "",
+        "Description": "HyperX Fluent Design Light Global Theme for HyperXOS",
+        "Description[id]": "Tema Global HyperX Fluent Design Terang untuk HyperXOS",
+        "Id": "org.hyperxos.fluent.light",
+        "License": "GPL-3.0-or-later",
+        "Name": "HyperX Fluent Light",
+        "Name[id]": "HyperX Fluent Light",
+        "Version": "2.0.0",
+        "Website": "https://github.com/budicuy/HyperXOS"
+    },
+    "X-KPackage-Dependencies": [
+        "kns://colorschemes.knsrc/api.kde-look.org/HyperXFluentLight",
+        "kns://plasma-themes.knsrc/api.kde-look.org/HyperX-Fluent-Light",
+        "kns://icons.knsrc/api.kde-look.org/Fluent-yellow-light"
+    ]
+}

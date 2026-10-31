@@ -8,14 +8,14 @@ use crate::config::VmConfig;
 use crate::display::DisplayManager;
 use crate::provisioner::VmmProvisioner;
 use crate::storage::StorageManager;
-use crate::util::run_stream;
+use hyperx_ui_kit::{find_latest_iso, run_stream};
 
 pub struct VmEngine;
 
 impl VmEngine {
     /// Boot HyperXOS Live ISO in hardware-accelerated VM
     pub fn run_live(root: &Path, config: &VmConfig) -> Result<(), String> {
-        let iso = StorageManager::find_latest_iso(root).ok_or_else(|| {
+        let iso = find_latest_iso(root).ok_or_else(|| {
             "No HyperXOS ISO found in out/. Please build one first using './hyperx build'.".to_string()
         })?;
 
@@ -46,7 +46,7 @@ impl VmEngine {
 
     /// Run installation test on clean 40GB virtual disk
     pub fn run_install(root: &Path, config: &VmConfig, auto: bool) -> Result<(), String> {
-        let iso = StorageManager::find_latest_iso(root).ok_or_else(|| {
+        let iso = find_latest_iso(root).ok_or_else(|| {
             "No HyperXOS ISO found in out/. Please build one first using './hyperx build'.".to_string()
         })?;
 

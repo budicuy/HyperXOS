@@ -40,7 +40,7 @@ plugin=menu.11.enhanced
 
 [Containments][2][Applets][4][Configuration][General]
 displayPosition=2
-favoriteApps=preferred://browser,applications:org.kde.dolphin.desktop,applications:hyper-x-tools.desktop,applications:hyper-x-installer.desktop,applications:systemsettings.desktop,applications:org.kde.konsole.desktop,applications:org.kde.discover.desktop,applications:org.kde.kwrite.desktop,applications:org.kde.kcalc.desktop,applications:org.kde.spectacle.desktop
+favoriteApps=preferred://browser,applications:org.kde.dolphin.desktop,applications:hyper-x-tools.desktop,applications:systemsettings.desktop,applications:org.kde.konsole.desktop,applications:org.kde.discover.desktop,applications:org.kde.kwrite.desktop,applications:org.kde.kcalc.desktop,applications:org.kde.spectacle.desktop
 icon=fluent-start
 numberColumns=6
 numberRows=3
@@ -53,7 +53,7 @@ plugin=org.kde.plasma.icontasks
 
 [Containments][2][Applets][5][Configuration][General]
 groupedTaskVisualization=1
-launchers=applications:org.kde.dolphin.desktop,applications:firefox.desktop,applications:org.kde.konsole.desktop,applications:hyper-x-tools.desktop,applications:hyper-x-installer.desktop
+launchers=applications:org.kde.dolphin.desktop,applications:firefox.desktop,applications:org.kde.konsole.desktop,applications:hyper-x-tools.desktop
 
 [Containments][2][Applets][6]
 immutability=1

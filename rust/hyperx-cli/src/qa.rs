@@ -4,7 +4,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::Duration;
 
-use crate::util::find_latest_iso;
+use hyperx_ui_kit::find_latest_iso;
 
 pub fn run_test(root: &Path) -> Result<(), String> {
     println!("==================================================");

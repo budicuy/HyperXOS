@@ -37,12 +37,18 @@ pub fn run_clean(root: &Path, all: bool) -> Result<(), String> {
         let _ = rm_tmp.status();
     }
 
-    // 4. If all requested, clean output and virtual disks
+    // 4. If all requested, clean output, cargo debug artifacts, and virtual disks
     if all {
-        println!("  -> Cleaning out/ directory and virtual test disks...");
+        println!("  -> Cleaning out/ directory, cargo debug cache, and virtual test disks...");
         let out_dir = root.join("out");
         if out_dir.exists() {
             let _ = fs::remove_dir_all(&out_dir);
+        }
+
+        let debug_target = root.join("rust/target/debug");
+        if debug_target.exists() {
+            println!("  -> Removing rust/target/debug/...");
+            let _ = fs::remove_dir_all(&debug_target);
         }
 
         let extra_files = [

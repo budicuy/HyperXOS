@@ -14,6 +14,7 @@ const CATEGORIES: [(&str, &str, &str); 5] = [
     ("Utilities", "Utilitas & Pemeliharaan", "Pemantau sistem interaktif dan pemulihan snapshot data"),
 ];
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     active_cat: &'a str,
     search_query: &'a str,
@@ -93,7 +94,6 @@ pub fn view<'a, Message: Clone + 'a>(
             } else {
                 TEXT_MUTED
             },
-            p.installed,
         );
 
         let action_btn = if !p.installed {

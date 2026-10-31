@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "dev@hyperxos.org",
+                "Name": "HyperXOS Design Team"
+            }
+        ],
+        "Category": "",
+        "Description": "HyperX Fluent Light Plasma Style (Windows 11 Mica/Acrylic Light)",
+        "Description[id]": "Gaya Plasma HyperX Fluent Terang (Windows 11 Mica/Acrylic Light)",
+        "EnabledByDefault": true,
+        "Id": "HyperX-Fluent-Light",
+        "License": "GPL-3.0-or-later",
+        "Name": "HyperX Fluent Light",
+        "Name[id]": "HyperX Fluent Light",
+        "Version": "2.0.0",
+        "Website": "https://github.com/budicuy/HyperXOS"
+    },
+    "X-Plasma-API": "5.0"
+}

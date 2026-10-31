@@ -4,7 +4,6 @@ mod engine;
 mod provisioner;
 mod qga;
 mod storage;
-mod util;
 
 use clap::{Parser, Subcommand};
 use std::path::Path;
@@ -15,7 +14,7 @@ use crate::display::DisplayManager;
 use crate::engine::VmEngine;
 use crate::provisioner::VmmProvisioner;
 use crate::storage::StorageManager;
-use crate::util::get_project_root;
+use hyperx_ui_kit::get_project_root;
 
 #[derive(Parser)]
 #[command(name = "hyperx-vm")]

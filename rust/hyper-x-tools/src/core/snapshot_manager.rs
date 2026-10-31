@@ -74,7 +74,11 @@ impl SnapshotManager {
             .unwrap_or_default()
             .as_secs();
 
-        let clean_desc = description.replace(' ', "_").replace('/', "-");
+        let clean_desc: String = description
+            .chars()
+            .filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-' || *c == ' ')
+            .collect::<String>()
+            .replace(' ', "_");
         let tag = if clean_desc.is_empty() {
             "manual".to_string()
         } else {
@@ -82,17 +86,14 @@ impl SnapshotManager {
         };
 
         let snap_name = format!("snapshot_{}_{}", now, tag);
-        let dest = format!("/.snapshots/{}", snap_name);
-
-        // Ensure /.snapshots exists
-        let _ = KernelManager::execute_action("pkexec", &["mkdir", "-p", "/.snapshots"], {
-            let log = log_cb.clone();
-            move |s| log(s)
-        });
+        let cmd = format!(
+            "mkdir -p /.snapshots && btrfs subvolume snapshot -r / '/.snapshots/{}'",
+            snap_name
+        );
 
         let _ = KernelManager::execute_action(
             "pkexec",
-            &["btrfs", "subvolume", "snapshot", "-r", "/", &dest],
+            &["sh", "-c", &cmd],
             log_cb,
         );
     }
@@ -101,10 +102,50 @@ impl SnapshotManager {
     where
         F: Fn(String) + Send + 'static,
     {
-        let src = format!("/.snapshots/{}", name);
+        if name.is_empty() || name.contains('/') || name.contains("..") {
+            log_cb("[✗] Nama snapshot tidak valid.\n".to_string());
+            return;
+        }
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+
+        // Find root block device from /proc/mounts and swap @ subvolume on top-level Btrfs (subvolid=5)
+        let restore_script = format!(
+            concat!(
+                "set -e; ",
+                "ROOT_DEV=$(awk '$2 == \"/\" {{print $1; exit}}' /proc/mounts); ",
+                "if [ -z \"$ROOT_DEV\" ]; then echo 'Gagal mendeteksi partisi root Btrfs' >&2; exit 1; fi; ",
+                "mkdir -p /tmp/hyperxos_btrfs_top; ",
+                "mount -o subvolid=5 \"$ROOT_DEV\" /tmp/hyperxos_btrfs_top; ",
+                "trap 'umount /tmp/hyperxos_btrfs_top 2>/dev/null || true' EXIT; ",
+                "if [ -d \"/tmp/hyperxos_btrfs_top/@/.snapshots/{name}\" ]; then ",
+                "  SNAP_SRC=\"/tmp/hyperxos_btrfs_top/@/.snapshots/{name}\"; ",
+                "elif [ -d \"/.snapshots/{name}\" ]; then ",
+                "  btrfs subvolume snapshot \"/.snapshots/{name}\" \"/tmp/hyperxos_btrfs_top/@_restored_{now}\"; ",
+                "  mv /tmp/hyperxos_btrfs_top/@ \"/tmp/hyperxos_btrfs_top/@_old_{now}\"; ",
+                "  mv \"/tmp/hyperxos_btrfs_top/@_restored_{now}\" /tmp/hyperxos_btrfs_top/@; ",
+                "  echo 'Snapshot berhasil dipulihkan ke subvolume @! Silakan reboot sistem untuk menerapkan.'; ",
+                "  exit 0; ",
+                "else ",
+                "  echo 'Snapshot tidak ditemukan' >&2; exit 1; ",
+                "fi; ",
+                "btrfs subvolume snapshot \"$SNAP_SRC\" \"/tmp/hyperxos_btrfs_top/@_restored_{now}\"; ",
+                "if [ -d /tmp/hyperxos_btrfs_top/@/.snapshots ]; then ",
+                "  mv /tmp/hyperxos_btrfs_top/@/.snapshots \"/tmp/hyperxos_btrfs_top/@_restored_{now}/.snapshots\" 2>/dev/null || true; ",
+                "fi; ",
+                "mv /tmp/hyperxos_btrfs_top/@ \"/tmp/hyperxos_btrfs_top/@_old_{now}\"; ",
+                "mv \"/tmp/hyperxos_btrfs_top/@_restored_{now}\" /tmp/hyperxos_btrfs_top/@; ",
+                "echo 'Snapshot berhasil dipulihkan ke subvolume @! Silakan reboot sistem untuk menerapkan.'"
+            ),
+            name = name,
+            now = now
+        );
+
         let _ = KernelManager::execute_action(
             "pkexec",
-            &["btrfs", "subvolume", "snapshot", &src, "/"],
+            &["sh", "-c", &restore_script],
             log_cb,
         );
     }

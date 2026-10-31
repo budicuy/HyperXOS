@@ -6,6 +6,7 @@ use crate::ui::components::{glass_scrollable, status_pill, terminal_box};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     is_btrfs: bool,
     fs_type_name: &'a str,
@@ -34,7 +35,10 @@ pub fn view<'a, Message: Clone + 'a>(
         ]
         .spacing(2),
         container("").width(Length::Fill),
-        status_pill(format!("Filesystem: {}", fs_type_name), FLUENT_PRIMARY, is_btrfs),
+        status_pill(
+            format!("Filesystem: {}", fs_type_name),
+            if is_btrfs { FLUENT_PRIMARY } else { TEXT_MUTED },
+        ),
     ]
     .align_y(Alignment::Center);
 
@@ -45,7 +49,7 @@ pub fn view<'a, Message: Clone + 'a>(
         .style(glass_input_style)
         .on_input(on_input_change);
 
-    let create_btn = button(
+    let mut create_btn = button(
         row![
             svg_icon(icons::SNAPSHOT, 13.0, Color::WHITE),
             text("Ambil Snapshot").size(11)
@@ -54,8 +58,11 @@ pub fn view<'a, Message: Clone + 'a>(
         .align_y(Alignment::Center),
     )
     .padding([8, 16])
-    .style(primary_button_style(ACCENT_CYAN))
-    .on_press(on_create);
+    .style(primary_button_style(ACCENT_CYAN));
+
+    if is_btrfs {
+        create_btn = create_btn.on_press(on_create);
+    }
 
     let create_card = container(
         column![

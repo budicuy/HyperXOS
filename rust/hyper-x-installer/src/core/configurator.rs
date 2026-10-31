@@ -1,7 +1,8 @@
 use std::fs;
+use std::io::Write;
 use std::os::unix::fs::symlink;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use crate::core::filesystem::FilesystemContext;
 
 #[derive(Debug, Clone)]
@@ -89,11 +90,6 @@ impl SystemConfigurator {
 
         // 6. User and Root Accounts
         progress_callback(&format!("Creating user account '{}' and configuring privileges...", cfg.username));
-        // Set root password
-        let root_passwd_cmd = format!("echo 'root:{}' | chpasswd", cfg.root_password);
-        let _ = Command::new("arch-chroot")
-            .args(["/mnt", "sh", "-c", &root_passwd_cmd])
-            .status();
 
         // Add user with wheel & audio/video groups
         let _ = Command::new("arch-chroot")
@@ -111,11 +107,21 @@ impl SystemConfigurator {
             ])
             .status();
 
-        // Set user password
-        let user_passwd_cmd = format!("echo '{}:{}' | chpasswd", cfg.username, cfg.password);
-        let _ = Command::new("arch-chroot")
-            .args(["/mnt", "sh", "-c", &user_passwd_cmd])
-            .status();
+        // Set root and user passwords securely via stdin pipe (safe against shell special characters)
+        if let Ok(mut child) = Command::new("arch-chroot")
+            .args(["/mnt", "chpasswd"])
+            .stdin(Stdio::piped())
+            .spawn()
+        {
+            if let Some(mut stdin) = child.stdin.take() {
+                let payload = format!(
+                    "root:{}\n{}:{}\n",
+                    cfg.root_password, cfg.username, cfg.password
+                );
+                let _ = stdin.write_all(payload.as_bytes());
+            }
+            let _ = child.wait();
+        }
 
         // Set full name
         let _ = Command::new("arch-chroot")
@@ -130,7 +136,7 @@ impl SystemConfigurator {
             .args(["440", "/mnt/etc/sudoers.d/10-installer-wheel"])
             .status();
 
-        // 7. SDDM & Wayland Configuration
+        // 7. SDDM & Wayland Configuration (Mandatory Login Screen on Installed System)
         progress_callback("Configuring SDDM Wayland display manager and systemd services...");
         let _ = fs::create_dir_all("/mnt/etc/sddm.conf.d");
         let sddm_cfg = r#"[General]
@@ -141,16 +147,39 @@ GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 CompositorCommand=kwin_wayland --no-lockscreen --no-global-shortcuts --locale1
 "#;
         let _ = fs::write("/mnt/etc/sddm.conf.d/10-wayland.conf", sddm_cfg);
+        // Ensure autologin is removed on installed system so SDDM prompts for password
+        let _ = fs::remove_file("/mnt/etc/sddm.conf.d/autologin.conf");
 
-        let autologin_cfg = format!(
-            r#"[Autologin]
-User={}
-Session=plasma
-Relogin=true
-"#,
-            cfg.username
-        );
-        let _ = fs::write("/mnt/etc/sddm.conf.d/autologin.conf", autologin_cfg);
+        // Configure /mnt/etc/pacman.conf to use hyperxos-mirrorlist
+        if let Ok(pac_conf) = fs::read_to_string("/mnt/etc/pacman.conf") {
+            let updated_pac = pac_conf.replace(
+                "Server = file:///opt/hyperxos-repo/$arch",
+                "Include = /etc/pacman.d/hyperxos-mirrorlist",
+            );
+            let _ = fs::write("/mnt/etc/pacman.conf", updated_pac);
+        }
+
+        // Sync Fluent icon suite from Live ISO to target system if present
+        if Path::new("/usr/share/icons/Fluent-yellow-light").exists() {
+            progress_callback("Deploying Fluent icon theme suite to target system...");
+            let _ = fs::create_dir_all("/mnt/usr/share/icons");
+            for dir_name in [
+                ".Fluent-base",
+                ".Fluent-light-base",
+                ".Fluent-dark-base",
+                "Fluent-yellow",
+                "Fluent-yellow-light",
+                "Fluent-yellow-dark",
+            ] {
+                let src_icon = format!("/usr/share/icons/{}", dir_name);
+                let dst_icon = format!("/mnt/usr/share/icons/{}", dir_name);
+                if Path::new(&src_icon).exists() && !Path::new(&dst_icon).exists() {
+                    let _ = Command::new("cp")
+                        .args(["-a", &src_icon, "/mnt/usr/share/icons/"])
+                        .status();
+                }
+            }
+        }
 
         // DNS Configuration
         let _ = fs::write(
@@ -202,11 +231,11 @@ Relogin=true
         progress_callback("Executing native hardware & GPU driver auto-configuration (hyper-x-hw)...");
         if Path::new("/usr/bin/hyper-x-hw").exists() {
             let _ = Command::new("/usr/bin/hyper-x-hw")
-                .args(["apply", "--target", "/mnt", "--no-pkg"])
+                .args(["apply", "--target", "/mnt"])
                 .status();
         } else if Path::new("/mnt/usr/bin/hyper-x-hw").exists() {
             let _ = Command::new("arch-chroot")
-                .args(["/mnt", "/usr/bin/hyper-x-hw", "apply", "--no-pkg"])
+                .args(["/mnt", "/usr/bin/hyper-x-hw", "apply"])
                 .status();
         } else if fs::metadata("/mnt/usr/local/bin/hw-detect-gpu").is_ok() {
             let _ = Command::new("arch-chroot")

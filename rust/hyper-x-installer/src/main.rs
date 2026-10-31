@@ -38,10 +38,7 @@ pub enum InstallerEvent {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    HeaderHover(Option<&'static str>),
     OpenUrl(&'static str),
-    Minimize,
-    Close,
 
     // Step 1: Preflight
     RefreshPreflight,
@@ -80,8 +77,6 @@ pub enum Message {
     StartInstallation,
 
     // Step 7: Progress & Real-time engine
-    EngineTick,
-    EngineEvent(InstallerEvent),
     AnimationTick,
 
     // Step 8: Finished
@@ -172,24 +167,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 pub struct App {
     step: StepId,
-    hovered_btn: Option<&'static str>,
 
     // Step 1 State
     preflight: PreflightStatus,
 
-    // Step 2 State
-    selected_tz: String,
-    selected_locale: String,
-
-    // Step 3 State
-    selected_keyboard: String,
+    // Step 3 Test Input State
     test_keyboard_text: String,
 
     // Step 4 State
     disks: Vec<DiskInfo>,
     selected_disk_path: Option<String>,
 
-    // Step 5 State
+    // Step 2, 3 & 5 Unified User & Locale Configuration
     user_config: UserConfig,
     confirm_password: String,
     use_same_root_password: bool,
@@ -219,11 +208,7 @@ impl Default for App {
 
         Self {
             step: StepId::Welcome,
-            hovered_btn: None,
             preflight,
-            selected_tz: "Asia/Jakarta".to_string(),
-            selected_locale: "en_US.UTF-8".to_string(),
-            selected_keyboard: "us".to_string(),
             test_keyboard_text: String::new(),
             disks,
             selected_disk_path: first_disk,
@@ -247,16 +232,10 @@ impl Default for App {
 impl App {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::HeaderHover(id) => {
-                self.hovered_btn = id;
-                Task::none()
-            }
             Message::OpenUrl(url) => {
                 open_external_url(url);
                 Task::none()
             }
-            Message::Minimize => window::latest().and_then(|id| window::minimize(id, true)),
-            Message::Close => window::latest().and_then(window::close),
 
             // Step 1: Preflight
             Message::RefreshPreflight => {
@@ -272,11 +251,11 @@ impl App {
 
             // Step 2: Location
             Message::SelectTimezone(tz) => {
-                self.selected_tz = tz;
+                self.user_config.timezone = tz;
                 Task::none()
             }
             Message::SelectLocale(loc) => {
-                self.selected_locale = loc;
+                self.user_config.locale = loc;
                 Task::none()
             }
             Message::GotoWelcome => {
@@ -292,7 +271,12 @@ impl App {
 
             // Step 3: Keyboard
             Message::SelectKeyboard(layout) => {
-                self.selected_keyboard = layout;
+                let layout_clone = layout.clone();
+                self.user_config.keymap = layout;
+                // Apply keyboard layout to the live session so the test input box reflects it immediately
+                let _ = std::process::Command::new("setxkbmap")
+                    .arg(&layout_clone)
+                    .spawn();
                 Task::none()
             }
             Message::ChangeTestText(val) => {
@@ -371,9 +355,6 @@ impl App {
                 Task::none()
             }
             Message::GotoSummary => {
-                self.user_config.timezone = self.selected_tz.clone();
-                self.user_config.locale = self.selected_locale.clone();
-                self.user_config.keymap = self.selected_keyboard.clone();
                 self.step = StepId::Summary;
                 self.step_transition.start();
                 Task::none()
@@ -401,7 +382,7 @@ impl App {
             }
 
             // Step 7: Engine Realtime Loop & Motion Smoothing
-            Message::AnimationTick | Message::EngineTick => {
+            Message::AnimationTick => {
                 let dt = 0.016;
                 self.step_transition.update(dt);
                 if self.is_installing {
@@ -440,10 +421,6 @@ impl App {
                 }
                 Task::none()
             }
-            Message::EngineEvent(_evt) => {
-                // Direct event handler if needed
-                Task::none()
-            }
 
             // Step 8: Done
             Message::ToggleRestart(val) => {
@@ -480,15 +457,15 @@ impl App {
                 Message::GotoLocation,
             ),
             StepId::Location => step2_location::view(
-                &self.selected_tz,
-                &self.selected_locale,
+                &self.user_config.timezone,
+                &self.user_config.locale,
                 Message::SelectTimezone,
                 Message::SelectLocale,
                 Message::GotoWelcome,
                 Message::GotoKeyboard,
             ),
             StepId::Keyboard => step3_keyboard::view(
-                &self.selected_keyboard,
+                &self.user_config.keymap,
                 &self.test_keyboard_text,
                 Message::SelectKeyboard,
                 Message::ChangeTestText,
@@ -559,11 +536,7 @@ impl App {
             row![
                 stepper_sidebar(self.step),
                 column![
-                    installer_header(
-                        self.hovered_btn,
-                        Message::HeaderHover,
-                        Message::OpenUrl,
-                    ),
+                    installer_header(Message::OpenUrl),
                     content_container,
                 ]
                 .width(Length::Fill)
@@ -621,6 +594,7 @@ impl App {
         let fs_ctx = match FilesystemManager::setup_filesystems(&layout, send_log.clone()) {
             Ok(c) => c,
             Err(e) => {
+                let _ = FilesystemManager::unmount_all();
                 let _ = tx.send(InstallerEvent::Finished(Err(format!("Filesystem error: {}", e))));
                 return;
             }
@@ -633,6 +607,7 @@ impl App {
         });
 
         if let Err(e) = PacstrapInstaller::prepare_pacman_environment(send_log.clone()) {
+            let _ = FilesystemManager::unmount_all();
             let _ = tx.send(InstallerEvent::Finished(Err(format!("Pacman setup error: {}", e))));
             return;
         }
@@ -644,6 +619,7 @@ impl App {
         });
 
         if let Err(e) = PacstrapInstaller::run_pacstrap(send_log.clone()) {
+            let _ = FilesystemManager::unmount_all();
             let _ = tx.send(InstallerEvent::Finished(Err(format!("Pacstrap installation error: {}", e))));
             return;
         }
@@ -655,6 +631,7 @@ impl App {
         });
 
         if let Err(e) = SystemConfigurator::configure_system(&fs_ctx, &user_config, send_log.clone()) {
+            let _ = FilesystemManager::unmount_all();
             let _ = tx.send(InstallerEvent::Finished(Err(format!("Configuration error: {}", e))));
             return;
         }
@@ -666,11 +643,15 @@ impl App {
         });
 
         if let Err(e) = LimineBootloader::install(&disk_path, &fs_ctx, send_log.clone()) {
+            let _ = FilesystemManager::unmount_all();
             let _ = tx.send(InstallerEvent::Finished(Err(format!("Bootloader installation error: {}", e))));
             return;
         }
 
-        // 7. Complete!
+        // 7. Unmount & Sync filesystems cleanly before completion
+        let _ = tx.send(InstallerEvent::Log("Syncing filesystems and unmounting /mnt...".to_string()));
+        let _ = FilesystemManager::unmount_all();
+
         let _ = tx.send(InstallerEvent::Stage {
             name: "Installation Successfully Completed!".to_string(),
             pct: 100.0,

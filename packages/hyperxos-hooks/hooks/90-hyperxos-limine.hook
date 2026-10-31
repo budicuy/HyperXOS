@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = limine
+
+[Action]
+Description = Deploying updated Limine EFI bootloader to ESP...
+When = PostTransaction
+Exec = /bin/sh -c 'if [ -f /usr/share/limine/BOOTX64.EFI ] && [ -d /boot/EFI ]; then install -Dm644 /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/BOOTX64.EFI; install -Dm644 /usr/share/limine/BOOTX64.EFI /boot/EFI/limine/BOOTX64.EFI; fi'

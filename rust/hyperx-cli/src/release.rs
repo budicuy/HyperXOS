@@ -2,7 +2,7 @@ use std::path::Path;
 use std::process::Command;
 
 use crate::checksum::run_checksum;
-use crate::util::{command_exists, find_latest_iso};
+use hyperx_ui_kit::{command_exists, find_latest_iso};
 
 pub fn run_release(root: &Path, checksum_only: bool) -> Result<(), String> {
     if checksum_only {

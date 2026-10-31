@@ -44,55 +44,54 @@ pub fn view<'a, Message: Clone + 'a>(
             let is_sel = selected_disk_path == Some(disk.path.as_str());
             let path_clone = disk.path.clone();
 
-            let card = button(
-                row![
-                    svg_icon(icons::HARD_DRIVE, 24.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
-                    column![
-                        row![
-                            text(&disk.model)
-                                .size(14)
-                                .font(FONT_BODY_SEMIBOLD)
+            let mut disk_row = row![
+                svg_icon(icons::DISK, 24.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
+                column![
+                    row![
+                        text(&disk.model)
+                            .size(14)
+                            .font(FONT_BODY_SEMIBOLD)
+                            .style(move |_| text::Style {
+                                color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
+                            }),
+                        container(
+                            text(&disk.transport)
+                                .size(9)
+                                .font(FONT_DISPLAY_BOLD)
                                 .style(move |_| text::Style {
-                                    color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
+                                    color: Some(TEXT_SUB),
                                 }),
-                            container(
-                                text(&disk.transport)
-                                    .size(9)
-                                    .font(FONT_DISPLAY_BOLD)
-                                    .style(move |_| text::Style {
-                                        color: Some(TEXT_SUB),
-                                    }),
-                            )
-                            .padding([2, 6])
-                            .style(glass_card_style),
-                        ]
-                        .spacing(8)
-                        .align_y(Alignment::Center),
-                        row![
-                            text(&disk.path).size(12).font(FONT_BODY).style(|_| text::Style {
-                                color: Some(TEXT_SUB),
-                            }),
-                            text("•").size(12).style(|_| text::Style {
-                                color: Some(TEXT_MUTED),
-                            }),
-                            text(format!("{:.1} GB", disk.size_gb)).size(12).font(FONT_BODY_SEMIBOLD).style(|_| text::Style {
-                                color: Some(TEXT_SUB),
-                            }),
-                        ]
-                        .spacing(6)
-                        .align_y(Alignment::Center),
+                        )
+                        .padding([2, 6])
+                        .style(glass_card_style),
                     ]
-                    .spacing(4)
-                    .width(Length::Fill),
-                    if is_sel {
-                        svg_icon(icons::CHECK_CIRCLE, 18.0, FLUENT_PRIMARY)
-                    } else {
-                        svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
-                    },
+                    .spacing(8)
+                    .align_y(Alignment::Center),
+                    row![
+                        text(&disk.path).size(12).font(FONT_BODY).style(|_| text::Style {
+                            color: Some(TEXT_SUB),
+                        }),
+                        text("•").size(12).style(|_| text::Style {
+                            color: Some(TEXT_MUTED),
+                        }),
+                        text(format!("{:.1} GB", disk.size_gb)).size(12).font(FONT_BODY_SEMIBOLD).style(|_| text::Style {
+                            color: Some(TEXT_SUB),
+                        }),
+                    ]
+                    .spacing(6)
+                    .align_y(Alignment::Center),
                 ]
-                .spacing(14)
-                .align_y(Alignment::Center),
-            )
+                .spacing(4)
+                .width(Length::Fill),
+            ]
+            .spacing(14)
+            .align_y(Alignment::Center);
+
+            if is_sel {
+                disk_row = disk_row.push(svg_icon(icons::CHECK_CIRCLE, 18.0, FLUENT_PRIMARY));
+            }
+
+            let card = button(disk_row)
             .padding([12, 16])
             .width(Length::Fill)
             .style(move |_, _| {

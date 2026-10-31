@@ -6,6 +6,7 @@ use crate::ui::components::{glass_scrollable, metric_card};
 use crate::ui::icons::{self, svg_icon};
 use crate::ui::theme::*;
 
+#[allow(clippy::too_many_arguments)]
 pub fn view<'a, Message: Clone + 'a>(
     metrics: &SystemMetrics,
     animated_cpu: f32,
@@ -106,7 +107,7 @@ pub fn view<'a, Message: Clone + 'a>(
     let cpu_val = format!("{:.1}%", animated_cpu);
     let cpu_card = metric_card(
         "Prosesor (CPU)",
-        icons::CPU,
+        icons::KERNEL,
         cpu_val,
         animated_cpu / 100.0,
         cpu_sub,

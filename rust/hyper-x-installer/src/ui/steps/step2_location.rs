@@ -37,28 +37,27 @@ pub fn view<'a, Message: Clone + 'a>(
         let is_sel = *tz_code == selected_tz;
         let code_str = tz_code.to_string();
 
-        let btn = button(
-            row![
-                svg_icon(icons::GLOBE, 14.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
-                column![
-                    text(*tz_code).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
-                        color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
-                    }),
-                    text(*tz_desc).size(10).font(FONT_BODY).style(move |_| text::Style {
-                        color: Some(TEXT_MUTED),
-                    }),
-                ]
-                .spacing(2)
-                .width(Length::Fill),
-                if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY)
-                } else {
-                    svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
-                },
+        let mut item_row = row![
+            svg_icon(icons::GLOBE, 14.0, if is_sel { FLUENT_PRIMARY } else { TEXT_MUTED }),
+            column![
+                text(*tz_code).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
+                    color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
+                }),
+                text(*tz_desc).size(10).font(FONT_BODY).style(move |_| text::Style {
+                    color: Some(TEXT_MUTED),
+                }),
             ]
-            .spacing(10)
-            .align_y(Alignment::Center),
-        )
+            .spacing(2)
+            .width(Length::Fill),
+        ]
+        .spacing(10)
+        .align_y(Alignment::Center);
+
+        if is_sel {
+            item_row = item_row.push(svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY));
+        }
+
+        let btn = button(item_row)
         .padding(10)
         .width(Length::Fill)
         .style(move |_, _| {
@@ -80,21 +79,20 @@ pub fn view<'a, Message: Clone + 'a>(
         let is_sel = *loc_code == selected_locale;
         let code_str = loc_code.to_string();
 
-        let btn = button(
-            row![
-                text(*loc_desc).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
-                    color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
-                }),
-                row![].width(Length::Fill),
-                if is_sel {
-                    svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY)
-                } else {
-                    svg_icon(icons::MINUS, 0.0, Color::TRANSPARENT)
-                },
-            ]
-            .spacing(8)
-            .align_y(Alignment::Center),
-        )
+        let mut loc_row = row![
+            text(*loc_desc).size(12).font(FONT_BODY_SEMIBOLD).style(move |_| text::Style {
+                color: Some(if is_sel { FLUENT_PRIMARY } else { TEXT_MAIN }),
+            }),
+            row![].width(Length::Fill),
+        ]
+        .spacing(8)
+        .align_y(Alignment::Center);
+
+        if is_sel {
+            loc_row = loc_row.push(svg_icon(icons::CHECK_CIRCLE, 14.0, FLUENT_PRIMARY));
+        }
+
+        let btn = button(loc_row)
         .padding(10)
         .width(Length::Fill)
         .style(move |_, _| {

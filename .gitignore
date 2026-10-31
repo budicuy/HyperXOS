@@ -29,8 +29,9 @@ packages/*/src/
 packages/*/*.pkg.tar.*
 packages/hyper-x-installer/hyper-x-installer
 
-# 6. Rust & C++ Compilation Objects (HyperXTools)
+# 6. Rust & C++ Compilation Objects (HyperXTools & Plasmoids)
 **/target/
+plasmoids/**/build/
 *.o
 *.a
 *.so

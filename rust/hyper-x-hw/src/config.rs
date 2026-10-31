@@ -128,16 +128,29 @@ impl ConfigApplier {
                 let mut new_lines = Vec::new();
 
                 for line in content.lines() {
-                    if line.trim_start().starts_with("MODULES=(") && !line.contains(&modules[0]) {
-                        // Insert modules safely inside MODULES=(...)
+                    if line.trim_start().starts_with("MODULES=(") {
                         if let Some(close_idx) = line.rfind(')') {
                             let (start, _) = line.split_at(close_idx);
-                            let added = format!(" {})\n", modules.join(" "));
-                            let mut full = start.to_string();
-                            full.push_str(&added);
-                            new_lines.push(full);
-                            modified = true;
-                            continue;
+                            let missing: Vec<&str> = modules
+                                .iter()
+                                .map(|m| m.as_str())
+                                .filter(|m| {
+                                    !start
+                                        .trim_start_matches("MODULES=(")
+                                        .split_whitespace()
+                                        .any(|tok| tok == *m)
+                                })
+                                .collect();
+                            if !missing.is_empty() {
+                                let sep = if start.ends_with('(') || start.ends_with(' ') {
+                                    ""
+                                } else {
+                                    " "
+                                };
+                                new_lines.push(format!("{}{}{}){}", start, sep, missing.join(" "), &line[close_idx + 1..]));
+                                modified = true;
+                                continue;
+                            }
                         }
                     }
                     new_lines.push(line.to_string());
@@ -173,7 +186,7 @@ impl ConfigApplier {
                     if line.trim_start().starts_with("cmdline:") {
                         let mut line_str = line.to_string();
                         for param in params {
-                            if !line_str.contains(param) {
+                            if !line_str.split_whitespace().any(|tok| tok == param) {
                                 line_str.push(' ');
                                 line_str.push_str(param);
                                 modified = true;

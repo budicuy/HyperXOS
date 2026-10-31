@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "dev@hyperxos.org",
+                "Name": "HyperXOS Design Team"
+            }
+        ],
+        "Category": "",
+        "Description": "HyperX Fluent Dark Plasma Style (Windows 11 Mica/Acrylic Dark)",
+        "Description[id]": "Gaya Plasma HyperX Fluent Gelap (Windows 11 Mica/Acrylic Dark)",
+        "EnabledByDefault": true,
+        "Id": "HyperX-Fluent-Dark",
+        "License": "GPL-3.0-or-later",
+        "Name": "HyperX Fluent Dark",
+        "Name[id]": "HyperX Fluent Dark",
+        "Version": "2.0.0",
+        "Website": "https://github.com/budicuy/HyperXOS"
+    },
+    "X-Plasma-API": "5.0"
+}

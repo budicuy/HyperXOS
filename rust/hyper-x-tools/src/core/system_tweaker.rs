@@ -2,6 +2,8 @@ use std::fs;
 use std::process::Command;
 use crate::core::kernel_manager::KernelManager;
 
+const SYSCTL_GAMING_CONF: &str = "/etc/sysctl.d/99-hyperx-gaming.conf";
+
 pub struct SystemTweaker;
 
 impl SystemTweaker {
@@ -33,15 +35,17 @@ impl SystemTweaker {
         (val, is_opt)
     }
 
-    pub fn optimize_max_map_count<F>(log_cb: F)
+    pub fn toggle_max_map_count<F>(enable: bool, log_cb: F)
     where
         F: Fn(String) + Send + 'static,
     {
-        let _ = KernelManager::execute_action(
-            "pkexec",
-            &["sysctl", "-w", "vm.max_map_count=2147483642"],
-            log_cb,
+        let target_val = if enable { "2147483642" } else { "65530" };
+        let split_val = if Self::is_split_lock_disabled() { "0" } else { "1" };
+        let script = format!(
+            "printf 'vm.max_map_count = %s\\nkernel.split_lock_mitigate = %s\\n' '{}' '{}' > {} && sysctl -w vm.max_map_count={}",
+            target_val, split_val, SYSCTL_GAMING_CONF, target_val
         );
+        let _ = KernelManager::execute_action("pkexec", &["sh", "-c", &script], log_cb);
     }
 
     pub fn is_split_lock_disabled() -> bool {
@@ -56,8 +60,12 @@ impl SystemTweaker {
         F: Fn(String) + Send + 'static,
     {
         let val = if disable { "0" } else { "1" };
-        let arg = format!("kernel.split_lock_mitigate={}", val);
-        let _ = KernelManager::execute_action("pkexec", &["sysctl", "-w", &arg], log_cb);
+        let (map_val, _) = Self::get_max_map_count();
+        let script = format!(
+            "printf 'vm.max_map_count = %s\\nkernel.split_lock_mitigate = %s\\n' '{}' '{}' > {} && sysctl -w kernel.split_lock_mitigate={}",
+            map_val, val, SYSCTL_GAMING_CONF, val
+        );
+        let _ = KernelManager::execute_action("pkexec", &["sh", "-c", &script], log_cb);
     }
 
     pub fn is_gamemode_active() -> bool {

@@ -47,8 +47,8 @@ ForegroundPositive=22,163,74
 ForegroundVisited=155,89,182
 
 [Colors:Header]
-BackgroundAlternate=243,243,243
-BackgroundNormal=255,255,255
+BackgroundAlternate=235,235,235
+BackgroundNormal=243,243,243
 DecorationFocus=0,120,212
 DecorationHover=0,120,212
 ForegroundActive=0,120,212
@@ -62,15 +62,15 @@ ForegroundVisited=155,89,182
 
 [Colors:Header][Inactive]
 BackgroundAlternate=243,243,243
-BackgroundNormal=250,250,250
+BackgroundNormal=248,248,248
 DecorationFocus=0,120,212
 DecorationHover=0,120,212
 ForegroundActive=0,120,212
-ForegroundInactive=97,97,97
+ForegroundInactive=120,120,120
 ForegroundLink=0,102,204
 ForegroundNegative=220,38,38
 ForegroundNeutral=217,119,6
-ForegroundNormal=31,31,31
+ForegroundNormal=97,97,97
 ForegroundPositive=22,163,74
 ForegroundVisited=155,89,182
 
@@ -135,3 +135,14 @@ ColorScheme=HyperXFluentLight
 Name=HyperX Fluent Light
 accentColor=0,120,212
 shadeSortColumn=true
+
+[KDE]
+contrast=4
+
+[WM]
+activeBackground=243,243,243
+activeBlend=31,31,31
+activeForeground=31,31,31
+inactiveBackground=238,238,238
+inactiveBlend=120,120,120
+inactiveForeground=120,120,120

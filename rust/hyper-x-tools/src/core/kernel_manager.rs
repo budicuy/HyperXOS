@@ -162,12 +162,36 @@ impl KernelManager {
             .spawn()
             .map_err(|e| format!("Gagal menjalankan {}: {}", cmd, e))?;
 
-        if let Some(stdout) = child.stdout.take() {
-            let reader = BufReader::new(stdout);
-            for line in reader.lines().map_while(Result::ok) {
-                log_cb(format!("{}\n", line));
+        let stdout = child.stdout.take();
+        let stderr = child.stderr.take();
+
+        let (tx, rx) = std::sync::mpsc::channel::<String>();
+        let tx_err = tx.clone();
+
+        let out_handle = std::thread::spawn(move || {
+            if let Some(out) = stdout {
+                let reader = BufReader::new(out);
+                for line in reader.lines().map_while(Result::ok) {
+                    let _ = tx.send(format!("{}\n", line));
+                }
             }
+        });
+
+        let err_handle = std::thread::spawn(move || {
+            if let Some(err) = stderr {
+                let reader = BufReader::new(err);
+                for line in reader.lines().map_while(Result::ok) {
+                    let _ = tx_err.send(format!("{}\n", line));
+                }
+            }
+        });
+
+        while let Ok(line) = rx.recv() {
+            log_cb(line);
         }
+
+        let _ = out_handle.join();
+        let _ = err_handle.join();
 
         let status = child
             .wait()

@@ -127,6 +127,17 @@ impl LimineBootloader {
         );
         let _ = fs::write("/mnt/etc/default/limine", default_limine);
 
+        // Apply GPU-specific kernel cmdline parameters into the newly generated limine.conf
+        if Path::new("/usr/bin/hyper-x-hw").exists() {
+            let _ = Command::new("/usr/bin/hyper-x-hw")
+                .args(["apply", "--target", "/mnt", "--no-pkg"])
+                .status();
+        } else if Path::new("/mnt/usr/bin/hyper-x-hw").exists() {
+            let _ = Command::new("arch-chroot")
+                .args(["/mnt", "/usr/bin/hyper-x-hw", "apply", "--no-pkg"])
+                .status();
+        }
+
         // 4. Register Limine in UEFI NVRAM via efibootmgr
         progress_callback("Registering HyperXOS UEFI boot entry in NVRAM (efibootmgr)...");
         let _ = Command::new("efibootmgr")

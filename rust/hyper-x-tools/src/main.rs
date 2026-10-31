@@ -82,9 +82,6 @@ pub struct App {
     all_packages: Vec<StorePackage>,
     filtered_packages: Vec<StorePackage>,
 
-    // Header state
-    hovered_header_btn: Option<&'static str>,
-
     // Motion & Animation States
     page_transition: TransitionState,
     cpu_smooth: SmoothValue,
@@ -103,14 +100,10 @@ pub enum Message {
     Tick,
     AnimTick,
     SelectPage(Page),
-    RefreshMetrics,
     ClearLog,
 
     // Window Management
     WindowDrag,
-    WindowMinimize,
-    WindowMaximize,
-    WindowClose,
 
     // Kernel
     InstallKernel(String),
@@ -145,7 +138,6 @@ pub enum Message {
 
     // External Links
     OpenUrl(&'static str),
-    HeaderBtnHovered(Option<&'static str>),
 }
 
 impl Default for App {
@@ -200,8 +192,6 @@ impl Default for App {
             all_packages,
             filtered_packages,
 
-            hovered_header_btn: None,
-
             page_transition: TransitionState::new(0.18),
             cpu_smooth: SmoothValue::new(cpu_pct, 6.0),
             ram_smooth: SmoothValue::new(ram_pct, 6.0),
@@ -235,8 +225,21 @@ impl App {
 
     pub fn update(&mut self, message: Message) -> Task<Message> {
         // Drain any incoming logs from background threads
+        let mut action_finished = false;
         while let Ok(msg) = self.log_rx.try_recv() {
+            if msg.contains("[✓] Perintah selesai") || msg.contains("[✗] Perintah keluar") {
+                action_finished = true;
+            }
             self.terminal_log.push_str(&msg);
+        }
+        if action_finished {
+            match self.current_page {
+                Page::KernelManager => self.refresh_kernel_state(),
+                Page::GameTweaks => self.refresh_tweaks_state(),
+                Page::Snapshots => self.refresh_snapshots_state(),
+                Page::PackageStore => self.refresh_store_state(),
+                _ => {}
+            }
         }
 
         match message {
@@ -255,14 +258,6 @@ impl App {
                 self.ram_smooth.update(dt);
                 self.disk_smooth.update(dt);
                 self.gpu_smooth.update(dt);
-                Task::none()
-            }
-            Message::RefreshMetrics => {
-                self.metrics = self.monitor.collect_metrics();
-                self.cpu_smooth.set_target(self.metrics.cpu_usage_percent);
-                self.ram_smooth.set_target(self.metrics.ram_usage_percent);
-                self.disk_smooth.set_target(self.metrics.disk_usage_percent);
-                self.gpu_smooth.set_target(self.metrics.gpu_usage_percent);
                 Task::none()
             }
             Message::SelectPage(page) => {
@@ -286,21 +281,8 @@ impl App {
             Message::WindowDrag => {
                 window::latest().and_then(window::drag)
             }
-            Message::WindowMinimize => {
-                window::latest().and_then(|id| window::minimize(id, true))
-            }
-            Message::WindowMaximize => {
-                window::latest().and_then(window::toggle_maximize)
-            }
-            Message::WindowClose => {
-                window::latest().and_then(window::close)
-            }
             Message::OpenUrl(url) => {
                 open_external_url(url);
-                Task::none()
-            }
-            Message::HeaderBtnHovered(btn) => {
-                self.hovered_header_btn = btn;
                 Task::none()
             }
 
@@ -348,6 +330,8 @@ impl App {
             }
 
             // --- GAMING TWEAKS ---
+            // Do not mutate state optimistically before Polkit completes;
+            // `action_finished` automatically refreshes actual kernel state via `refresh_tweaks_state()`.
             Message::SetGovernor(gov) => {
                 let tx = self.log_tx.clone();
                 let gov_str = gov.to_string();
@@ -356,18 +340,16 @@ impl App {
                         let _ = tx.send(s);
                     });
                 });
-                self.current_governor = gov.to_string();
                 Task::none()
             }
             Message::ToggleMaxMapCount => {
                 let tx = self.log_tx.clone();
+                let target_enable = !self.is_max_map_opt;
                 std::thread::spawn(move || {
-                    SystemTweaker::optimize_max_map_count(move |s| {
+                    SystemTweaker::toggle_max_map_count(target_enable, move |s| {
                         let _ = tx.send(s);
                     });
                 });
-                self.is_max_map_opt = true;
-                self.max_map_count_val = "2147483642".to_string();
                 Task::none()
             }
             Message::ToggleSplitLock => {
@@ -378,7 +360,6 @@ impl App {
                         let _ = tx.send(s);
                     });
                 });
-                self.is_split_lock_disabled = new_disabled;
                 Task::none()
             }
             Message::ToggleGameMode => {
@@ -389,7 +370,6 @@ impl App {
                         let _ = tx.send(s);
                     });
                 });
-                self.is_gamemode_active = new_active;
                 Task::none()
             }
             Message::InstallGamingRuntimes => {
@@ -551,12 +531,7 @@ impl App {
 
     pub fn view(&self) -> Element<'_, Message> {
         let side = sidebar(self.current_page, Message::SelectPage, Message::WindowDrag);
-        let head = tools_header(
-            self.hovered_header_btn,
-            Message::HeaderBtnHovered,
-            Message::OpenUrl,
-            Message::WindowDrag,
-        );
+        let head = tools_header(Message::OpenUrl, Message::WindowDrag);
 
         let main_content: Element<'_, Message> = match self.current_page {
             Page::Dashboard => ui::pages::dashboard::view(

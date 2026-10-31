@@ -39,6 +39,8 @@ wireplumber
 plasma-meta
 plasma-vault
 power-profiles-daemon
+cpupower
+pacman-contrib
 dolphin
 konsole
 ark
@@ -46,7 +48,6 @@ mesa
 sddm
 xdg-user-dirs
 xorg-xwayland
-papirus-icon-theme
 ttf-jetbrains-mono-nerd
 
 # Core Web Browser

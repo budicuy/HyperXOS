@@ -3,14 +3,14 @@ use std::path::Path;
 use std::process::Command;
 
 use crate::checksum::run_checksum;
-use crate::util::{find_latest_iso, run_stream};
+use hyperx_ui_kit::{find_latest_iso, run_stream};
 
 pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String> {
     let mode = if prod { "prod" } else { "dev" };
     println!("==================================================");
     println!("  HyperXOS Unified Build Engine (Pure Rust)");
     println!("  Mode: {}", mode);
-    println!("  Time: {}", chrono_lite_timestamp());
+    println!("  Time: {}", chrono::Local::now().format("%Y-%m-%d %H:%M:%S %Z"));
     println!("==================================================");
 
     let out_dir = root.join("out");
@@ -20,7 +20,7 @@ pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String>
     let mkinit_conf = profile_dir.join("airootfs/etc/mkinitcpio.conf.d/archiso.conf");
     let packages_file = profile_dir.join("packages.x86_64");
     let hash_file = work_dir.join(".packages.hash");
-    let max_prod_bytes: u64 = 2_000_000_000; // 2.0 GB decimal limit
+    let max_prod_bytes: u64 = 3_200_000_000; // 3.2 GB decimal limit for full KDE Plasma 6 + Firmware ISO
 
     fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
 
@@ -69,7 +69,7 @@ pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String>
 
     if prod {
         println!("  -> Applying PRODUCTION settings: Ultra-compressed (SquashFS zstd -22 1M, Initramfs xz -9e)");
-        println!("  -> Strict zero-tolerance quality policy: no errors, no conflicts, strict < 2.0GB size.");
+        println!("  -> Strict zero-tolerance quality policy: no errors, no conflicts, strict < 3.2GB size.");
 
         // SquashFS zstd -22 1M
         modify_profiledef_compression(&profiledef, "('-comp' 'zstd' '-Xcompression-level' '22' '-b' '1M' '-no-xattrs')")?;
@@ -106,7 +106,33 @@ pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String>
 
         if airootfs_work.exists() && packages_marker.exists() && cached_hash == current_pkg_list_hash {
             println!("  -> [CACHE HIT] Reusing cached pacstrap airootfs for instant build...");
-            println!("  -> Syncing overlay archiso/airootfs changes & newly built dev binaries...");
+            println!("  -> Syncing overlay archiso/airootfs, base packages, & newly built dev binaries...");
+
+            // Sync hyperxos-default-settings and hyperxos-branding into cached airootfs
+            let def_settings = root.join("packages/hyperxos-default-settings");
+            for sub in ["etc", "usr"] {
+                let src = def_settings.join(sub);
+                let dst = airootfs_work.join(sub);
+                if src.exists() {
+                    let _ = Command::new("sudo")
+                        .args(["cp", "-af", "--no-preserve=ownership,mode", &format!("{}/.", src.display()), &format!("{}/", dst.display())])
+                        .status();
+                }
+            }
+            let skel_src = def_settings.join("etc/skel");
+            let live_home = airootfs_work.join("home/hyperxos");
+            if skel_src.exists() && live_home.exists() {
+                let _ = Command::new("sudo")
+                    .args(["cp", "-af", "--no-preserve=ownership,mode", &format!("{}/.", skel_src.display()), &format!("{}/", live_home.display())])
+                    .status();
+            }
+            let branding_usr = root.join("packages/hyperxos-branding/usr");
+            if branding_usr.exists() {
+                let _ = Command::new("sudo")
+                    .args(["cp", "-af", "--no-preserve=ownership,mode", &format!("{}/.", branding_usr.display()), &format!("{}/", airootfs_work.join("usr").display())])
+                    .status();
+            }
+
             let mut cp_cmd = Command::new("sudo");
             cp_cmd.args(["cp", "-af", "--no-preserve=ownership,mode", &format!("{}/.", profile_dir.join("airootfs").display()), &format!("{}/", airootfs_work.display())]);
             let _ = cp_cmd.status();
@@ -202,11 +228,11 @@ pub fn run_build(root: &Path, prod: bool, repo_only: bool) -> Result<(), String>
     if prod {
         if size_bytes >= max_prod_bytes {
             return Err(format!(
-                "Production ISO size ({} bytes / {} MB) EXCEEDS 2.0 GB limit ({} bytes)!",
+                "Production ISO size ({} bytes / {} MB) EXCEEDS 3.2 GB limit ({} bytes)!",
                 size_bytes, size_mb, max_prod_bytes
             ));
         }
-        println!("[✓] Production size check PASSED: strictly under 2.0 GB ({} < {}).", size_bytes, max_prod_bytes);
+        println!("[✓] Production size check PASSED: strictly under 3.2 GB ({} < {}).", size_bytes, max_prod_bytes);
     }
 
     println!("==> Generating ISO checksums...");
@@ -245,14 +271,7 @@ fn modify_profiledef_compression(profiledef: &Path, options: &str) -> Result<(),
 }
 
 fn users_id() -> String {
-    let uid = Command::new("id").arg("-u").output().map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string()).unwrap_or_else(|_| "1000".to_string());
-    let gid = Command::new("id").arg("-g").output().map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string()).unwrap_or_else(|_| "1000".to_string());
+    let uid = nix::unistd::getuid().as_raw();
+    let gid = nix::unistd::getgid().as_raw();
     format!("{}:{}", uid, gid)
-}
-
-fn chrono_lite_timestamp() -> String {
-    Command::new("date")
-        .output()
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-        .unwrap_or_else(|_| "Unknown Date".to_string())
 }
