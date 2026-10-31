@@ -165,6 +165,7 @@ Relogin=true
             "systemd-resolved.service",
             "systemd-timesyncd.service",
             "bluetooth.service",
+            "power-profiles-daemon.service",
             "qemu-guest-agent.service",
         ] {
             let _ = Command::new("arch-chroot")

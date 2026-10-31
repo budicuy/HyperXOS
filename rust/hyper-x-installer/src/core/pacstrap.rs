@@ -34,6 +34,7 @@ pub const BASE_ONLINE_PACKAGES: &[&str] = &[
     "pipewire-alsa",
     "wireplumber",
     "plasma-meta",
+    "power-profiles-daemon",
     "dolphin",
     "konsole",
     "ark",

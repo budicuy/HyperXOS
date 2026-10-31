@@ -58,3 +58,7 @@ repo/x86_64/*.pkg.tar.*
 repo/x86_64/hyperxos.db*
 repo/x86_64/hyperxos.files*
 
+# 10. Large Assets & Icon Packs inside airootfs (Fluent Icon Suite)
+archiso/airootfs/usr/share/icons/
+
+

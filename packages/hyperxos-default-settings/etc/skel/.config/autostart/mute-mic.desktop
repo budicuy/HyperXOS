@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Mute Microphone Default
+Exec=sh -c "sleep 2 && (wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1 2>/dev/null || pactl set-source-mute @DEFAULT_SOURCE@ 1 2>/dev/null || true)"
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-phase=2

@@ -19,30 +19,48 @@ Image=/usr/share/wallpapers/hyperxos-default.png
 
 [Containments][2]
 activityId=
+floating=1
 formfactor=2
 immutability=1
 lastScreen=0
 location=4
 plugin=org.kde.panel
+thickness=48
 
 [Containments][2][Applets][3]
 immutability=1
-plugin=org.kde.plasma.kickoff
+plugin=org.kde.plasma.panelspacer
+
+[Containments][2][Applets][3][Configuration][General]
+expanding=true
 
 [Containments][2][Applets][4]
 immutability=1
-plugin=org.kde.plasma.pager
+plugin=menu.11.enhanced
+
+[Containments][2][Applets][4][Configuration][General]
+displayPosition=2
+favoriteApps=preferred://browser,applications:org.kde.dolphin.desktop,applications:hyper-x-tools.desktop,applications:hyper-x-installer.desktop,applications:systemsettings.desktop,applications:org.kde.konsole.desktop,applications:org.kde.discover.desktop,applications:org.kde.kwrite.desktop,applications:org.kde.kcalc.desktop,applications:org.kde.spectacle.desktop
+icon=fluent-start
+numberColumns=6
+numberRows=3
+showAtCenter=true
+showRecentDocuments=true
 
 [Containments][2][Applets][5]
 immutability=1
 plugin=org.kde.plasma.icontasks
 
 [Containments][2][Applets][5][Configuration][General]
+groupedTaskVisualization=1
 launchers=applications:org.kde.dolphin.desktop,applications:firefox.desktop,applications:org.kde.konsole.desktop,applications:hyper-x-tools.desktop,applications:hyper-x-installer.desktop
 
 [Containments][2][Applets][6]
 immutability=1
-plugin=org.kde.plasma.marginsseparator
+plugin=org.kde.plasma.panelspacer
+
+[Containments][2][Applets][6][Configuration][General]
+expanding=true
 
 [Containments][2][Applets][7]
 activityId=
@@ -50,11 +68,21 @@ formfactor=0
 immutability=1
 lastScreen=0
 location=0
-plugin=org.kde.plasma.systemtray
+plugin=org.kde.windowsmodern.systemtray
+
+[Containments][2][Applets][7][Configuration][General]
+extraItems=org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.battery,org.kde.plasma.bluetooth
+hiddenItems=org.kde.plasma.volume,org.kde.plasma.brightness
+shownItems=org.kde.plasma.networkmanagement,org.kde.plasma.battery
 
 [Containments][2][Applets][8]
 immutability=1
 plugin=org.kde.plasma.digitalclock
+
+[Containments][2][Applets][8][Configuration][Appearance]
+dateFormat=shortDate
+showDate=true
+showSeconds=false
 
 [Containments][2][Applets][9]
 immutability=1

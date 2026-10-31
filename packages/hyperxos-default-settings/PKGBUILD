@@ -1,9 +1,9 @@
 # Maintainer: HyperXOS Development Team <dev@hyperxos.org>
 pkgname=hyperxos-default-settings
 pkgver=1.0.0
-pkgrel=9
+pkgrel=22
 pkgdesc="Default shell, user skeleton, and KDE Plasma 6 desktop configurations for HyperXOS"
-arch=('any')
+arch=('x86_64')
 url="https://github.com/budicuy/HyperXOS"
 license=('GPL-3.0-or-later')
 depends=()
@@ -18,5 +18,10 @@ package() {
 
     if [ -d etc/skel ]; then
         cp -af etc/skel/. "${pkgdir}/etc/skel/"
+    fi
+
+    if [ -d usr ]; then
+        install -d "${pkgdir}/usr"
+        cp -af usr/. "${pkgdir}/usr/"
     fi
 }

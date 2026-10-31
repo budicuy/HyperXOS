@@ -37,6 +37,6 @@ package() {
     ln -sf /usr/bin/hyper-x-installer-launcher "${pkgdir}/usr/local/bin/launch-installer"
     install -Dm644 "${startdir}/hyper-x-installer.desktop" "${pkgdir}/usr/share/applications/hyper-x-installer.desktop"
     local logo_src="${startdir}/../../rust/hyperx-ui-kit/assets/logo.png"
-    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/hyper-x-installer.png"
     install -Dm644 "${logo_src}" "${pkgdir}/usr/share/pixmaps/hyper-x-installer.png"
+    install -Dm644 "${logo_src}" "${pkgdir}/usr/share/icons/hicolor/128x128/apps/hyper-x-installer.png"
 }

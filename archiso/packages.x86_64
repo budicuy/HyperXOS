@@ -37,6 +37,8 @@ wireplumber
 
 # Desktop Environment: KDE Plasma 6 (Wayland)
 plasma-meta
+plasma-vault
+power-profiles-daemon
 dolphin
 konsole
 ark
