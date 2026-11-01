@@ -242,6 +242,7 @@ Item {
                 id: actionPanel
                 Layout.fillWidth: true
                 onRequestPage: name => popup.activateFlyout(name)
+                onRequestClosePopup: systemTrayState.expanded = false
             }
         }
 

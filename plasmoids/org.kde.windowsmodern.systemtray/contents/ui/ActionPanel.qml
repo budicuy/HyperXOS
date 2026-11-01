@@ -25,6 +25,7 @@ ColumnLayout {
     id: actionPanel
 
     signal requestPage(string name)
+    signal requestClosePopup()
 
     readonly property real scale: Plasmoid.configuration.scale / 100
     property int currentPage: 0
@@ -57,10 +58,10 @@ ColumnLayout {
 
     readonly property var defaultOrder: [
         "network", "bluetooth", "airplane", "battery", "nightlight", "colorscheme",
-        "dnd", "micmute", "hotspot", "inhibitsleep", "screenshot", "hyperxtools",
-        "display", "taskmanager", "vault", "weather", "soundsettings", "accessibility",
-        "gamemode", "clipboard", "screenrecord", "colorpicker", "magnifier", "calculator",
-        "terminal", "emojipicker", "lockscreen", "touchpad"
+        "dnd", "micmute", "inhibitsleep", "screenshot", "screenrecord", "calculator",
+        "hyperxtools", "display", "taskmanager", "vault", "weather", "soundsettings",
+        "accessibility", "clipboard", "colorpicker", "magnifier", "terminal",
+        "emojipicker", "lockscreen", "touchpad"
     ]
 
     readonly property var tileMeta: ({
@@ -72,7 +73,6 @@ ColumnLayout {
         "colorscheme":   { "label": qsTr("Dark Mode"),     "icon": "weather-clear-night-symbolic" },
         "dnd":           { "label": qsTr("Do Not Disturb"),"icon": "notifications-disabled-symbolic" },
         "micmute":       { "label": qsTr("Mic Mute"),      "icon": "audio-input-microphone-muted-symbolic" },
-        "hotspot":       { "label": qsTr("Hotspot"),       "icon": "network-wireless-hotspot-symbolic" },
         "inhibitsleep":  { "label": qsTr("No Sleep"),      "icon": "system-suspend-inhibited-symbolic" },
         "screenshot":    { "label": qsTr("Snipping Tool"), "icon": "edit-cut-symbolic" },
         "hyperxtools":   { "label": qsTr("HyperX Hub"),    "icon": "preferences-system-symbolic" },
@@ -82,7 +82,6 @@ ColumnLayout {
         "weather":       { "label": qsTr("Weather"),       "icon": "weather-clouds-symbolic" },
         "soundsettings": { "label": qsTr("Sound Mixer"),   "icon": "audio-volume-high-symbolic" },
         "accessibility": { "label": qsTr("Accessibility"), "icon": "accessibility-symbolic" },
-        "gamemode":      { "label": qsTr("Game Mode"),     "icon": "input-gaming-symbolic" },
         "clipboard":     { "label": qsTr("Clipboard"),     "icon": "edit-paste-symbolic" },
         "screenrecord":  { "label": qsTr("Screen Record"), "icon": "media-record-symbolic" },
         "colorpicker":   { "label": qsTr("Color Picker"),  "icon": "color-picker-symbolic" },
@@ -110,7 +109,6 @@ ColumnLayout {
         case "colorscheme": return Plasmoid.configuration.showColorScheme;
         case "dnd": return Plasmoid.configuration.showDnd;
         case "micmute": return Plasmoid.configuration.showMicMute;
-        case "hotspot": return Plasmoid.configuration.showHotspot;
         case "inhibitsleep": return Plasmoid.configuration.showInhibitSleep;
         case "screenshot": return Plasmoid.configuration.showScreenshot;
         case "hyperxtools": return Plasmoid.configuration.showHyperXTools;
@@ -120,7 +118,6 @@ ColumnLayout {
         case "weather": return Plasmoid.configuration.showWeather;
         case "soundsettings": return Plasmoid.configuration.showSoundSettings;
         case "accessibility": return Plasmoid.configuration.showAccessibility;
-        case "gamemode": return Plasmoid.configuration.showGameMode;
         case "clipboard": return Plasmoid.configuration.showClipboard;
         case "screenrecord": return Plasmoid.configuration.showScreenRecord;
         case "colorpicker": return Plasmoid.configuration.showColorPicker;
@@ -147,7 +144,6 @@ ColumnLayout {
         case "colorscheme": Plasmoid.configuration.showColorScheme = val; break;
         case "dnd": Plasmoid.configuration.showDnd = val; break;
         case "micmute": Plasmoid.configuration.showMicMute = val; break;
-        case "hotspot": Plasmoid.configuration.showHotspot = val; break;
         case "inhibitsleep": Plasmoid.configuration.showInhibitSleep = val; break;
         case "screenshot": Plasmoid.configuration.showScreenshot = val; break;
         case "hyperxtools": Plasmoid.configuration.showHyperXTools = val; break;
@@ -157,7 +153,6 @@ ColumnLayout {
         case "weather": Plasmoid.configuration.showWeather = val; break;
         case "soundsettings": Plasmoid.configuration.showSoundSettings = val; break;
         case "accessibility": Plasmoid.configuration.showAccessibility = val; break;
-        case "gamemode": Plasmoid.configuration.showGameMode = val; break;
         case "clipboard": Plasmoid.configuration.showClipboard = val; break;
         case "screenrecord": Plasmoid.configuration.showScreenRecord = val; break;
         case "colorpicker": Plasmoid.configuration.showColorPicker = val; break;
@@ -256,25 +251,23 @@ ColumnLayout {
     Component { id: compColorscheme; Components.ColorSchemeToggle {} }
     Component { id: compDnd; Components.DndToggle { onArrowClicked: actionPanel.requestPage("notifications") } }
     Component { id: compMicmute; Components.MicMuteToggle {} }
-    Component { id: compHotspot; Components.HotspotToggle {} }
     Component { id: compInhibitsleep; Components.InhibitSleepToggle {} }
-    Component { id: compScreenshot; Components.ScreenshotToggle {} }
-    Component { id: compHyperxtools; Components.HyperXToolsToggle {} }
-    Component { id: compDisplay; Components.DisplayConfigToggle { onArrowClicked: actionPanel.requestPage("display") } }
-    Component { id: compTaskmanager; Components.TaskManagerToggle {} }
-    Component { id: compVault; Components.VaultToggle { onArrowClicked: actionPanel.requestPage("vault") } }
+    Component { id: compScreenshot; Components.ScreenshotToggle { onClicked: actionPanel.requestClosePopup(); onRightClicked: actionPanel.requestClosePopup() } }
+    Component { id: compHyperxtools; Components.HyperXToolsToggle { onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compDisplay; Components.DisplayConfigToggle { onArrowClicked: actionPanel.requestPage("display"); onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compTaskmanager; Components.TaskManagerToggle { onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compVault; Components.VaultToggle { onArrowClicked: actionPanel.requestPage("vault"); onClicked: actionPanel.requestPage("vault") } }
     Component { id: compWeather; Components.WeatherToggle { onArrowClicked: actionPanel.requestPage("weather"); onClicked: actionPanel.requestPage("weather") } }
-    Component { id: compSoundsettings; Components.SoundSettingsToggle { onArrowClicked: actionPanel.requestPage("volume") } }
-    Component { id: compAccessibility; Components.AccessibilityToggle {} }
-    Component { id: compGamemode; Components.GameModeToggle {} }
+    Component { id: compSoundsettings; Components.SoundSettingsToggle { onArrowClicked: actionPanel.requestPage("volume"); onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compAccessibility; Components.AccessibilityToggle { onClicked: actionPanel.requestClosePopup() } }
     Component { id: compClipboard; Components.ClipboardToggle { onArrowClicked: actionPanel.requestPage("clipboard"); onClicked: actionPanel.requestPage("clipboard") } }
     Component { id: compScreenrecord; Components.ScreenRecordToggle {} }
-    Component { id: compColorpicker; Components.ColorPickerToggle {} }
+    Component { id: compColorpicker; Components.ColorPickerToggle { onClicked: actionPanel.requestClosePopup() } }
     Component { id: compMagnifier; Components.MagnifierToggle {} }
-    Component { id: compCalculator; Components.CalculatorToggle {} }
-    Component { id: compTerminal; Components.TerminalToggle {} }
-    Component { id: compEmojipicker; Components.EmojiPickerToggle {} }
-    Component { id: compLockscreen; Components.LockScreenToggle {} }
+    Component { id: compCalculator; Components.CalculatorToggle { onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compTerminal; Components.TerminalToggle { onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compEmojipicker; Components.EmojiPickerToggle { onClicked: actionPanel.requestClosePopup() } }
+    Component { id: compLockscreen; Components.LockScreenToggle { onClicked: actionPanel.requestClosePopup() } }
     Component { id: compTouchpad; Components.TouchpadToggle {} }
 
     function getTileComponent(id) {
@@ -287,7 +280,6 @@ ColumnLayout {
         case "colorscheme": return compColorscheme;
         case "dnd": return compDnd;
         case "micmute": return compMicmute;
-        case "hotspot": return compHotspot;
         case "inhibitsleep": return compInhibitsleep;
         case "screenshot": return compScreenshot;
         case "hyperxtools": return compHyperxtools;
@@ -297,7 +289,6 @@ ColumnLayout {
         case "weather": return compWeather;
         case "soundsettings": return compSoundsettings;
         case "accessibility": return compAccessibility;
-        case "gamemode": return compGamemode;
         case "clipboard": return compClipboard;
         case "screenrecord": return compScreenrecord;
         case "colorpicker": return compColorpicker;

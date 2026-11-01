@@ -25,7 +25,7 @@ immutability=1
 lastScreen=0
 location=4
 plugin=org.kde.panel
-thickness=48
+thickness=40
 
 [Containments][2][Applets][3]
 immutability=1

@@ -199,14 +199,12 @@ ecm_target_qml_sources(org.kde.windowsmodern.systemtray
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/DndToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/ColorSchemeToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/MicMuteToggle.qml
-        ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/HotspotToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/InhibitSleepToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/ScreenshotToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/HyperXToolsToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/TaskManagerToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/SoundSettingsToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/AccessibilityToggle.qml
-        ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/GameModeToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/ClipboardToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/ScreenRecordToggle.qml
         ${CMAKE_CURRENT_SOURCE_DIR}/contents/ui/components/ColorPickerToggle.qml

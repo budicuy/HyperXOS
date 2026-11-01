@@ -20,7 +20,6 @@ KCMUtils.ScrollViewKCM {
     property bool cfg_showColorScheme: true
     property bool cfg_showDnd: true
     property bool cfg_showMicMute: true
-    property bool cfg_showHotspot: true
     property bool cfg_showInhibitSleep: true
     property bool cfg_showScreenshot: true
     property bool cfg_showHyperXTools: true
@@ -30,7 +29,6 @@ KCMUtils.ScrollViewKCM {
     property bool cfg_showWeather: true
     property bool cfg_showSoundSettings: true
     property bool cfg_showAccessibility: true
-    property bool cfg_showGameMode: true
     property bool cfg_showClipboard: true
     property bool cfg_showScreenRecord: true
     property bool cfg_showColorPicker: true
@@ -42,42 +40,40 @@ KCMUtils.ScrollViewKCM {
     property bool cfg_showTouchpad: true
 
     readonly property var allTilesMeta: ({
-        "network":       { "name": i18n("Network (Wi-Fi / LAN)"), "icon": "network-wireless" },
-        "bluetooth":     { "name": i18n("Bluetooth"),             "icon": "bluetooth" },
-        "airplane":      { "name": i18n("Airplane Mode"),         "icon": "airplane-mode" },
+        "network":       { "name": i18n("Network (Wi-Fi / LAN)"), "icon": "network-wireless-symbolic" },
+        "bluetooth":     { "name": i18n("Bluetooth"),             "icon": "preferences-system-bluetooth-symbolic" },
+        "airplane":      { "name": i18n("Airplane Mode"),         "icon": "network-flightmode-on-symbolic" },
         "battery":       { "name": i18n("Power Mode / Battery"),  "icon": "battery-profile-balanced-symbolic" },
         "nightlight":    { "name": i18n("Night Light"),           "icon": "redshift-status-on-symbolic" },
-        "colorscheme":   { "name": i18n("Dark / Light Mode"),     "icon": "contrast" },
-        "dnd":           { "name": i18n("Do Not Disturb / Notif"),"icon": "notifications" },
-        "micmute":       { "name": i18n("Microphone Mute"),       "icon": "audio-input-microphone-muted" },
-        "hotspot":       { "name": i18n("Mobile Hotspot"),        "icon": "network-wireless-hotspot" },
-        "inhibitsleep":  { "name": i18n("No Sleep (Inhibit)"),    "icon": "system-lock-screen" },
-        "screenshot":    { "name": i18n("Snipping Tool"),         "icon": "accessories-screenshot-tool" },
-        "hyperxtools":   { "name": i18n("HyperX Control Hub"),    "icon": "preferences-system" },
-        "display":       { "name": i18n("Display / Project"),     "icon": "video-display" },
-        "taskmanager":   { "name": i18n("Task Manager"),          "icon": "utilities-system-monitor" },
-        "vault":         { "name": i18n("Plasma Vaults"),         "icon": "plasmavault" },
-        "weather":       { "name": i18n("Weather"),               "icon": "weather-clouds" },
-        "soundsettings": { "name": i18n("Sound Mixer"),           "icon": "audio-volume-high" },
-        "accessibility": { "name": i18n("Accessibility"),         "icon": "preferences-desktop-accessibility" },
-        "gamemode":      { "name": i18n("Game Mode"),             "icon": "input-gaming" },
-        "clipboard":     { "name": i18n("Clipboard History"),     "icon": "klipper" },
-        "screenrecord":  { "name": i18n("Screen Recorder"),       "icon": "media-record" },
-        "colorpicker":   { "name": i18n("Color Picker"),          "icon": "color-picker" },
-        "magnifier":     { "name": i18n("Magnifier / Zoom"),      "icon": "zoom-in" },
-        "calculator":    { "name": i18n("Calculator"),            "icon": "accessories-calculator" },
-        "terminal":      { "name": i18n("Terminal (Konsole)"),    "icon": "utilities-terminal" },
-        "emojipicker":   { "name": i18n("Emoji Picker"),          "icon": "preferences-desktop-emoticons" },
-        "lockscreen":    { "name": i18n("Lock Screen"),           "icon": "system-lock-screen" },
-        "touchpad":      { "name": i18n("Touchpad (Auto-Detect)"),"icon": "input-touchpad" }
+        "colorscheme":   { "name": i18n("Dark / Light Mode"),     "icon": "weather-clear-night-symbolic" },
+        "dnd":           { "name": i18n("Do Not Disturb / Notif"),"icon": "notifications-disabled-symbolic" },
+        "micmute":       { "name": i18n("Microphone Mute"),       "icon": "audio-input-microphone-muted-symbolic" },
+        "inhibitsleep":  { "name": i18n("No Sleep (Inhibit)"),    "icon": "system-suspend-inhibited-symbolic" },
+        "screenshot":    { "name": i18n("Snipping Tool"),         "icon": "edit-cut-symbolic" },
+        "hyperxtools":   { "name": i18n("HyperX Control Hub"),    "icon": "preferences-system-symbolic" },
+        "display":       { "name": i18n("Display / Project"),     "icon": "video-display-symbolic" },
+        "taskmanager":   { "name": i18n("Task Manager"),          "icon": "speedometer" },
+        "vault":         { "name": i18n("Plasma Vaults"),         "icon": "folder-locked-symbolic" },
+        "weather":       { "name": i18n("Weather"),               "icon": "weather-clouds-symbolic" },
+        "soundsettings": { "name": i18n("Sound Mixer"),           "icon": "audio-volume-high-symbolic" },
+        "accessibility": { "name": i18n("Accessibility"),         "icon": "accessibility-symbolic" },
+        "clipboard":     { "name": i18n("Clipboard History"),     "icon": "edit-paste-symbolic" },
+        "screenrecord":  { "name": i18n("Screen Recorder"),       "icon": "media-record-symbolic" },
+        "colorpicker":   { "name": i18n("Color Picker"),          "icon": "color-picker-symbolic" },
+        "magnifier":     { "name": i18n("Magnifier / Zoom"),      "icon": "zoom-in-symbolic" },
+        "calculator":    { "name": i18n("Calculator"),            "icon": "accessories-calculator-symbolic" },
+        "terminal":      { "name": i18n("Terminal (Konsole)"),    "icon": "utilities-terminal-symbolic" },
+        "emojipicker":   { "name": i18n("Emoji Picker"),          "icon": "face-smile-symbolic" },
+        "lockscreen":    { "name": i18n("Lock Screen"),           "icon": "system-lock-screen-symbolic" },
+        "touchpad":      { "name": i18n("Touchpad (Auto-Detect)"),"icon": "input-touchpad-symbolic" }
     })
 
     readonly property var defaultOrder: [
         "network", "bluetooth", "airplane", "battery", "nightlight", "colorscheme",
-        "dnd", "micmute", "hotspot", "inhibitsleep", "screenshot", "hyperxtools",
-        "display", "taskmanager", "vault", "weather", "soundsettings", "accessibility",
-        "gamemode", "clipboard", "screenrecord", "colorpicker", "magnifier", "calculator",
-        "terminal", "emojipicker", "lockscreen", "touchpad"
+        "dnd", "micmute", "inhibitsleep", "screenshot", "screenrecord", "calculator",
+        "hyperxtools", "display", "taskmanager", "vault", "weather", "soundsettings",
+        "accessibility", "clipboard", "colorpicker", "magnifier", "terminal",
+        "emojipicker", "lockscreen", "touchpad"
     ]
 
     property var workingOrder: []
@@ -136,7 +132,6 @@ KCMUtils.ScrollViewKCM {
         case "colorscheme": return cfg_showColorScheme;
         case "dnd": return cfg_showDnd;
         case "micmute": return cfg_showMicMute;
-        case "hotspot": return cfg_showHotspot;
         case "inhibitsleep": return cfg_showInhibitSleep;
         case "screenshot": return cfg_showScreenshot;
         case "hyperxtools": return cfg_showHyperXTools;
@@ -146,7 +141,6 @@ KCMUtils.ScrollViewKCM {
         case "weather": return cfg_showWeather;
         case "soundsettings": return cfg_showSoundSettings;
         case "accessibility": return cfg_showAccessibility;
-        case "gamemode": return cfg_showGameMode;
         case "clipboard": return cfg_showClipboard;
         case "screenrecord": return cfg_showScreenRecord;
         case "colorpicker": return cfg_showColorPicker;
@@ -170,7 +164,6 @@ KCMUtils.ScrollViewKCM {
         case "colorscheme": cfg_showColorScheme = val; break;
         case "dnd": cfg_showDnd = val; break;
         case "micmute": cfg_showMicMute = val; break;
-        case "hotspot": cfg_showHotspot = val; break;
         case "inhibitsleep": cfg_showInhibitSleep = val; break;
         case "screenshot": cfg_showScreenshot = val; break;
         case "hyperxtools": cfg_showHyperXTools = val; break;
@@ -180,7 +173,6 @@ KCMUtils.ScrollViewKCM {
         case "weather": cfg_showWeather = val; break;
         case "soundsettings": cfg_showSoundSettings = val; break;
         case "accessibility": cfg_showAccessibility = val; break;
-        case "gamemode": cfg_showGameMode = val; break;
         case "clipboard": cfg_showClipboard = val; break;
         case "screenrecord": cfg_showScreenRecord = val; break;
         case "colorpicker": cfg_showColorPicker = val; break;

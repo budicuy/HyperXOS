@@ -22,8 +22,8 @@ Lib.Tile {
     }
 
     onClicked: {
-        execEngine.run("kcalc &");
+        execEngine.run("(command -v kcalc >/dev/null 2>&1 && kcalc || plasmawindowed org.kde.plasma.calculator) >/dev/null 2>&1 &");
     }
 
-    tooltipText: qsTr("Open Calculator (KCalc)")
+    tooltipText: qsTr("Open Calculator")
 }

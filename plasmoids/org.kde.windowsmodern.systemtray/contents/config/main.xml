@@ -54,7 +54,7 @@
       <max>150</max>
     </entry>
     <entry name="tilesOrder" type="StringList">
-      <default>network,bluetooth,airplane,battery,nightlight,colorscheme,dnd,micmute,hotspot,inhibitsleep,screenshot,hyperxtools,display,taskmanager,vault,weather,soundsettings,accessibility,gamemode,clipboard,screenrecord,colorpicker,magnifier,calculator,terminal,emojipicker,lockscreen,touchpad</default>
+      <default>network,bluetooth,airplane,battery,nightlight,colorscheme,dnd,micmute,inhibitsleep,screenshot,screenrecord,calculator,hyperxtools,display,taskmanager,vault,weather,soundsettings,accessibility,clipboard,colorpicker,magnifier,terminal,emojipicker,lockscreen,touchpad</default>
     </entry>
     <entry name="showVolume" type="Bool">
       <default>true</default>
@@ -86,9 +86,6 @@
     <entry name="showMicMute" type="Bool">
       <default>true</default>
     </entry>
-    <entry name="showHotspot" type="Bool">
-      <default>true</default>
-    </entry>
     <entry name="showInhibitSleep" type="Bool">
       <default>true</default>
     </entry>
@@ -114,9 +111,6 @@
       <default>true</default>
     </entry>
     <entry name="showAccessibility" type="Bool">
-      <default>true</default>
-    </entry>
-    <entry name="showGameMode" type="Bool">
       <default>true</default>
     </entry>
     <entry name="showClipboard" type="Bool">

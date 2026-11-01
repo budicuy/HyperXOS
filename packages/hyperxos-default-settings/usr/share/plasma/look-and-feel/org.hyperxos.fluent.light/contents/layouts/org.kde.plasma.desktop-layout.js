@@ -9,7 +9,7 @@ for (var j = 0; j < desktopsArray.length; j++) {
 // Recreate HyperXOS Windows 11 Centered Floating Panel if layout is applied
 var panel = new Panel("org.kde.panel");
 panel.location = "bottom";
-panel.height = 48;
+panel.height = 40;
 panel.floating = true;
 
 var leftSpacer = panel.addWidget("org.kde.plasma.panelspacer");

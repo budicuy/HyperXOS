@@ -22,11 +22,11 @@ Lib.Tile {
     }
 
     onClicked: {
-        execEngine.run("spectacle -r || spectacle &");
+        execEngine.run("(sleep 0.15 && (spectacle -r || spectacle)) >/dev/null 2>&1 &");
     }
 
     onRightClicked: {
-        execEngine.run("spectacle &");
+        execEngine.run("(sleep 0.15 && spectacle) >/dev/null 2>&1 &");
     }
 
     tooltipText: qsTr("Snipping Tool — Capture Screen Region")
